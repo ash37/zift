@@ -1,0 +1,2 @@
+module UnavailabilityRequestsHelper
+end

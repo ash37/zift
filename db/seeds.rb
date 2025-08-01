@@ -7,3 +7,19 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+location = Location.create!(
+  name: "Head Office",
+  address: "123 Admin Way",
+  latitude: 0.0,
+  longitude: 0.0,
+  allowed_radius: 100
+)
+
+User.create!(
+  name: "Test Admin",
+  email: "admin@example.com",
+  password: "password",
+  password_confirmation: "password",
+  role: :admin,
+  location: location
+)

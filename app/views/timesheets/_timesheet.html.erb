@@ -1,0 +1,26 @@
+<div id="<%= dom_id timesheet %>" class="w-full sm:w-auto my-5 space-y-5">
+  <div>
+    <strong class="block font-medium mb-1">User:</strong>
+    <%= timesheet.user_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Shift:</strong>
+    <%= timesheet.shift_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Clock in at:</strong>
+    <%= timesheet.clock_in_at %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Clock out at:</strong>
+    <%= timesheet.clock_out_at %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Duration:</strong>
+    <%= timesheet.duration %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Status:</strong>
+    <%= timesheet.status %>
+  </div>
+</div>
