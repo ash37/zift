@@ -1,29 +1,70 @@
 <% content_for :title, "Users" %>
 
-<div class="w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
-
-  <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Users</h1>
-    <%= link_to "New user", new_user_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+<section class="container px-4 py-4 mx-auto">
+  <div class="flex items-center gap-x-3">
+    <h2 class="text-lg font-medium text-gray-800 dark:text-white">Team members</h2>
+    <span class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400"><%= pluralize(@users.count, 'user') %></span>
   </div>
 
-  <div id="users" class="min-w-full divide-y divide-gray-200 space-y-5">
-    <% if @users.any? %>
-      <% @users.each do |user| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render user %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", user, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_user_path(user), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= button_to "Destroy", user, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
-          </div>
+  <div class="flex justify-end mt-4">
+    <%= link_to "New user", admin_new_user_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
+
+  </div>
+
+  <div class="flex flex-col mt-6">
+    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
+                  Name
+                </th>
+                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
+                  Email
+                </th>
+                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
+                  Role
+                </th>
+                <th scope="col" class="relative py-3.5 px-4">
+                  <span class="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+              <% @users.each do |user| %>
+                <tr>
+                  <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                    <div class="flex items-center gap-x-2">
+                      <div>
+                        <h2 class="font-medium text-gray-800 dark:text-white"><%= user.name %></h2>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= user.email %></td>
+                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= user.role_name %>
+</td>
+                  <td class="px-4 py-4 text-sm whitespace-nowrap">
+                    <div class="flex items-center gap-x-3">
+                      <%= link_to edit_user_path(user), class: "text-gray-500 hover:text-yellow-500" do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                        </svg>
+                      <% end %>
+                      <%= button_to user, method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-gray-500 hover:text-red-500" do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916" />
+                        </svg>
+                      <% end %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
         </div>
-      <% end %>
-    <% else %>
-      <p class="text-center my-10">No users found.</p>
-    <% end %>
+      </div>
+    </div>
   </div>
-</div>
+</section>

@@ -6,10 +6,20 @@ Rails.application.routes.draw do
   get "dashboards", to: "dashboards#index"
 
   # Devise authentication
-  devise_for :users
+  devise_for :users, skip: [:registrations]
+
+  # Allow self-registration (optional, only if needed)
+  as :user do
+    get   "users/sign_up", to: "devise/registrations#new",    as: :new_user_registration
+    post  "users",         to: "devise/registrations#create", as: :user_registration
+  end
+
+  # Admin-managed user creation (separate from Devise)
+  get  "users/new",    to: "users#new",    as: :admin_new_user
+  post "users/create", to: "users#create", as: :admin_create_user
 
   # Core resources
-  resources :users
+  resources :users, except: [:new, :create]
   resources :locations
   resources :shifts
   resources :recurrences
@@ -17,11 +27,11 @@ Rails.application.routes.draw do
   resources :unavailability_requests
 
   resources :rosters do
-  member do
-    post :publish
-    post :copy_previous_week
+    member do
+      post :publish
+      post :copy_previous_week
+    end
   end
-end
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
@@ -30,4 +40,3 @@ end
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 end
-

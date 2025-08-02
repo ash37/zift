@@ -1,37 +1,68 @@
-<%= form_with(model: user, class: "contents") do |form| %>
-  <% if user.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
+<section class="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800">
+  <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white">Add Employee</h2>
 
-      <ul class="list-disc ml-6">
-        <% user.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+  <%= form_with(
+  model: user,
+  url: user.persisted? ? user_path(user) : admin_create_user_path,
+  method: user.persisted? ? :patch : :post,
+  class: "mt-6"
+) do |form| %>
+
+    
+    <% if user.errors.any? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mb-6">
+        <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
+        <ul class="list-disc ml-6 mt-2">
+          <% user.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div>
+        <%= form.label :name, class: "text-gray-700 dark:text-gray-200" %>
+        <%= form.text_field :name, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+      </div>
+
+      <div>
+        <%= form.label :email, "Email Address", class: "text-gray-700 dark:text-gray-200" %>
+        <%= form.email_field :email, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+      </div>
+
+      <% if user.new_record? %>
+        <div>
+          <%= form.label :password, class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.password_field :password, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+        </div>
+
+        <div>
+          <%= form.label :password_confirmation, "Password Confirmation", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.password_field :password_confirmation, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+        </div>
+      <% end %>
+
+      <% if user.new_record? || current_user.role_admin? %>
+        <div>
+          <%= form.label :role, "Role", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.select :role,
+              User::ROLES.map { |key, val| [key.to_s.titleize, val] },
+              { prompt: "Select role" },
+              class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :location_id, "Location", class: "text-gray-700 dark:text-gray-200" %>
+        <%= form.collection_select :location_id, Location.all, :id, :name, { prompt: "Select location" },
+              class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-6 gap-4 flex-wrap">
+      <%= form.submit "Save", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600" %>
+      <%= link_to "Back to users", users_path, class: "px-8 py-2.5 leading-5 text-gray-700 transition-colors duration-300 transform bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" %>
     </div>
   <% end %>
-
-  <div class="my-5">
-    <%= form.label :name %>
-    <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": user.errors[:name].none?, "border-red-400 focus:outline-red-600": user.errors[:name].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :email %>
-    <%= form.text_field :email, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": user.errors[:email].none?, "border-red-400 focus:outline-red-600": user.errors[:email].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :role %>
-    <%= form.number_field :role, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": user.errors[:role].none?, "border-red-400 focus:outline-red-600": user.errors[:role].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :location_id %>
-    <%= form.text_field :location_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": user.errors[:location_id].none?, "border-red-400 focus:outline-red-600": user.errors[:location_id].any?}] %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
-  </div>
-<% end %>
+</section>

@@ -1,8 +1,33 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-  # enum role: { employee: 0, manager: 1, admin: 2 }
+
   belongs_to :location, optional: true
+
+  ROLES = {
+    employee: 0,
+    manager: 1,
+    admin: 2
+  }.freeze
+
+  def role_name
+    ROLES.key(role)&.to_s&.titleize || "—"
+  end
+
+  def admin?
+    role == ROLES[:admin]
+  end
+
+  def manager?
+    role == ROLES[:manager]
+  end
+
+  def employee?
+    role == ROLES[:employee]
+  end
+
+  # Used in views to allow role assignment only for admins
+  def role_admin?
+    admin?
+  end
 end
