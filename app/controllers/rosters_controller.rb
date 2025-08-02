@@ -1,14 +1,14 @@
 class RostersController < ApplicationController
-  before_action :set_roster, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!
+  before_action :set_roster, only: %i[show edit update destroy publish copy_previous_week]
 
-  # GET /rosters or /rosters.json
+  # GET /rosters
   def index
     @rosters = Roster.all
   end
 
-  # GET /rosters/1 or /rosters/1.json
-  def show
-  end
+  # GET /rosters/1
+  def show; end
 
   # GET /rosters/new
   def new
@@ -16,10 +16,9 @@ class RostersController < ApplicationController
   end
 
   # GET /rosters/1/edit
-  def edit
-  end
+  def edit; end
 
-  # POST /rosters or /rosters.json
+  # POST /rosters
   def create
     @roster = Roster.new(roster_params)
 
@@ -34,7 +33,7 @@ class RostersController < ApplicationController
     end
   end
 
-  # PATCH/PUT /rosters/1 or /rosters/1.json
+  # PATCH/PUT /rosters/1
   def update
     respond_to do |format|
       if @roster.update(roster_params)
@@ -47,24 +46,47 @@ class RostersController < ApplicationController
     end
   end
 
-  # DELETE /rosters/1 or /rosters/1.json
+  # DELETE /rosters/1
   def destroy
     @roster.destroy!
-
     respond_to do |format|
       format.html { redirect_to rosters_path, status: :see_other, notice: "Roster was successfully destroyed." }
       format.json { head :no_content }
     end
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_roster
-      @roster = Roster.find(params.expect(:id))
-    end
+  # POST /rosters/:id/publish
+  def publish
+    @roster.update(status: Roster::STATUSES[:published])
+    redirect_to @roster, notice: "Roster published."
+  end
 
-    # Only allow a list of trusted parameters through.
-    def roster_params
-      params.expect(roster: [ :starts_on, :status ])
+  # POST /rosters/:id/copy_previous_week
+  def copy_previous_week
+    previous_roster = Roster.where(starts_on: @roster.starts_on - 7).first
+
+    if previous_roster.present?
+      previous_roster.shifts.each do |shift|
+        @roster.shifts.create!(
+          user_id: shift.user_id,
+          location_id: shift.location_id,
+          start_time: shift.start_time + 7.days,
+          end_time: shift.end_time + 7.days
+        )
+      end
+      redirect_to @roster, notice: "Previous week's shifts copied."
+    else
+      redirect_to @roster, alert: "No previous roster found."
     end
+  end
+
+  private
+
+  def set_roster
+    @roster = Roster.find(params[:id])
+  end
+
+  def roster_params
+    params.require(:roster).permit(:starts_on, :status)
+  end
 end

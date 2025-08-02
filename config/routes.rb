@@ -15,7 +15,13 @@ Rails.application.routes.draw do
   resources :recurrences
   resources :timesheets
   resources :unavailability_requests
-  resources :rosters
+
+  resources :rosters do
+  member do
+    post :publish
+    post :copy_previous_week
+  end
+end
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check

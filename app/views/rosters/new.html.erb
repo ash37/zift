@@ -1,9 +1,24 @@
-<% content_for :title, "New roster" %>
+<h1 class="text-3xl font-bold mb-6">Create New Roster</h1>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">New roster</h1>
+<%= form_with model: @roster, local: true, class: "space-y-6 max-w-lg" do |form| %>
+  <div>
+    <%= form.label :starts_on, "Week Starting (Monday)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= form.date_field :starts_on, required: true, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
 
-  <%= render "form", roster: @roster %>
+  <div>
+    <%= form.label :status, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= form.select :status,
+      Roster::STATUSES.map { |key, val| [key.to_s.humanize, val] },
+      { selected: @roster.status || Roster::STATUSES[:draft] },
+      class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
 
-  <%= link_to "Back to rosters", rosters_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+  <div>
+    <%= form.submit "Create Roster", class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md shadow" %>
+  </div>
+<% end %>
+
+<div class="mt-4">
+  <%= link_to "← Back to Rosters", rosters_path, class: "text-sm text-blue-600 hover:underline" %>
 </div>

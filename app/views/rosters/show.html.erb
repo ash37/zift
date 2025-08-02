@@ -1,15 +1,77 @@
-<% content_for :title, "Showing roster" %>
+<h1 class="text-2xl font-bold mb-4">
+  Roster: Week of <%= @roster.starts_on.strftime('%b %d, %Y') %>
+</h1>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<p class="mb-4">
+  Status:
+  <span class="inline-block px-2 py-1 rounded text-white text-sm <%= @roster.draft? ? 'bg-yellow-500' : 'bg-green-600' %>">
+    <%= @roster.status_label %>
+  </span>
+</p>
 
-  <h1 class="font-bold text-4xl">Showing roster</h1>
+<% if @roster.draft? %>
+  <div class="mb-6 flex gap-3">
+    <%= button_to "Copy Previous Week", copy_previous_week_roster_path(@roster), method: :post, class: "bg-gray-200 hover:bg-gray-300 text-sm px-4 py-2 rounded-md" %>
+    <%= button_to "Publish Roster", publish_roster_path(@roster), method: :post, class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm" %>
+  </div>
+<% end %>
 
-  <%= render @roster %>
+<table class="w-full border border-gray-300 text-sm">
+  <thead>
+    <tr>
+      <th class="bg-gray-100 text-left p-2 border border-gray-300">Employee</th>
+      <% 7.times do |i| %>
+        <th class="bg-gray-100 text-center p-2 border border-gray-300">
+          <%= (@roster.starts_on + i.days).strftime("%a %d") %>
+        </th>
+      <% end %>
+    </tr>
+  </thead>
 
-  <%= link_to "Edit this roster", edit_roster_path(@roster), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to rosters", rosters_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this roster", @roster, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+  <tbody>
+    <% User.all.each do |user| %>
+      <tr>
+        <td class="font-medium p-2 border border-gray-300"><%= user.name %></td>
+        <% 7.times do |i| %>
+          <% date = @roster.starts_on + i.days %>
+          <td id="roster_day_<%= user.id %>_<%= date %>" class="align-top p-2 border border-gray-300 hover:bg-gray-50 group relative">
+            <% shifts = Shift.where(roster: @roster, user: user).where("DATE(start_time) = ?", date) %>
+
+            <% if shifts.any? %>
+              <% shifts.each do |shift| %>
+                <div class="bg-blue-100 rounded px-2 py-1 mb-1">
+                  <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %>
+<br>
+                  <%= shift.location&.name || "No location" %>
+                </div>
+              <% end %>
+            <% elsif @roster.draft? %>
+              <div class="relative w-full h-full">
+  <!-- Keeps the cell height consistent -->
+  <span class="invisible select-none">—</span>
+
+  <div class="absolute inset-0 flex items-start justify-center pt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+    <%= link_to new_shift_path(user_id: user.id, roster_id: @roster.id, date: date),
+        data: { turbo_frame: "assign_shift_modal" },
+        class: "pointer-events-auto" do %>
+      <span class="inline-block p-2 text-blue-600 bg-blue-100 rounded-full shadow hover:bg-blue-200 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+        </svg>
+      </span>
+    <% end %>
+  </div>
 </div>
+
+              </div>
+            <% else %>
+              <span class="text-gray-400 italic">No shift</span>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<turbo-frame id="assign_shift_modal"></turbo-frame>

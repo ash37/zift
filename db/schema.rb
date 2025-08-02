@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_01_112652) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_02_001416) do
   create_table "locations", force: :cascade do |t|
     t.string "name"
     t.string "address"
@@ -48,6 +48,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_01_112652) do
     t.index ["location_id"], name: "index_shifts_on_location_id"
     t.index ["roster_id"], name: "index_shifts_on_roster_id"
     t.index ["user_id"], name: "index_shifts_on_user_id"
+  end
+
+  create_table "test_enums", force: :cascade do |t|
+    t.integer "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "timesheets", force: :cascade do |t|
