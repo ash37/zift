@@ -25,18 +25,31 @@ class ShiftsController < ApplicationController
 
   # POST /shifts (Turbo or full HTML)
   def create
-    @shift = Shift.new(shift_params)
+  # Extract the date from the permitted parameters.
+  # We use .to_s to ensure it's a string before parsing, preventing errors if it's nil.
+  shift_date = Date.parse(shift_params[:date].to_s)
 
-    respond_to do |format|
-      if @shift.save
-        format.turbo_stream
-        format.html { redirect_to roster_path(@shift.roster_id), notice: "Shift created." }
-      else
-        format.turbo_stream { render partial: "form_modal", status: :unprocessable_entity, locals: { shift: @shift } }
-        format.html { render :new, status: :unprocessable_entity }
-      end
+  # Create a new shift instance, but exclude the :date attribute to prevent an error,
+  # as the Shift model does not have a 'date' column in the database.
+  @shift = Shift.new(shift_params.except(:date))
+
+  # Manually combine the selected date with the start and end times from the form.
+  # The .change method updates the date components of the timestamp while preserving the time.
+  @shift.start_time = @shift.start_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
+  @shift.end_time = @shift.end_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
+
+  respond_to do |format|
+    if @shift.save
+      # If the shift saves successfully, respond with the appropriate format.
+      format.turbo_stream
+      format.html { redirect_to roster_path(@shift.roster_id), notice: "Shift created." }
+    else
+      # If there are validation errors, re-render the form so the user can see them.
+      format.turbo_stream { render partial: "form_modal", status: :unprocessable_entity, locals: { shift: @shift } }
+      format.html { render :new, status: :unprocessable_entity }
     end
   end
+end
 
   # PATCH/PUT /shifts/1
  def update
@@ -81,6 +94,6 @@ class ShiftsController < ApplicationController
   end
 
   def shift_params
-    params.require(:shift).permit(:user_id, :location_id, :roster_id, :start_time, :end_time, :recurrence_id)
+    params.require(:shift).permit(:user_id, :location_id, :roster_id, :start_time, :end_time, :date, :recurrence_id)
   end
 end
