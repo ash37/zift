@@ -1,7 +1,5 @@
-# This partial represents a single shift. It's wrapped in a turbo_frame_tag
-# so it can be targeted and replaced by Turbo Stream updates.
-<%= turbo_frame_tag dom_id(shift) do %>
-  <div class="bg-blue-100 rounded px-2 py-1 mb-1 cursor-grab" data-id="<%= shift.id %>">
+<%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, class: "cursor-grab" do %>
+  <div class="bg-blue-100 rounded px-2 py-1 mb-1">
     <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %>
     <br>
     <%= shift.location&.name || "No location" %>
