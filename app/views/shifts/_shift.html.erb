@@ -1,26 +1,9 @@
-<div id="<%= dom_id shift %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
-    <strong class="block font-medium mb-1">User:</strong>
-    <%= shift.user_id %>
+# This partial represents a single shift. It's wrapped in a turbo_frame_tag
+# so it can be targeted and replaced by Turbo Stream updates.
+<%= turbo_frame_tag dom_id(shift) do %>
+  <div class="bg-blue-100 rounded px-2 py-1 mb-1 cursor-grab" data-id="<%= shift.id %>">
+    <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %>
+    <br>
+    <%= shift.location&.name || "No location" %>
   </div>
-  <div>
-    <strong class="block font-medium mb-1">Location:</strong>
-    <%= shift.location_id %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Roster:</strong>
-    <%= shift.roster_id %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Start time:</strong>
-    <%= shift.start_time %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">End time:</strong>
-    <%= shift.end_time %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Recurrence:</strong>
-    <%= shift.recurrence_id %>
-  </div>
-</div>
+<% end %>

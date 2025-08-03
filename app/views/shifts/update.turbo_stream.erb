@@ -1,0 +1,5 @@
+# This Turbo Stream is rendered after a shift is updated via drag-and-drop.
+# It replaces the old shift frame with the updated one in its new location.
+<%= turbo_stream.replace dom_id(@shift) do %>
+  <%= render "shifts/shift", shift: @shift %>
+<% end %>

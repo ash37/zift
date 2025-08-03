@@ -1,10 +1,8 @@
-<turbo-stream action="append" target="roster_day_<%= @shift.user_id %>_<%= @shift.start_time.to_date %>">
-  <template>
-    <div class="bg-blue-100 rounded px-2 py-1 mb-1">
-      <%= @shift.start_time.strftime("%H:%M") %> - <%= @shift.end_time.strftime("%H:%M") %><br>
-      <%= @shift.location.name %>
-    </div>
-  </template>
-</turbo-stream>
+# This Turbo Stream is for when a new shift is created via the modal.
+# It appends the new shift to the correct cell on the roster.
+<%= turbo_stream.append "roster_day_#{@shift.user_id}_#{@shift.start_time.to_date}" do %>
+  <%= render "shifts/shift", shift: @shift %>
+<% end %>
 
-<turbo-stream action="remove" target="assign_shift_modal" />
+# This part clears the modal after the form is submitted.
+<%= turbo_stream.replace "assign_shift_modal", "" %>

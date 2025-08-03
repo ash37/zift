@@ -39,15 +39,29 @@ class ShiftsController < ApplicationController
   end
 
   # PATCH/PUT /shifts/1
-  def update
-    respond_to do |format|
-      if @shift.update(shift_params)
-        format.html { redirect_to shift_path(@shift), notice: "Shift updated." }
-        format.json { render :show, status: :ok, location: @shift }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @shift.errors, status: :unprocessable_entity }
+ def update
+    # Parse the new date from the parameters sent by the Stimulus controller.
+    new_date = Date.parse(params.dig(:shift, :date))
+    
+    # Keep the original time but change the date part of start_time and end_time.
+    new_start_time = @shift.start_time.change(year: new_date.year, month: new_date.month, day: new_date.day)
+    new_end_time = @shift.end_time.change(year: new_date.year, month: new_date.month, day: new_date.day)
+
+    update_params = {
+      user_id: params.dig(:shift, :user_id),
+      start_time: new_start_time,
+      end_time: new_end_time
+    }
+
+    if @shift.update(update_params)
+      respond_to do |format|
+        # Responds with a Turbo Stream to move the shift in the UI.
+        format.turbo_stream
+        format.html { redirect_to roster_path(@shift.roster) }
       end
+    else
+      # Handle update failure, perhaps by rendering an error message.
+      head :unprocessable_entity
     end
   end
 

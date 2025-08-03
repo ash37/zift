@@ -34,38 +34,42 @@
         <td class="font-medium p-2 border border-gray-300"><%= user.name %></td>
         <% 7.times do |i| %>
           <% date = @roster.starts_on + i.days %>
-          <td id="roster_day_<%= user.id %>_<%= date %>" class="align-top p-2 border border-gray-300 hover:bg-gray-50 group relative">
+          <%# This cell is now a drop zone and a Stimulus controller host %>
+          <td id="roster_day_<%= user.id %>_<%= date %>"
+              class="align-top p-2 border border-gray-300 hover:bg-gray-50 group relative min-h-[60px]"
+              data-controller="drag"
+              data-user-id="<%= user.id %>"
+              data-date="<%= date %>">
+
             <% shifts = Shift.where(roster: @roster, user: user).where("DATE(start_time) = ?", date) %>
 
+            <%# We now render the partial for each shift to keep the code DRY %>
             <% if shifts.any? %>
               <% shifts.each do |shift| %>
-                <div class="bg-blue-100 rounded px-2 py-1 mb-1">
-                  <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %>
-<br>
-                  <%= shift.location&.name || "No location" %>
-                </div>
+                <%= render "shifts/shift", shift: shift %>
               <% end %>
-            <% elsif @roster.draft? %>
+            <% end %>
+            
+            <%# The "add shift" button only shows in empty cells during a draft %>
+            <% if shifts.empty? && @roster.draft? %>
               <div class="relative w-full h-full">
-  <!-- Keeps the cell height consistent -->
-  <span class="invisible select-none">—</span>
+                <!-- Keeps the cell height consistent -->
+                <span class="invisible select-none">—</span>
 
-  <div class="absolute inset-0 flex items-start justify-center pt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-    <%= link_to new_shift_path(user_id: user.id, roster_id: @roster.id, date: date),
-        data: { turbo_frame: "assign_shift_modal" },
-        class: "pointer-events-auto" do %>
-      <span class="inline-block p-2 text-blue-600 bg-blue-100 rounded-full shadow hover:bg-blue-200 transition">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
-        </svg>
-      </span>
-    <% end %>
-  </div>
-</div>
-
+                <div class="absolute inset-0 flex items-start justify-center pt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  <%= link_to new_shift_path(user_id: user.id, roster_id: @roster.id, date: date),
+                      data: { turbo_frame: "assign_shift_modal" },
+                      class: "pointer-events-auto" do %>
+                    <span class="inline-block p-2 text-blue-600 bg-blue-100 rounded-full shadow hover:bg-blue-200 transition">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+                      </svg>
+                    </span>
+                  <% end %>
+                </div>
               </div>
-            <% else %>
-              <span class="text-gray-400 italic">No shift</span>
+            <% elsif shifts.empty? %>
+               <span class="invisible select-none">—</span>
             <% end %>
           </td>
         <% end %>
@@ -74,4 +78,5 @@
   </tbody>
 </table>
 
+<%# This frame will be used to load the 'new shift' modal %>
 <turbo-frame id="assign_shift_modal"></turbo-frame>
