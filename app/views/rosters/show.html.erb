@@ -34,42 +34,11 @@
         <td class="font-medium p-2 border border-gray-300"><%= user.name %></td>
         <% 7.times do |i| %>
           <% date = @roster.starts_on + i.days %>
-          <%# This cell is now a drop zone and a Stimulus controller host %>
-          <td id="roster_day_<%= user.id %>_<%= date %>"
-              class="align-top p-2 border border-gray-300 hover:bg-gray-50 group relative min-h-[60px]"
-              data-controller="drag"
-              data-user-id="<%= user.id %>"
-              data-date="<%= date %>">
-
-            <% shifts = Shift.where(roster: @roster, user: user).where("DATE(start_time) = ?", date) %>
-
-            <%# We now render the partial for each shift to keep the code DRY %>
-           <%# If shifts exist in this cell, render them %>
-<% if shifts.any? %>
-  <% shifts.each do |shift| %>
-    <%= render "shifts/shift", shift: shift %>
-  <% end %>
-
-<%# If the cell is empty %>
-<% else %>
-  <%# And the roster is a draft, make the entire cell a link to add a new shift %>
-  <% if @roster.draft? %>
-    <%= link_to new_shift_path(user_id: user.id, roster_id: @roster.id, date: date),
-                data: { turbo_frame: "assign_shift_modal" },
-                class: "block w-full h-full py-4 text-center group",
-                aria_label: "Add shift for #{user.name} on #{date.strftime('%A, %B %d')}" do %>
-      <%# This plus icon will scale up when the user hovers anywhere in the cell %>
-      <span class="inline-block text-gray-400 transition-transform duration-200 group-hover:text-blue-600 group-hover:scale-125">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-      </span>
-    <% end %>
-  <% else %>
-    <%# If not a draft, render an invisible character to maintain cell height %>
-    <span class="invisible select-none">—</span>
-  <% end %>
-<% end %>
+          <%# This cell is now much simpler. All the complex logic for what goes inside the cell
+              has been moved to the _cell_content.html.erb partial. We removed the padding
+              from this cell and let the partial handle its own layout. %>
+          <td class="align-top p-0 border border-gray-300 hover:bg-gray-50 group relative min-h-[60px]">
+            <%= render 'rosters/cell_content', roster: @roster, user: user, date: date %>
           </td>
         <% end %>
       </tr>

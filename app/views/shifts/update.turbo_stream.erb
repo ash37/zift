@@ -1,3 +1,14 @@
-<%= turbo_stream.replace dom_id(@shift) do %>
-  <%= render "shifts/shift", shift: @shift %>
+<% new_user = @shift.user %>
+<% new_date = @shift.start_time.to_date %>
+
+
+
+<%= turbo_stream.replace dom_id(@roster, "cell_content_#{old_user.id}_#{old_date}") do %>
+  <%= render 'rosters/cell_content', roster: @roster, user: old_user, date: old_date %>
+<% end %>
+
+
+
+<%= turbo_stream.replace dom_id(@roster, "cell_content_#{new_user.id}_#{new_date}") do %>
+  <%= render 'rosters/cell_content', roster: @roster, user: new_user, date: new_date %>
 <% end %>

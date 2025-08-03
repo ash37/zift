@@ -1,46 +1,72 @@
-// This Stimulus controller handles the drag-and-drop logic.
 import { Controller } from "@hotwired/stimulus"
 import Sortable from "sortablejs"
+// We no longer need to import from '@rails/request.js'
+// import { patch } from '@rails/request.js'
 
+// Connects to data-controller="drag"
 export default class extends Controller {
+  // Define the values the controller will accept from the HTML data attributes.
+  static values = {
+    url: String,
+    userId: String,
+    date: String
+  }
+
   connect() {
-    // Initializes SortableJS on the element this controller is connected to (each <td>).
     this.sortable = Sortable.create(this.element, {
-      group: 'shared', // Allows dragging between elements in the same group.
-      animation: 150,  // Animation speed.
-      onEnd: this.end.bind(this) // Callback function when a drag operation ends.
+      group: 'shared', // Allows dragging between elements with the same group name
+      animation: 150,
+      
+      // This is the key change: We explicitly tell SortableJS that only
+      // turbo-frames with a 'data-id' attribute (our shifts) can be dragged.
+      // It will now ignore clicks on all other elements, like the "Add Shift" link.
+      draggable: "turbo-frame[data-id]", 
+      
+      onEnd: this.onDragEnd.bind(this) // Bind the onEnd event to our method
     });
   }
 
-  // Called when a shift is dropped into a new cell.
-  end(event) {
-    // Get the shift ID from the dragged item's data attribute.
-    let id = event.item.dataset.id
-    // The URL to send the update request to.
-    let url = `/shifts/${id}`
-    let data = new FormData()
+  onDragEnd(event) {
+    // event.item: the dragged element (the shift)
+    // event.to: the container the element was dropped into (the cell's div)
 
-    // Append the new user_id and date from the target cell's data attributes.
-    data.append("shift[user_id]", event.to.dataset.userId)
-    data.append("shift[date]", event.to.dataset.date)
+    const shiftId = event.item.dataset.id;
+    const url = this.urlValue.replace(":id", shiftId);
+    const dropTargetController = this.application.getControllerForElementAndIdentifier(event.to, "drag");
 
-    // Get the CSRF token to include in the request headers for security.
-    const csrfToken = document.querySelector("[name='csrf-token']").content
+    if (!dropTargetController) {
+      console.error("Could not find Stimulus 'drag' controller on the drop target.");
+      return;
+    }
 
-    // Use the Fetch API to send a PATCH request to update the shift.
+    const userId = dropTargetController.userIdValue;
+    const date = dropTargetController.dateValue;
+
+    const body = {
+      shift: {
+        user_id: userId,
+        date: date,
+      },
+    };
+
+    // Find the CSRF token from the page's meta tags. Rails includes this for security.
+    const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+
+    // Use the browser's built-in fetch API to send the request.
     fetch(url, {
       method: 'PATCH',
       headers: {
+        'Content-Type': 'application/json',
         'X-CSRF-Token': csrfToken,
-        'Accept': 'text/vnd.turbo-stream.html' // Important for Turbo to process the response
+        // This header tells Rails to respond with a Turbo Stream
+        'Accept': 'text/vnd.turbo-stream.html'
       },
-      body: data
+      body: JSON.stringify(body)
     })
     .then(response => response.text())
     .then(html => {
-      // Let Turbo process the returned stream message to update the DOM.
+      // Use Turbo to process the stream response from the server
       Turbo.renderStreamMessage(html)
-    })
-    .catch(error => console.error("Drag and drop failed:", error))
+    });
   }
 }
