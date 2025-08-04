@@ -85,13 +85,13 @@ class ShiftsController < ApplicationController
     end
   end
 
-  # DELETE /shifts/1
- def destroy
+# DELETE /shifts/1
+def destroy
   # Store the user and roster before destroying the shift, so we can
   # use them in the turbo stream view to update the UI correctly.
   @user = @shift.user
   @roster = @shift.roster
-  
+
   @shift.destroy!
 
   respond_to do |format|

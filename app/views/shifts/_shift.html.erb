@@ -1,10 +1,35 @@
 <%# app/views/shifts/_shift.html.erb %>
 <%
   area = shift.area
-  text_color_class = (area&.color == '#ffffff') ? 'text-zinc-800' : 'text-white'
+  roster_is_draft = shift.roster.draft?
+
+  # Base classes for the main container
+  main_div_classes = "p-2.5 rounded-lg relative shadow-lg"
+  main_div_style = ""
+
+  # Classes and styles for PUBLISHED shifts
+  unless roster_is_draft
+    main_div_style = "background-color: #{area.color};" if area&.color.present?
+    main_div_classes += " #{area&.color.blank? ? 'bg-violet-500' : ''}"
+    main_div_classes += (area&.color == '#ffffff') ? ' text-zinc-800' : ' text-white'
+  end
+
+  # Classes and styles for DRAFT shifts
+  if roster_is_draft
+    main_div_classes += " border-2 border-dashed"
+    main_div_style = "border-color: #{area&.color || '#cccccc'};" # Fallback to gray border
+    main_div_classes += " text-zinc-800" # Text is always dark for drafts
+  end
+
+  # Determine background for child elements based on roster status
+  child_bg_class = roster_is_draft ? 'bg-black/10' : 'bg-black/30'
+  edit_icon_bg_class = roster_is_draft ? 'bg-black/10 hover:bg-black/20' : 'bg-black/20 hover:bg-black/40'
+  default_child_bg_class = roster_is_draft ? 'bg-gray-200' : 'bg-violet-700'
+  default_edit_icon_bg_class = roster_is_draft ? 'bg-gray-200 hover:bg-gray-300' : 'bg-violet-600/50 hover:bg-violet-600/90'
 %>
+
 <%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: "cursor-grab relative group" do %>
-  <div style="<%= "background-color: #{area.color}" if area&.color.present? %>" class="<%= area&.color.blank? ? 'bg-violet-500' : '' %> <%= text_color_class %> p-2.5 rounded-lg relative shadow-lg shadow-violet-500/10">
+  <div style="<%= main_div_style %>" class="<%= main_div_classes %>">
     <div class="flex justify-between items-start">
       <div>
         <p class="text-xs font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
@@ -13,7 +38,7 @@
       
       <div class="opacity-0 group-hover:opacity-100 transition-opacity">
         <%= link_to edit_shift_path(shift) do %>
-          <span class="inline-block p-1 rounded-full <%= area&.color.present? ? 'bg-black/20 hover:bg-black/40' : 'bg-violet-600/50 hover:bg-violet-600/90' %>">
+          <span class="inline-block p-1 rounded-full <%= area&.color.present? ? edit_icon_bg_class : default_edit_icon_bg_class %>">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
           </span>
         <% end %>
@@ -23,7 +48,7 @@
     <%# Shift Duration %>
     <div class="mt-2">
       <% duration_in_hours = (shift.end_time - shift.start_time) / 3600.0 %>
-      <span class="<%= area&.color.present? ? 'bg-black/30' : 'bg-violet-700' %> px-2 py-0.5 rounded-3xl text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
+      <span class="<%= area&.color.present? ? child_bg_class : default_child_bg_class %> px-2 py-0.5 rounded-md text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
     </div>
   </div>
 <% end %>

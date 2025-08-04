@@ -1,6 +1,6 @@
 class RostersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_roster, only: %i[show edit update destroy publish copy_previous_week]
+  before_action :set_roster, only: %i[show edit update destroy publish copy_previous_week revert_to_draft]
 
   # GET /rosters
   def index
@@ -59,6 +59,11 @@ class RostersController < ApplicationController
   def publish
     @roster.update(status: Roster::STATUSES[:published])
     redirect_to @roster, notice: "Roster published."
+  end
+
+  def revert_to_draft
+    @roster.update(status: Roster::STATUSES[:draft])
+    redirect_to @roster, notice: "Roster has been reverted to draft."
   end
 
   def show_by_date

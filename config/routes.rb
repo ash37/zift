@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   get "dashboards", to: "dashboards#index"
 
   # Devise authentication
-  devise_for :users, skip: [:registrations]
+  devise_for :users, skip: [ :registrations ]
 
   # Allow self-registration (optional, only if needed)
   as :user do
@@ -19,9 +19,9 @@ Rails.application.routes.draw do
   post "users/create", to: "users#create", as: :admin_create_user
 
   # Core resources
-  resources :users, except: [:new, :create]
+  resources :users, except: [ :new, :create ]
   resources :locations do
-    resources :areas, only: [:create]
+    resources :areas, only: [ :create ]
   end
   resources :shifts
   resources :recurrences
@@ -31,10 +31,11 @@ Rails.application.routes.draw do
   resources :rosters do
     member do
       post :publish
+      post :revert_to_draft
       post :copy_previous_week
     end
     collection do
-        get 'week(/:date)', to: 'rosters#show_by_date', as: 'show_by_date'
+        get "week(/:date)", to: "rosters#show_by_date", as: "show_by_date"
     end
   end
 
