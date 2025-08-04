@@ -1,12 +1,15 @@
-<%# This partial renders the content for a single cell in the roster grid. %>
-<%# Added min-h-[100px] to ensure all cells have a consistent minimum height. %>
+<%
+  shifts_query = roster.shifts.where(user: user, start_time: date.all_day)
+  if selected_location_id.present?
+    shifts_query = shifts_query.where(location_id: selected_location_id)
+  end
+  shifts = shifts_query
+%>
 <div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[100px] space-y-2"
       data-controller="drag"
       data-drag-url-value="/shifts/:id"
       data-drag-user-id-value="<%= user.id %>"
       data-drag-date-value="<%= date.to_s %>">
-
-  <% shifts = roster.shifts.where(user: user, start_time: date.all_day) %>
 
   <% if shifts.any? %>
     <% shifts.each do |shift| %>
@@ -15,7 +18,7 @@
   <% else %>
     <% if roster.draft? %>
       <%# The link now fills the parent container, which has a minimum height. %>
-      <%= link_to new_shift_path(user_id: user.id, roster_id: roster.id, date: date),
+      <%= link_to new_shift_path(user_id: user.id, roster_id: roster.id, date: date, location_id: selected_location_id),
                   data: { turbo_frame: "assign_shift_modal" },
                   class: "block w-full h-full text-center group",
                   aria_label: "Add shift for #{user.name} on #{date.strftime('%A, %B %d')}" do %>

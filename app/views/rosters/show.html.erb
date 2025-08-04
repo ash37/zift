@@ -1,4 +1,4 @@
-<%= render "sub_nav" %>
+<%= render "sub_nav", selected_location_id: @selected_location_id %>
 
 <%# We add a style block here to define the custom styles for drag-and-drop. %>
 <style>
@@ -44,13 +44,13 @@
           <td class="p-2 border-t border-zinc-200">
             <div class="font-semibold text-zinc-800"><%= user.name %></div>
             <div id="<%= dom_id(user, 'hours_total') %>">
-              <%= render 'rosters/user_hours', roster: @roster, user: user %>
+              <%= render 'rosters/user_hours', roster: @roster, user: user, selected_location_id: @selected_location_id %>
             </div>
           </td>
           <% 7.times do |i| %>
             <% date = @roster.starts_on + i.days %>
             <td class="p-1 border-t border-zinc-200">
-              <%= render 'rosters/cell_content', roster: @roster, user: user, date: date %>
+              <%= render 'rosters/cell_content', roster: @roster, user: user, date: date, selected_location_id: @selected_location_id %>
             </td>
           <% end %>
         </tr>
@@ -63,7 +63,7 @@
         <% 7.times do |i| %>
           <% date = @roster.starts_on + i.days %>
           <td class="p-2 border-t-2 border-zinc-300">
-            <%= render 'rosters/daily_hours', roster: @roster, date: date %>
+            <%= render 'rosters/daily_hours', roster: @roster, date: date, selected_location_id: @selected_location_id %>
           </td>
         <% end %>
       </tr>

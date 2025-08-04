@@ -8,7 +8,10 @@ class RostersController < ApplicationController
   end
 
   # GET /rosters/1
-  def show; end
+  def show
+    @locations = Location.all
+    @selected_location_id = params[:location_id]
+  end
 
   # GET /rosters/new
   def new
@@ -73,6 +76,8 @@ class RostersController < ApplicationController
       @roster.status = Roster::STATUSES[:draft]
       @roster.save!
     end
+    @locations = Location.all
+    @selected_location_id = params[:location_id]
     render :show
   end
 
@@ -99,7 +104,9 @@ class RostersController < ApplicationController
   private
 
   def set_roster
-    @roster = Roster.find(params[:id])
+    # We use find_by to avoid errors if the ID is not found, especially with date-based lookups.
+    @roster = Roster.find_by(id: params[:id])
+    redirect_to rosters_path, alert: "Roster not found." unless @roster
   end
 
   def roster_params

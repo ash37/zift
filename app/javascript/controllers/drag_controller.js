@@ -50,11 +50,15 @@ export default class extends Controller {
 
     const userId = dropTargetController.userIdValue;
     const date = dropTargetController.dateValue;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const locationId = urlParams.get('location_id');
 
     const body = {
       shift: {
         user_id: userId,
         date: date,
+        roster_filter_location_id: locationId
       },
     };
 

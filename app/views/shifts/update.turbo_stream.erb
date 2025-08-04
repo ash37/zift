@@ -1,44 +1,34 @@
-<%# This Turbo Stream is rendered after a shift is successfully updated. %>
-
-<%# Get the new user and date from the updated shift object. %>
 <% new_user = @shift.user %>
 <% new_date = @shift.start_time.to_date %>
 
-<%# 1. Replace the content of the cell the shift came FROM. %>
 <%= turbo_stream.replace dom_id(@roster, "cell_content_#{@old_user.id}_#{@old_date}") do %>
-  <%= render 'rosters/cell_content', roster: @roster, user: @old_user, date: @old_date %>
+  <%= render 'rosters/cell_content', roster: @roster, user: @old_user, date: @old_date, selected_location_id: @selected_location_id %>
 <% end %>
 
-<%# 2. Replace the content of the cell the shift went TO (if it's different). %>
 <% if @old_user != new_user || @old_date != new_date %>
   <%= turbo_stream.replace dom_id(@roster, "cell_content_#{new_user.id}_#{new_date}") do %>
-    <%= render 'rosters/cell_content', roster: @roster, user: new_user, date: new_date %>
+    <%= render 'rosters/cell_content', roster: @roster, user: new_user, date: new_date, selected_location_id: @selected_location_id %>
   <% end %>
 <% end %>
 
-<%# 3. Update the total hours for the user the shift was dragged FROM. %>
 <%= turbo_stream.replace dom_id(@old_user, 'hours_total') do %>
-  <%= render 'rosters/user_hours', roster: @roster, user: @old_user %>
+  <%= render 'rosters/user_hours', roster: @roster, user: @old_user, selected_location_id: @selected_location_id %>
 <% end %>
 
-<%# 4. Update the total hours for the user the shift was dragged TO (if different). %>
 <% if @old_user != new_user %>
   <%= turbo_stream.replace dom_id(new_user, 'hours_total') do %>
-    <%= render 'rosters/user_hours', roster: @roster, user: new_user %>
+    <%= render 'rosters/user_hours', roster: @roster, user: new_user, selected_location_id: @selected_location_id %>
   <% end %>
 <% end %>
 
-<%# 5. Update the source day's hours. %>
 <%= turbo_stream.replace dom_id(@roster, "daily_hours_#{@old_date.to_s}") do %>
-  <%= render 'rosters/daily_hours', roster: @roster, date: @old_date %>
+  <%= render 'rosters/daily_hours', roster: @roster, date: @old_date, selected_location_id: @selected_location_id %>
 <% end %>
 
-<%# 6. Update the destination day's hours (if different). %>
 <% if @old_date != new_date %>
   <%= turbo_stream.replace dom_id(@roster, "daily_hours_#{new_date.to_s}") do %>
-    <%= render 'rosters/daily_hours', roster: @roster, date: new_date %>
+    <%= render 'rosters/daily_hours', roster: @roster, date: new_date, selected_location_id: @selected_location_id %>
   <% end %>
 <% end %>
 
-<%# 7. Close the modal window if it's open. %>
 <%= turbo_stream.replace "assign_shift_modal", "" %>
