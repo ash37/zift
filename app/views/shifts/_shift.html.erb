@@ -1,31 +1,29 @@
-<%# We add target: "assign_shift_modal" to the frame itself. 
-   This tells Turbo that any link clicked inside this frame should target the modal.
+<%# app/views/shifts/_shift.html.erb %>
+<%
+  area = shift.area
+  text_color_class = (area&.color == '#ffffff') ? 'text-zinc-800' : 'text-white'
 %>
-<% area = shift.area %>
 <%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: "cursor-grab relative group" do %>
-  <div style="<%= "background-color: #{area.color}" if area&.color.present? %>" class="<%= area&.color.blank? ? 'bg-violet-500' : '' %> text-white p-2.5 rounded-lg relative shadow-lg shadow-violet-500/10">
+  <div style="<%= "background-color: #{area.color}" if area&.color.present? %>" class="<%= area&.color.blank? ? 'bg-violet-500' : '' %> <%= text_color_class %> p-2.5 rounded-lg relative shadow-lg shadow-violet-500/10">
     <div class="flex justify-between items-start">
       <div>
         <p class="text-xs font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
         <h3 class="text-xs font-light opacity-80"><%= area&.name || shift.location&.name %></h3>
       </div>
       
-      <%# The link no longer needs a data-turbo-frame attribute, as it inherits the target from its 
-parent frame. %>
       <div class="opacity-0 group-hover:opacity-100 transition-opacity">
         <%= link_to edit_shift_path(shift) do %>
-          <span class="inline-block p-1 rounded-full bg-violet-600/50 hover:bg-violet-600/90">
+          <span class="inline-block p-1 rounded-full <%= area&.color.present? ? 'bg-black/10 hover:bg-black/10' : 'bg-violet-600/50 hover:bg-violet-600/90' %>">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
           </span>
         <% end %>
       </div>
-   
- </div>
+    </div>
     
     <%# Shift Duration %>
     <div class="mt-2">
       <% duration_in_hours = (shift.end_time - shift.start_time) / 3600.0 %>
-      <span class="bg-violet-700 px-2 py-0.5 rounded-md text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
+      <span class="<%= area&.color.present? ? 'bg-black/20' : 'bg-violet-700' %> px-2 py-0.5 rounded-md text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
     </div>
   </div>
 <% end %>
