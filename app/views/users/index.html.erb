@@ -1,15 +1,19 @@
 <% content_for :title, "Users" %>
 
 <section class="container px-4 py-4 mx-auto">
+  <div class="flex justify-between items-center">
+  <%# Left Side: Title and user count %>
   <div class="flex items-center gap-x-3">
-    <h2 class="text-lg font-medium text-gray-800 dark:text-white">Team members</h2>
-    <span class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400"><%= pluralize(@users.count, 'user') %></span>
+    <h2 class="text-lg font-medium text-gray-800 dark:text-white">Team</h2>
+    <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400"><%= pluralize(@users.count, 'user') %></span>
   </div>
 
-  <div class="flex justify-end mt-4">
-    <%= link_to "New user", admin_new_user_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
-
+  <%# Right Side: Add user button %>
+  <div>
+    <%= link_to "Add", admin_new_user_path, class: "rounded-lg px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white font-medium" %>
   </div>
+</div>
+
 
   <div class="flex flex-col mt-6">
     <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -18,16 +22,17 @@
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-800">
               <tr>
-                <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
+                
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Name
                 </th>
-                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
+               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Email
                 </th>
-                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Role
                 </th>
-                <th scope="col" class="relative py-3.5 px-4">
+               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   <span class="sr-only">Actions</span>
                 </th>
               </tr>
