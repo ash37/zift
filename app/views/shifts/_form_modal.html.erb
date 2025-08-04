@@ -1,49 +1,63 @@
 <%= turbo_frame_tag "assign_shift_modal" do %>
-  <div x-data="{ isOpen: true }" x-show="isOpen"
-       x-transition:enter="transition duration-300 ease-out"
-       x-transition:enter-start="translate-y-4 opacity-0 sm:translate-y-0 sm:scale-95"
-       x-transition:enter-end="translate-y-0 opacity-100 sm:scale-100"
-       x-transition:leave="transition duration-150 ease-in"
-       x-transition:leave-start="translate-y-0 opacity-100 sm:scale-100"
-       x-transition:leave-end="translate-y-4 opacity-0 sm:translate-y-0 sm:scale-95"
-       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-10 min-h-screen"
-       aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <%# The dark background. It connects to the modal controller and closes on click. %>
+  <div class="fixed inset-0 w-full h-full bg-black/50 z-10"
+        data-controller="modal"
+        data-action="click->modal#close">
 
-    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md sm:my-8 sm:align-middle">
-      <h2 class="text-xl font-semibold mb-4 text-gray-800" id="modal-title">
-        Add Shift
-      </h2>
+    <%# The modal content. It has an action to stop clicks inside from closing the modal. %>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-full max-w-md"
+          data-action="click->modal#stopClose">
 
-      <%= form_with model: @shift, url: shifts_path, method: :post do |f| %>
-        <%= f.hidden_field :user_id %>
-        <%= f.hidden_field :roster_id %>
-        <%= f.hidden_field :date, value: params[:date] %>
+      <h2 class="text-xl font-bold mb-4"><%= shift.persisted? ? "Edit Shift" : "New Shift" %></h2>
+
+      <%= form_with(model: shift) do |f| %>
+        <% if shift.errors.any? %>
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            There were some errors:
+            <ul>
+              <% shift.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%= f.hidden_field :roster_id, value: shift.roster_id %>
+        <%= f.hidden_field :user_id, value: shift.user_id %>
+        <%# Ensure the date is passed correctly for both new and existing shifts %>
+        <%= f.hidden_field :date, value: params[:date] || shift.start_time.to_date %>
+
         <div class="mb-4">
-          <%= f.label :location_id, "Location", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= f.collection_select :location_id, Location.all, :id, :name, {}, class: "block w-full border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500" %>
+          <%= f.label :location_id, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.collection_select :location_id, Location.all, :id, :name, {}, { class: "block w-full rounded-md border-gray-300 shadow-sm" } %>
         </div>
 
-        <div class="flex gap-4 mb-4">
-  <div class="w-1/2">
-    <%= f.label :start_time, "Start Time", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= f.time_field :start_time, class: "block w-full border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500" %>
-  </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <%= f.label :start_time, class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= f.time_field :start_time, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
+          </div>
+          <div>
+            <%= f.label :end_time, class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= f.time_field :end_time, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
+          </div>
+        </div>
 
-  <div class="w-1/2">
-    <%= f.label :end_time, "End Time", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= f.time_field :end_time, class: "block w-full border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500" %>
-  </div>
-</div>
-
-
-        <div class="flex justify-end gap-3">
-          <button type="button"
-                  @click="isOpen = false"
-                  class="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-md hover:bg-gray-100">
-            Cancel
-          </button>
-
-          <%= f.submit "Save Shift", class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium rounded-md" %>
+        <div class="flex justify-between items-center pt-4">
+          <div>
+            <%# The Delete button only appears when editing an existing shift. %>
+            <%# We use link_to with data-turbo-method to avoid nesting forms. %>
+            <% if shift.persisted? %>
+              <%= link_to "Delete Shift", shift_path(shift),
+                  class: "text-sm text-red-600 hover:text-red-800",
+                  data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %>
+            <% end %>
+          </div>
+          <div class="flex gap-3">
+            <%# This button now has a data-action to trigger the modal close. %>
+            <button type="button" data-action="click->modal#close" class="px-4 py-2 rounded-md text-sm bg-gray-100 hover:bg-gray-200">Cancel</button>
+            <%= f.submit "Save Shift", class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm cursor-pointer" %>
+          </div>
         </div>
       <% end %>
     </div>

@@ -1,7 +1,25 @@
-<%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, class: "cursor-grab" do %>
-  <div class="bg-blue-100 rounded px-2 py-1 mb-1">
-    <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %>
-    <br>
-    <%= shift.location&.name || "No location" %>
+<%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, class: "cursor-grab relative group" do %>
+  <div class="bg-violet-500 text-white p-2.5 rounded-lg relative shadow-lg shadow-violet-500/10">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-xs font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+        <h3 class="text-xs font-light opacity-80"><%= shift.location&.name %></h3>
+      </div>
+      
+      <%# Edit Icon Link %>
+      <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+        <%= link_to edit_shift_path(shift), data: { turbo_frame: "assign_shift_modal" } do %>
+          <span class="inline-block p-1 rounded-full bg-violet-600/50 hover:bg-violet-600/90">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </span>
+        <% end %>
+      </div>
+    </div>
+    
+    <%# Shift Duration %>
+    <div class="mt-2">
+      <% duration_in_hours = (shift.end_time - shift.start_time) / 3600.0 %>
+      <span class="bg-violet-700 px-2 py-0.5 rounded-md text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
+    </div>
   </div>
 <% end %>

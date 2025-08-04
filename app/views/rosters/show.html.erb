@@ -1,50 +1,78 @@
-<h1 class="text-2xl font-bold mb-4">
-  Roster: Week of <%= @roster.starts_on.strftime('%b %d, %Y') %>
-</h1>
+<%# We add a style block here to define the custom styles for drag-and-drop. %>
+<style>
+  /* Style for the placeholder that appears in the new list */
+  .sortable-ghost-custom {
+    @apply bg-violet-100/50 border-2 border-dashed border-violet-400 rounded-lg;
+  }
+  .sortable-ghost-custom > * {
+    @apply opacity-0;
+  }
 
-<p class="mb-4">
-  Status:
-  <span class="inline-block px-2 py-1 rounded text-white text-sm <%= @roster.draft? ? 'bg-yellow-500' : 'bg-green-600' %>">
-    <%= @roster.status_label %>
-  </span>
-</p>
+  /* Style for the item being dragged to give it a "lifted" effect */
+  .sortable-drag-custom {
+    @apply opacity-90 shadow-2xl scale-105;
+  }
 
-<% if @roster.draft? %>
-  <div class="mb-6 flex gap-3">
-    <%= button_to "Copy Previous Week", copy_previous_week_roster_path(@roster), method: :post, class: "bg-gray-200 hover:bg-gray-300 text-sm px-4 py-2 rounded-md" %>
-    <%= button_to "Publish Roster", publish_roster_path(@roster), method: :post, class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm" %>
+  /* Style for all potential drop zones when a drag is active - updated to light gray */
+  .drop-target-active {
+    @apply bg-zinc-100 rounded-lg;
+  }
+</style>
+
+<div class="bg-zinc-50 p-4 sm:p-6 rounded-lg">
+  <%# Header section with Title and Status %>
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4 sm:mb-6">
+    <div>
+      <h2 class="font-semibold text-xl text-zinc-800">Schedule</h2>
+      <p class="text-sm text-zinc-500">
+        <%= @roster.starts_on.strftime('%b %d').upcase %> - <%= (@roster.starts_on + 6.days).strftime('%b %d').upcase %>
+        <span class="ml-2 inline-block px-2 py-1 rounded text-white text-xs <%= @roster.draft? ? 'bg-yellow-500' : 'bg-green-600' %>">
+          <%= @roster.status_label %>
+        </span>
+      </p>
+    </div>
+    <% if @roster.draft? %>
+      <div class="flex gap-3 mt-4 sm:mt-0">
+        <%= button_to "Copy Previous Week", copy_previous_week_roster_path(@roster), method: :post, class: "bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-sm px-4 py-2 rounded-md shadow-sm" %>
+        <%= button_to "Publish Roster", publish_roster_path(@roster), method: :post, class: "bg-violet-500 hover:bg-violet-600 text-white px-4 py-2 rounded-md text-sm font-semibold shadow-sm shadow-violet-500/20" %>
+      </div>
+    <% end %>
   </div>
-<% end %>
 
-<table class="w-full border border-gray-300 text-sm">
-  <thead>
-    <tr>
-      <th class="bg-gray-100 text-left p-2 border border-gray-300">Employee</th>
-      <% 7.times do |i| %>
-        <th class="bg-gray-100 text-center p-2 border border-gray-300">
-          <%= (@roster.starts_on + i.days).strftime("%a %d") %>
-        </th>
-      <% end %>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% User.all.each do |user| %>
+  <%# Calendar Table %>
+  <table class="w-full border-separate table-fixed" style="border-spacing: 0;">
+    <thead class="text-xs text-zinc-500">
       <tr>
-        <td class="font-medium p-2 border border-gray-300"><%= user.name %></td>
+        <th class="w-48 text-left font-semibold p-2">EMPLOYEE</th>
         <% 7.times do |i| %>
           <% date = @roster.starts_on + i.days %>
-          <%# This cell is now much simpler. All the complex logic for what goes inside the cell
-              has been moved to the _cell_content.html.erb partial. We removed the padding
-              from this cell and let the partial handle its own layout. %>
-          <td class="align-top p-0 border border-gray-300 hover:bg-gray-50 group relative min-h-[60px]">
-            <%= render 'rosters/cell_content', roster: @roster, user: user, date: date %>
-          </td>
+          <th class="text-center font-normal p-2 <%= 'text-violet-600 font-semibold' if date == Date.today %>">
+            <p><%= date.strftime("%a").upcase %></p>
+            <p class="text-lg"><%= date.strftime("%d") %></p>
+          </th>
         <% end %>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% User.all.each do |user| %>
+        <tr class="align-top">
+          <td class="p-2 border-t border-zinc-200">
+            <div class="font-semibold text-zinc-800"><%= user.name %></div>
+            <div id="<%= dom_id(user, 'hours_total') %>">
+              <%= render 'rosters/user_hours', roster: @roster, user: user %>
+            </div>
+          </td>
+          <% 7.times do |i| %>
+            <% date = @roster.starts_on + i.days %>
+            <td class="p-1 border-t border-zinc-200">
+              <%= render 'rosters/cell_content', roster: @roster, user: user, date: date %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
 
 <%# This frame will be used to load the 'new shift' modal %>
 <turbo-frame id="assign_shift_modal"></turbo-frame>

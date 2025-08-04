@@ -1,0 +1,12 @@
+
+<%= turbo_stream.replace dom_id(@roster, "cell_content_#{@user.id}_#{@shift.start_time.to_date}") do %>
+  <%= render 'rosters/cell_content', roster: @roster, user: @user, date: @shift.start_time.to_date %>
+<% end %>
+
+<%# 2. Update the total hours for the user whose shift was deleted. %>
+<%= turbo_stream.replace dom_id(@user, 'hours_total') do %>
+  <%= render 'rosters/user_hours', roster: @roster, user: @user %>
+<% end %>
+
+<%# 3. Close the modal window by replacing its content with nothing. %>
+<%= turbo_stream.replace "assign_shift_modal", "" %>

@@ -1,14 +1,29 @@
+<%# This Turbo Stream is rendered after a shift is successfully updated via drag-and-drop. %>
+
+<%# Get the new user from the updated shift object. %>
 <% new_user = @shift.user %>
-<% new_date = @shift.start_time.to_date %>
 
-
-
+<%# 1. Replace the content of the cell the shift was dragged FROM. %>
+<%#    This re-renders it, showing the "Add Shift" link if it's now empty. %>
 <%= turbo_stream.replace dom_id(@roster, "cell_content_#{old_user.id}_#{old_date}") do %>
   <%= render 'rosters/cell_content', roster: @roster, user: old_user, date: old_date %>
 <% end %>
 
+<%# 2. Replace the content of the cell the shift was dragged TO. %>
+<%#    This re-renders it with the updated shift now inside. %>
+<%= turbo_stream.replace dom_id(@roster, "cell_content_#{new_user.id}_#{@shift.start_time.to_date}") do %>
+  <%= render 'rosters/cell_content', roster: @roster, user: new_user, date: @shift.start_time.to_date %>
+<% end %>
 
+<%# 3. Update the total hours for the user the shift was dragged FROM. %>
+<%= turbo_stream.replace dom_id(old_user, 'hours_total') do %>
+  <%= render 'rosters/user_hours', roster: @roster, user: old_user %>
+<% end %>
 
-<%= turbo_stream.replace dom_id(@roster, "cell_content_#{new_user.id}_#{new_date}") do %>
-  <%= render 'rosters/cell_content', roster: @roster, user: new_user, date: new_date %>
+<%# 4. Update the total hours for the user the shift was dragged TO. %>
+<%#    We only need to do this if the user is different to avoid a redundant update. %>
+<% if old_user != new_user %>
+  <%= turbo_stream.replace dom_id(new_user, 'hours_total') do %>
+    <%= render 'rosters/user_hours', roster: @roster, user: new_user %>
+  <% end %>
 <% end %>

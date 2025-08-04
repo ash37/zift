@@ -1,37 +1,32 @@
 <%# This partial renders the content for a single cell in the roster grid. %>
-<%# It receives the roster, user, and date as local variables. %>
-
-<%# Generate a unique ID for this cell's content wrapper. %>
-<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full"
+<%# Added min-h-[100px] to ensure all cells have a consistent minimum height. %>
+<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[100px] space-y-2"
       data-controller="drag"
       data-drag-url-value="/shifts/:id"
       data-drag-user-id-value="<%= user.id %>"
       data-drag-date-value="<%= date.to_s %>">
 
-  <%# Find all shifts for the given user and date. %>
   <% shifts = roster.shifts.where(user: user, start_time: date.all_day) %>
 
   <% if shifts.any? %>
-    <%# If shifts exist, render each one. %>
     <% shifts.each do |shift| %>
       <%= render "shifts/shift", shift: shift %>
     <% end %>
   <% else %>
-    <%# If no shifts exist and the roster is a draft, show the "Add Shift" link. %>
     <% if roster.draft? %>
+      <%# The link now fills the parent container, which has a minimum height. %>
       <%= link_to new_shift_path(user_id: user.id, roster_id: roster.id, date: date),
                   data: { turbo_frame: "assign_shift_modal" },
-                  class: "block w-full h-full py-4 text-center group",
+                  class: "block w-full h-full text-center group",
                   aria_label: "Add shift for #{user.name} on #{date.strftime('%A, %B %d')}" do %>
-        <span class="inline-block text-gray-400 transition-transform duration-200 group-hover:text-blue-600 group-hover:scale-125">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-        </span>
+        <div class="flex items-center justify-center h-full">
+          <span class="inline-block text-zinc-300 transition-transform duration-200 group-hover:text-violet-500 group-hover:scale-125">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </span>
+        </div>
       <% end %>
-    <% else %>
-      <%# Otherwise, render a non-breaking space to maintain cell height. %>
-      <span class="invisible select-none">—</span>
     <% end %>
   <% end %>
 </div>

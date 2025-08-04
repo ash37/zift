@@ -1,6 +1,15 @@
-<%= turbo_stream.append "roster_day_#{@shift.user_id}_#{@shift.start_time.to_date}" do %>
-  <%= render "shifts/shift", shift: @shift %>
+<%# This Turbo Stream is rendered after a new shift is successfully created. %>
+
+<%# 1. Replace the content of the cell where the new shift was added. %>
+<%#    This replaces the "Add Shift" link with the newly created shift. %>
+<%= turbo_stream.replace dom_id(@shift.roster, "cell_content_#{@shift.user_id}_#{@shift.start_time.to_date}") do %>
+  <%= render 'rosters/cell_content', roster: @shift.roster, user: @shift.user, date: @shift.start_time.to_date %>
 <% end %>
 
+<%# 2. Update the total hours for the user who received the new shift. %>
+<%= turbo_stream.replace dom_id(@shift.user, 'hours_total') do %>
+  <%= render 'rosters/user_hours', roster: @shift.roster, user: @shift.user %>
+<% end %>
 
+<%# 3. Close the modal window by replacing its content with nothing. %>
 <%= turbo_stream.replace "assign_shift_modal", "" %>
