@@ -72,9 +72,9 @@ class ShiftsController < ApplicationController
 
     if @shift.update(attrs_to_update)
       respond_to do |format|
-        # This is the corrected line. We must explicitly pass the local variables
-        # that the turbo_stream view needs to render correctly.
-        format.turbo_stream { render locals: { old_user: @old_user, old_date: @old_date } }
+        # Rails will now automatically find and render update.turbo_stream.erb
+        # The view will use the instance variables @shift, @roster, @old_user, and @old_date.
+        format.turbo_stream
         format.html { redirect_to roster_path(@roster), notice: "Shift updated." }
       end
     else

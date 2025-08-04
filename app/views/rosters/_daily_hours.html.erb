@@ -1,0 +1,14 @@
+<%# This partial calculates and displays the total hours for a given day on a roster. %>
+<%
+  # Find all shifts for the given date within this roster.
+  shifts_for_day = roster.shifts.where(start_time: date.all_day)
+  # Calculate the total duration in seconds.
+  total_seconds = shifts_for_day.sum { |shift| shift.end_time - shift.start_time }
+  # Convert seconds to hours.
+  total_hours = total_seconds / 3600.0
+%>
+
+<%# This div has a unique ID so we can target it with a Turbo Stream. %>
+<div id="<%= dom_id(roster, "daily_hours_#{date.to_s}") %>" class="text-sm font-semibold text-zinc-800">
+  <%= number_with_precision(total_hours, precision: 2) %>h
+</div>

@@ -1,3 +1,4 @@
+<%# The turbo-frame is the draggable item. We add 'group' to make the hover effect work. %>
 <%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, class: "cursor-grab relative group" do %>
   <div class="bg-violet-500 text-white p-2.5 rounded-lg relative shadow-lg shadow-violet-500/10">
     <div class="flex justify-between items-start">
@@ -6,9 +7,9 @@
         <h3 class="text-xs font-light opacity-80"><%= shift.location&.name %></h3>
       </div>
       
-      <%# Edit Icon Link %>
+      <%# This is the corrected line. We use 'turbo-frame' as a string key. %>
       <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-        <%= link_to edit_shift_path(shift), data: { turbo_frame: "assign_shift_modal" } do %>
+        <%= link_to edit_shift_path(shift), data: { 'turbo-frame': "assign_shift_modal" } do %>
           <span class="inline-block p-1 rounded-full bg-violet-600/50 hover:bg-violet-600/90">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
           </span>

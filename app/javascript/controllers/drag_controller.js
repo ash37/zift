@@ -19,11 +19,26 @@ export default class extends Controller {
       ghostClass: "sortable-ghost-custom", // For the placeholder
       dragClass: "sortable-drag-custom",   // For the item being dragged
       
+      // These functions are called when a drag starts and ends.
+      onStart: this.onDragStart.bind(this),
       onEnd: this.onDragEnd.bind(this)
     });
   }
 
+  onDragStart(event) {
+    // When a drag starts, add a class to all drop zones to highlight them.
+    document.querySelectorAll('.shifts-container').forEach(container => {
+      container.classList.add('drop-target-active');
+    });
+  }
+
   onDragEnd(event) {
+    // When a drag ends, remove the highlight from all drop zones.
+    document.querySelectorAll('.shifts-container').forEach(container => {
+      container.classList.remove('drop-target-active');
+    });
+
+    // --- The rest of the onEnd logic to update the server ---
     const shiftId = event.item.dataset.id;
     const url = this.urlValue.replace(":id", shiftId);
     const dropTargetController = this.application.getControllerForElementAndIdentifier(event.to, "drag");
