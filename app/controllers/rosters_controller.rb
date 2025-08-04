@@ -80,6 +80,7 @@ class RostersController < ApplicationController
         @roster.shifts.create!(
           user_id: shift.user_id,
           location_id: shift.location_id,
+          area_id: shift.area_id,
           start_time: shift.start_time + 7.days,
           end_time: shift.end_time + 7.days
         )
