@@ -1,0 +1,32 @@
+<div class="bg-zinc-50 p-4 sm:p-6 rounded-lg">
+  <%# Header section with Title and Status %>
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4 sm:mb-6">
+    <div>
+      <h2 class="font-semibold text-xl text-zinc-800">Schedule</h2>
+      <div class="flex items-center gap-x-2">
+        <%= link_to show_by_date_rosters_path(date: @roster.starts_on - 7.days) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 hover:text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        <% end %>
+        <p class="text-sm text-zinc-500">
+          <%= @roster.starts_on.strftime('%b %d').upcase %> - <%= (@roster.starts_on + 6.days).strftime('%b %d').upcase %>
+          <span class="ml-2 inline-block px-2 py-1 rounded text-white text-xs <%= @roster.draft? ? 'bg-yellow-500' : 'bg-green-600' %>">
+            <%= @roster.status_label %>
+         </span>
+        </p>
+        <%= link_to show_by_date_rosters_path(date: @roster.starts_on + 7.days) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 hover:text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        <% end %>
+      </div>
+    </div>
+    <% if @roster.draft? %>
+      <div class="flex gap-3 mt-4 sm:mt-0">
+        <%= button_to "Copy Previous Week", copy_previous_week_roster_path(@roster), method: :post, class: "bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-sm px-4 py-2 rounded-md shadow-sm" %>
+        <%= button_to "Publish Roster", publish_roster_path(@roster), method: :post, class: "bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-sm font-semibold shadow-sm" %>
+      </div>
+    <% end %>
+  </div>
+</div>

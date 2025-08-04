@@ -20,7 +20,9 @@ Rails.application.routes.draw do
 
   # Core resources
   resources :users, except: [:new, :create]
-  resources :locations
+  resources :locations do
+    resources :areas, only: [:create]
+  end
   resources :shifts
   resources :recurrences
   resources :timesheets
@@ -30,6 +32,9 @@ Rails.application.routes.draw do
     member do
       post :publish
       post :copy_previous_week
+    end
+    collection do
+        get 'week(/:date)', to: 'rosters#show_by_date', as: 'show_by_date'
     end
   end
 

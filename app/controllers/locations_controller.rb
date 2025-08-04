@@ -8,6 +8,8 @@ class LocationsController < ApplicationController
 
   # GET /locations/1 or /locations/1.json
   def show
+    @area = Area.new(location: @location)
+    @areas = @location.areas
   end
 
   # GET /locations/new

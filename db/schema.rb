@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_02_001416) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_05_062108) do
+  create_table "areas", force: :cascade do |t|
+    t.string "name"
+    t.string "export_code"
+    t.string "color"
+    t.integer "location_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_areas_on_location_id"
+  end
+
   create_table "locations", force: :cascade do |t|
     t.string "name"
     t.string "address"
@@ -45,6 +55,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_001416) do
     t.integer "recurrence_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "area_id"
+    t.index ["area_id"], name: "index_shifts_on_area_id"
     t.index ["location_id"], name: "index_shifts_on_location_id"
     t.index ["roster_id"], name: "index_shifts_on_roster_id"
     t.index ["user_id"], name: "index_shifts_on_user_id"
@@ -97,6 +109,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_001416) do
     t.index ["location_id"], name: "index_users_on_location_id"
   end
 
+  add_foreign_key "areas", "locations"
+  add_foreign_key "shifts", "areas"
   add_foreign_key "shifts", "locations"
   add_foreign_key "shifts", "rosters"
   add_foreign_key "shifts", "users"

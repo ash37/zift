@@ -1,14 +1,17 @@
 <%# We add target: "assign_shift_modal" to the frame itself. 
-   This tells Turbo that any link clicked inside this frame should target the modal. %>
+   This tells Turbo that any link clicked inside this frame should target the modal.
+%>
+<% area = shift.area %>
 <%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: "cursor-grab relative group" do %>
-  <div class="bg-violet-500 text-white p-2.5 rounded-lg relative shadow-lg shadow-violet-500/10">
+  <div style="<%= "background-color: #{area.color}" if area&.color.present? %>" class="<%= area&.color.blank? ? 'bg-violet-500' : '' %> text-white p-2.5 rounded-lg relative shadow-lg shadow-violet-500/10">
     <div class="flex justify-between items-start">
       <div>
         <p class="text-xs font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
-        <h3 class="text-xs font-light opacity-80"><%= shift.location&.name %></h3>
+        <h3 class="text-xs font-light opacity-80"><%= area&.name || shift.location&.name %></h3>
       </div>
       
-      <%# The link no longer needs a data-turbo-frame attribute, as it inherits the target from its parent frame. %>
+      <%# The link no longer needs a data-turbo-frame attribute, as it inherits the target from its 
+parent frame. %>
       <div class="opacity-0 group-hover:opacity-100 transition-opacity">
         <%= link_to edit_shift_path(shift) do %>
           <span class="inline-block p-1 rounded-full bg-violet-600/50 hover:bg-violet-600/90">
@@ -16,7 +19,8 @@
           </span>
         <% end %>
       </div>
-    </div>
+   
+ </div>
     
     <%# Shift Duration %>
     <div class="mt-2">

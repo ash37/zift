@@ -109,6 +109,6 @@ end
   end
 
   def shift_params
-    params.require(:shift).permit(:user_id, :location_id, :roster_id, :start_time, :end_time, :date, :recurrence_id)
+    params.require(:shift).permit(:user_id, :location_id, :roster_id, :start_time, :end_time, :date, :recurrence_id, :area_id)
   end
 end

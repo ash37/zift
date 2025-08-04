@@ -61,6 +61,16 @@ class RostersController < ApplicationController
     redirect_to @roster, notice: "Roster published."
   end
 
+  def show_by_date
+    starts_on = params[:date] ? Date.parse(params[:date]) : Date.today.beginning_of_week
+    @roster = Roster.find_or_initialize_by(starts_on: starts_on)
+    if @roster.new_record?
+      @roster.status = Roster::STATUSES[:draft]
+      @roster.save!
+    end
+    render :show
+  end
+
   # POST /rosters/:id/copy_previous_week
   def copy_previous_week
     previous_roster = Roster.where(starts_on: @roster.starts_on - 7).first
