@@ -1,38 +1,19 @@
 <%= turbo_frame_tag "assign_shift_modal" do %>
-  <%# The dark background. It connects to the modal controller and closes on click. %>
-  <div class="fixed inset-0 w-full h-full bg-black/50 z-10"
-        data-controller="modal"
-        data-action="click->modal#close">
+  <div class="fixed inset-0 w-full h-full bg-black/50 z-10" data-controller="modal" data-action="click->modal#close">
+    <div class="relative absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-full max-w-md" data-action="click->modal#stopClose">
 
-    <%# The modal content. It has an action to stop clicks inside from closing the modal. %>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-full max-w-md"
-          data-action="click->modal#stopClose">
+      <h2 class="text-xl font-bold mb-4"><%= @shift.persisted? ? "Edit Shift" : "New Shift" %></h2>
 
-      <h2 class="text-xl font-bold mb-4"><%= shift.persisted? ? "Edit Shift" : "New Shift" %></h2>
+      <%= form_with(model: @shift) do |f| %>
+        <%# ... form fields ... %>
+        <%= f.hidden_field :roster_id %>
+        <%= f.hidden_field :user_id %>
+        <%= f.hidden_field :date, value: params[:date] || @shift.start_time.to_date %>
 
-      <%= form_with(model: shift) do |f| %>
-        <% if shift.errors.any? %>
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            There were some errors:
-            <ul>
-              <% shift.errors.each do |error| %>
-                <li><%= error.full_message %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
-        <%= f.hidden_field :roster_id, value: shift.roster_id %>
-        <%= f.hidden_field :user_id, value: shift.user_id %>
-        <%= f.hidden_field :date, value: params[:date] || shift.start_time.to_date %>
-
-        <%# This is the updated location section %>
-        <% location = shift.location || Location.first %>
+        <% location = @shift.location || Location.first %>
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-          <%# Display the location name as styled, non-editable text. %>
           <p class="mt-1 block w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm text-sm text-gray-500"><%= location&.name %></p>
-          <%# Include a hidden field to ensure the location_id is submitted with the form. %>
           <%= f.hidden_field :location_id, value: location&.id %>
         </div>
 
@@ -47,18 +28,18 @@
           </div>
         </div>
 
-        <div class="flex justify-between items-center pt-4">
-          <div>
-            <% if shift.persisted? %>
-              <%= link_to "Delete Shift", shift_path(shift),
-                  class: "text-sm text-red-600 hover:text-red-800",
-                  data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %>
-            <% end %>
-          </div>
-          <div class="flex gap-3">
-            <button type="button" data-action="click->modal#close" class="px-4 py-2 rounded-md text-sm bg-gray-100 hover:bg-gray-200">Cancel</button>
-            <%= f.submit "Save Shift", class: "bg-zinc-800 hover:bg-zinc-900 text-white px-4 py-2 rounded-md text-sm cursor-pointer" %>
-          </div>
+        <div class="flex justify-end items-center pt-4 gap-3">
+          <button type="button" data-action="click->modal#close" class="px-4 py-2 rounded-md text-sm bg-gray-100 hover:bg-gray-200">Cancel</button>
+          <%= f.submit "Save Shift", class: "bg-zinc-800 hover:bg-zinc-900 text-white px-4 py-2 rounded-md text-sm cursor-pointer" %>
+        </div>
+      <% end %>
+
+      <%# The Delete button is now outside the main form to prevent conflicts. %>
+      <% if @shift.persisted? %>
+        <div class="absolute bottom-6 left-6">
+          <%= button_to "Delete Shift", shift_path(@shift), method: :delete,
+              class: "text-sm text-red-600 hover:text-red-800",
+              form: { data: { turbo_confirm: 'Are you sure you want to delete this shift?' } } %>
         </div>
       <% end %>
     </div>

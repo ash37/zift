@@ -1,7 +1,16 @@
 <%# This partial calculates and displays the total weekly hours for a given user and roster. %>
 <%
-  user_shifts_for_week = roster.shifts.where(user: user)
+  # Define the start and end dates for the visible week.
+  week_start = roster.starts_on.beginning_of_day
+  week_end = roster.starts_on.end_of_day + 6.days
+
+  # This is the corrected query. It now scopes the shifts to the specific
+  # 7-day period of the roster being displayed.
+  user_shifts_for_week = roster.shifts.where(user: user, start_time: week_start..week_end)
+  
+  # Calculate the total duration in seconds.
   total_seconds = user_shifts_for_week.sum { |shift| shift.end_time - shift.start_time }
+  # Convert seconds to hours.
   total_hours = total_seconds / 3600.0
 %>
 

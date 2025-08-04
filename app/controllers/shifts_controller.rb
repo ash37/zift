@@ -86,17 +86,21 @@ class ShiftsController < ApplicationController
   end
 
   # DELETE /shifts/1
-  def destroy
-    @user = @shift.user
-    @roster = @shift.roster
-    @shift.destroy!
+ def destroy
+  # Store the user and roster before destroying the shift, so we can
+  # use them in the turbo stream view to update the UI correctly.
+  @user = @shift.user
+  @roster = @shift.roster
+  
+  @shift.destroy!
 
-    respond_to do |format|
-      format.turbo_stream
-      format.html { redirect_to roster_path(@roster), status: :see_other, notice: "Shift deleted." }
-      format.json { head :no_content }
-    end
+  respond_to do |format|
+    # This line tells Rails to look for destroy.turbo_stream.erb
+    format.turbo_stream
+    format.html { redirect_to roster_path(@roster), status: :see_other, notice: "Shift deleted." }
+    format.json { head :no_content }
   end
+end
 
   private
 
