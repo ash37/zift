@@ -4,7 +4,13 @@ class RostersController < ApplicationController
 
   # GET /rosters
   def index
-    @rosters = Roster.all
+    starts_on = Date.today.beginning_of_week
+    roster = Roster.find_or_initialize_by(starts_on: starts_on)
+    if roster.new_record?
+      roster.status = Roster::STATUSES[:draft]
+      roster.save!
+    end
+    redirect_to roster_path(roster)
   end
 
   # GET /rosters/1
@@ -71,14 +77,12 @@ class RostersController < ApplicationController
 
   def show_by_date
     starts_on = params[:date] ? Date.parse(params[:date]) : Date.today.beginning_of_week
-    @roster = Roster.find_or_initialize_by(starts_on: starts_on)
-    if @roster.new_record?
-      @roster.status = Roster::STATUSES[:draft]
-      @roster.save!
+    roster = Roster.find_or_initialize_by(starts_on: starts_on)
+    if roster.new_record?
+      roster.status = Roster::STATUSES[:draft]
+      roster.save!
     end
-    @locations = Location.all
-    @selected_location_id = params[:location_id]
-    render :show
+    redirect_to roster_path(roster, location_id: params[:location_id])
   end
 
   # POST /rosters/:id/copy_previous_week
@@ -104,7 +108,6 @@ class RostersController < ApplicationController
   private
 
   def set_roster
-    # We use find_by to avoid errors if the ID is not found, especially with date-based lookups.
     @roster = Roster.find_by(id: params[:id])
     redirect_to rosters_path, alert: "Roster not found." unless @roster
   end
