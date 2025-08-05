@@ -28,6 +28,11 @@
           <%= f.label :area_id, class: "block text-sm font-medium text-gray-700 mb-1" %>
           <%= f.collection_select :area_id, [], :id, :name, { prompt: "Select an Area" }, { class: "block w-full rounded-md border-gray-300 shadow-sm", data: { 'dynamic-select-target': 'target' } } %>
         </div>
+        
+        <div class="mb-4">
+          <%= f.label :note, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_area :note, rows: 3, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
+        </div>
 
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>

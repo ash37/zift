@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_05_062108) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_05_100055) do
   create_table "areas", force: :cascade do |t|
     t.string "name"
     t.string "export_code"
@@ -56,6 +56,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_062108) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "area_id"
+    t.text "note"
     t.index ["area_id"], name: "index_shifts_on_area_id"
     t.index ["location_id"], name: "index_shifts_on_location_id"
     t.index ["roster_id"], name: "index_shifts_on_roster_id"
