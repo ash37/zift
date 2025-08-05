@@ -1,3 +1,4 @@
+# app/models/user.rb
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
@@ -31,5 +32,13 @@ class User < ApplicationRecord
   # Used in views to allow role assignment only for admins
   def role_admin?
     admin?
+  end
+
+  def first_name
+    name.split.first
+  end
+
+  def last_name
+    name.split.last
   end
 end

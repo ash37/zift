@@ -3,9 +3,24 @@ class TimesheetsController < ApplicationController
 
   # GET /timesheets
   def index
+    if params[:date].blank?
+      redirect_to week_timesheets_path(date: Date.today.beginning_of_week.to_s) and return
+    end
+
+    @start_date = Date.parse(params[:date])
+    @selected_location_id = params[:location_id]
+    @locations = Location.all
+
+    week_range = @start_date.beginning_of_day..(@start_date + 6.days).end_of_day
+
     base_scope = Shift.joins(:roster)
                       .where(rosters: { status: Roster::STATUSES[:published] })
+                      .where(start_time: week_range)
                       .order("shifts.start_time ASC")
+
+    if @selected_location_id.present?
+      base_scope = base_scope.where(location_id: @selected_location_id)
+    end
 
     if current_user.admin? || current_user.manager?
       @shifts = base_scope.all

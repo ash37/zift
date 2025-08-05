@@ -34,6 +34,9 @@ Rails.application.routes.draw do
       get :clock_off_form
       patch :clock_off
     end
+    collection do
+      get "week(/:date)", to: "timesheets#index", as: "week"
+    end
   end
 
   resources :unavailability_requests

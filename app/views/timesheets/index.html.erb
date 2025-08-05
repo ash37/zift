@@ -1,74 +1,120 @@
 <% content_for :title, "Timesheets" %>
 
-<section class="container px-4 py-4 mx-auto">
-  <div class="flex justify-between items-center">
-    <div class="flex items-center gap-x-3">
-      <h2 class="text-lg font-medium text-gray-800 dark:text-white">Timesheets</h2>
-      <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400"><%= pluralize(@shifts.count, 'shift') %></span>
-    </div>
-  </div>
+<%= render 'sub_nav' %>
 
-  <div class="flex flex-col mt-6">
-    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-        <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Employee</th>
-                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Date</th>
-                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Time</th>
-                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Hours</th>
-                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Status</th>
-                <th scope="col" class="relative py-3.5 px-4"><span class="sr-only">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-              <% @shifts.each do |shift| %>
-                <% timesheet = shift.timesheets.first %>
-                <tr <% if timesheet && (current_user.admin? || current_user.manager?) %>
-                      data-controller="clickable-row"
-                      data-action="click->clickable-row#visit"
-                      data-clickable-row-url-value="<%= edit_timesheet_path(timesheet) %>"
-                    <% end %>
-                    class="hover:bg-gray-50 dark:hover:bg-gray-800"
-                >
-                  <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap dark:text-white"><%= shift.user.name %></td>
-                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= shift.start_time.strftime("%a, %d %b") %></td>
-                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                    <% if timesheet %>
-                      <div><%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></div>
-                    <% end %>
-                    <div class="text-xs text-gray-400">Rostered: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></div>
-                  </td>
-                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                    <% if timesheet %>
-                      <div><%= number_with_precision(timesheet.duration_in_hours, precision: 2) %>h</div>
-                    <% end %>
-                    <div class="text-xs text-gray-400">Rostered: <%= number_with_precision(shift.duration_in_hours, precision: 2) %>h</div>
-                  </td>
-                  <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                    <% if timesheet %>
-                      <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 <%= 'bg-emerald-100/60' if timesheet.approved? %> <%= 'bg-yellow-100/60' if timesheet.pending? %> <%= 'bg-red-100/60' if timesheet.rejected? %>">
-                        <h2 class="text-sm font-normal"><%= timesheet.status_name.titleize %></h2>
-                      </div>
-                    <% else %>
-                      <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-gray-100/60">
-                        <h2 class="text-sm font-normal">Not Started</h2>
-                      </div>
-                    <% end %>
-                  </td>
-                  <td class="px-4 py-4 text-sm whitespace-nowrap text-right">
-                    <% if timesheet && (current_user.admin? || current_user.manager?) && timesheet.pending? %>
-                      <%= button_to "Approve", approve_timesheet_path(timesheet), method: :patch, class: "text-emerald-500 hover:text-emerald-700" %>
-                    <% end %>
-                  </td>
+<div class="container px-0 sm:px-4 mx-auto">
+  <!-- Desktop Table -->
+  <div class="hidden sm:block">
+    <div class="flex flex-col mt-6">
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+          <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Employee</th>
+                  <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Date</th>
+                  <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Time</th>
+                  <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Hours</th>
+                  <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Status</th>
+                  <th scope="col" class="relative py-3.5 px-4"><span class="sr-only">Actions</span></th>
                 </tr>
-              <% end %>
-            </tbody>
-          </table>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                <% @shifts.each do |shift| %>
+                  <% timesheet = shift.timesheets.first %>
+                  <tr <% if timesheet && (current_user.admin? || current_user.manager?) && shift.start_time.to_date <= Date.today %>
+                        data-controller="clickable-row"
+                        data-action="click->clickable-row#visit"
+                        data-clickable-row-url-value="<%= edit_timesheet_path(timesheet) %>"
+                      <% end %>
+                      class="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap dark:text-white"><%= shift.user.name %></td>
+                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= shift.start_time.strftime("%a, %d %b") %></td>
+                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                      <% if timesheet %>
+                        <div><%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></div>
+                      <% end %>
+                      <div class="text-xs text-gray-400">Rostered: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></div>
+                    </td>
+                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                      <% if timesheet %>
+                        <div><%= number_with_precision(timesheet.duration_in_hours, precision: 2) %>h</div>
+                      <% end %>
+                      <div class="text-xs text-gray-400">Rostered: <%= number_with_precision(shift.duration_in_hours, precision: 2) %>h</div>
+                    </td>
+                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                      <% if timesheet %>
+                        <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 <%= 'bg-emerald-100/60' if timesheet.approved? %> <%= 'bg-yellow-100/60' if timesheet.pending? %> <%= 'bg-red-100/60' if timesheet.rejected? %>">
+                          <h2 class="text-sm font-normal"><%= timesheet.status_name.titleize %></h2>
+                        </div>
+                      <% else %>
+                        <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-gray-100/60">
+                          <h2 class="text-sm font-normal">Not Started</h2>
+                        </div>
+                      <% end %>
+                    </td>
+                    <td class="px-4 py-4 text-sm whitespace-nowrap text-right">
+                      <% if timesheet && (current_user.admin? || current_user.manager?) && timesheet.pending? %>
+                        <%= button_to "Approve", approve_timesheet_path(timesheet), method: :patch, class: "text-emerald-500 hover:text-emerald-700" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+
+  <!-- Mobile Cards -->
+  <div class="sm:hidden">
+    <% @shifts.group_by { |s| s.start_time.to_date }.each do |date, shifts_for_day| %>
+      <div class="mt-1">
+        <div class="text-lg font-bold text-gray-800 dark:text-white px-4"><%= date.strftime("%A, %d %B") %></div>
+        <div class="mt-1 space-y-2">
+          <% shifts_for_day.each do |shift| %>
+            <% timesheet = shift.timesheets.first %>
+            <div <% if timesheet && (current_user.admin? || current_user.manager?) && shift.start_time.to_date <= Date.today %>
+                  data-controller="clickable-row"
+                  data-action="click->clickable-row#visit"
+                  data-clickable-row-url-value="<%= edit_timesheet_path(timesheet) %>"
+                <% end %>
+                class="bg-white dark:bg-gray-800 p-4 shadow-sm relative"
+            >
+              <div class="flex justify-between">
+                <div>
+                  <p class="font-bold text-gray-800 dark:text-white"><%= shift.user.name %></p>
+                  <% if timesheet %>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Worked: <%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></p>
+                  <% end %>
+                  <p class="text-xs text-gray-500 dark:text-gray-400"><%= [shift.area&.name, shift.location.name].compact.join(' - ') %></p>
+                  <p class="text-xs text-violet-700 dark:text-violet-600">Scheduled: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+                </div>
+                <div class="text-right">
+                  <% if timesheet %>
+                    <div class="inline-flex items-center px-2 py-1 rounded-full gap-x-1 text-xs <%= 'bg-emerald-100/60 text-emerald-800' if timesheet.approved? %> <%= 'bg-yellow-100/60 text-yellow-800' if timesheet.pending? %> <%= 'bg-red-100/60 text-red-800' if timesheet.rejected? %>">
+                      <%= timesheet.status_name.titleize %>
+                    </div>
+                    <% if (timesheet.duration_in_hours - shift.duration_in_hours).abs > 0.01 %>
+                      <div class="mt-1" title="Worked hours do not match rostered hours.">
+                        <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.21 3.03-1.742 3.03H4.42c-1.532 0-2.492-1.696-1.742-3.03l5.58-9.92zM10 13a1 1 0 110-2 1 1 0 010 2zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                      </div>
+                    <% end %>
+                  <% else %>
+                    <div class="inline-flex items-center px-2 py-1 rounded-full gap-x-1 text-xs bg-gray-100/60 text-gray-800">
+                      Not Started
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
