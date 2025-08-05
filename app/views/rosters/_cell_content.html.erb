@@ -1,9 +1,8 @@
 <%
-  shifts_query = roster.shifts.where(user: user, start_time: date.all_day)
+  shifts = roster.shifts.where(user: user, start_time: date.all_day)
   if selected_location_id.present?
-    shifts_query = shifts_query.where(location_id: selected_location_id)
+    shifts = shifts.where(location_id: selected_location_id)
   end
-  shifts = shifts_query
 %>
 <div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[100px] space-y-2"
       data-controller="drag"
@@ -13,7 +12,7 @@
 
   <% if shifts.any? %>
     <% shifts.each do |shift| %>
-      <%= render "shifts/shift", shift: shift %>
+      <%= render "shifts/shift", shift: shift, selected_location_id: selected_location_id %>
     <% end %>
   <% else %>
     <% if roster.draft? %>
