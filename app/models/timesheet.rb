@@ -2,6 +2,8 @@ class Timesheet < ApplicationRecord
   belongs_to :user
   belongs_to :shift
 
+  accepts_nested_attributes_for :shift
+
   STATUSES = {
     pending: 0,
     approved: 1,
