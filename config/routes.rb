@@ -25,7 +25,17 @@ Rails.application.routes.draw do
   end
   resources :shifts
   resources :recurrences
-  resources :timesheets
+
+  post "shifts/:id/clock_on", to: "timesheets#clock_on", as: "clock_on_shift"
+
+  resources :timesheets do
+    member do
+      patch :approve
+      get :clock_off_form
+      patch :clock_off
+    end
+  end
+
   resources :unavailability_requests
 
   resources :rosters do

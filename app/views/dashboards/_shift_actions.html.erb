@@ -1,0 +1,11 @@
+<% timesheet = shift.timesheets.where(user: current_user).order(created_at: :desc).first %>
+
+<div class="flex items-center gap-x-4">
+  <% if timesheet&.clocked_out? %>
+    <span class="px-3 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">Completed</span>
+  <% elsif timesheet %>
+    <%= link_to "Clock Off", clock_off_form_timesheet_path(timesheet), class: "px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600" %>
+  <% else %>
+    <%= button_to "Clock On", clock_on_shift_path(shift), method: :post, class: "px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600" %>
+  <% end %>
+</div>

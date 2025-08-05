@@ -1,12 +1,20 @@
 class TimesheetsController < ApplicationController
-  before_action :set_timesheet, only: %i[ show edit update destroy ]
+  before_action :set_timesheet, only: %i[ show edit update destroy approve clock_off_form clock_off ]
 
-  # GET /timesheets or /timesheets.json
+  # GET /timesheets
   def index
-    @timesheets = Timesheet.all
+    base_scope = Shift.joins(:roster)
+                      .where(rosters: { status: Roster::STATUSES[:published] })
+                      .order("shifts.start_time ASC")
+
+    if current_user.admin? || current_user.manager?
+      @shifts = base_scope.all
+    else
+      @shifts = base_scope.where(user_id: current_user.id)
+    end
   end
 
-  # GET /timesheets/1 or /timesheets/1.json
+  # GET /timesheets/1
   def show
   end
 
@@ -19,52 +27,76 @@ class TimesheetsController < ApplicationController
   def edit
   end
 
-  # POST /timesheets or /timesheets.json
+  # POST /timesheets
   def create
     @timesheet = Timesheet.new(timesheet_params)
 
-    respond_to do |format|
-      if @timesheet.save
-        format.html { redirect_to @timesheet, notice: "Timesheet was successfully created." }
-        format.json { render :show, status: :created, location: @timesheet }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @timesheet.errors, status: :unprocessable_entity }
-      end
+    if @timesheet.save
+      redirect_to @timesheet, notice: "Timesheet was successfully created."
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /timesheets/1 or /timesheets/1.json
+  # PATCH/PUT /timesheets/1
   def update
-    respond_to do |format|
-      if @timesheet.update(timesheet_params)
-        format.html { redirect_to @timesheet, notice: "Timesheet was successfully updated." }
-        format.json { render :show, status: :ok, location: @timesheet }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @timesheet.errors, status: :unprocessable_entity }
-      end
+    if @timesheet.update(timesheet_params)
+      redirect_to timesheets_path, notice: "Timesheet was successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
-  # DELETE /timesheets/1 or /timesheets/1.json
+  # DELETE /timesheets/1
   def destroy
     @timesheet.destroy!
+    redirect_to timesheets_url, notice: "Timesheet was successfully destroyed.", status: :see_other
+  end
 
-    respond_to do |format|
-      format.html { redirect_to timesheets_path, status: :see_other, notice: "Timesheet was successfully destroyed." }
-      format.json { head :no_content }
+  def clock_on
+    @shift = Shift.find(params[:id])
+    if @shift.timesheets.where(user: current_user, clock_out_at: nil).none?
+      @timesheet = @shift.timesheets.create(
+        user: current_user,
+        clock_in_at: Time.current,
+        status: Timesheet::STATUSES[:pending]
+      )
+      redirect_to dashboards_path, notice: "Clocked on successfully."
+    else
+      redirect_to dashboards_path, alert: "You are already clocked on for this shift."
+    end
+  end
+
+  def clock_off_form
+    # Renders the view
+  end
+
+  def clock_off
+    if @timesheet.update(clock_off_params.merge(clock_out_at: Time.current))
+      redirect_to dashboards_path, notice: "Clocked off successfully."
+    else
+      render :clock_off_form, status: :unprocessable_entity
+    end
+  end
+
+  def approve
+    if @timesheet.update(status: Timesheet::STATUSES[:approved])
+      redirect_to timesheets_path, notice: "Timesheet approved."
+    else
+      redirect_to timesheets_path, alert: "Could not approve timesheet."
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_timesheet
-      @timesheet = Timesheet.find(params.expect(:id))
+      @timesheet = Timesheet.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
     def timesheet_params
-      params.expect(timesheet: [ :user_id, :shift_id, :clock_in_at, :clock_out_at, :duration, :status ])
+      params.require(:timesheet).permit(:user_id, :shift_id, :clock_in_at, :clock_out_at, :duration, :status, :notes, :travel)
+    end
+
+    def clock_off_params
+      params.require(:timesheet).permit(:notes, :travel)
     end
 end

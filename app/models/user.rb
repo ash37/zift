@@ -3,6 +3,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   belongs_to :location, optional: true
+  has_many :shifts, dependent: :destroy
+  has_many :timesheets, dependent: :destroy
 
   ROLES = {
     employee: 0,

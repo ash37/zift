@@ -1,29 +1,74 @@
 <% content_for :title, "Timesheets" %>
 
-<div class="w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
-
+<section class="container px-4 py-4 mx-auto">
   <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Timesheets</h1>
-    <%= link_to "New timesheet", new_timesheet_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+    <div class="flex items-center gap-x-3">
+      <h2 class="text-lg font-medium text-gray-800 dark:text-white">Timesheets</h2>
+      <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400"><%= pluralize(@shifts.count, 'shift') %></span>
+    </div>
   </div>
 
-  <div id="timesheets" class="min-w-full divide-y divide-gray-200 space-y-5">
-    <% if @timesheets.any? %>
-      <% @timesheets.each do |timesheet| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render timesheet %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", timesheet, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_timesheet_path(timesheet), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= button_to "Destroy", timesheet, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
-          </div>
+  <div class="flex flex-col mt-6">
+    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Employee</th>
+                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Date</th>
+                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Time</th>
+                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Hours</th>
+                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Status</th>
+                <th scope="col" class="relative py-3.5 px-4"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+              <% @shifts.each do |shift| %>
+                <% timesheet = shift.timesheets.first %>
+                <tr <% if timesheet && (current_user.admin? || current_user.manager?) %>
+                      data-controller="clickable-row"
+                      data-action="click->clickable-row#visit"
+                      data-clickable-row-url-value="<%= edit_timesheet_path(timesheet) %>"
+                    <% end %>
+                    class="hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
+                  <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap dark:text-white"><%= shift.user.name %></td>
+                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= shift.start_time.strftime("%a, %d %b") %></td>
+                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                    <% if timesheet %>
+                      <div><%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></div>
+                    <% end %>
+                    <div class="text-xs text-gray-400">Rostered: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></div>
+                  </td>
+                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                    <% if timesheet %>
+                      <div><%= number_with_precision(timesheet.duration_in_hours, precision: 2) %>h</div>
+                    <% end %>
+                    <div class="text-xs text-gray-400">Rostered: <%= number_with_precision(shift.duration_in_hours, precision: 2) %>h</div>
+                  </td>
+                  <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                    <% if timesheet %>
+                      <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 <%= 'bg-emerald-100/60' if timesheet.approved? %> <%= 'bg-yellow-100/60' if timesheet.pending? %> <%= 'bg-red-100/60' if timesheet.rejected? %>">
+                        <h2 class="text-sm font-normal"><%= timesheet.status_name.titleize %></h2>
+                      </div>
+                    <% else %>
+                      <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-gray-100/60">
+                        <h2 class="text-sm font-normal">Not Started</h2>
+                      </div>
+                    <% end %>
+                  </td>
+                  <td class="px-4 py-4 text-sm whitespace-nowrap text-right">
+                    <% if timesheet && (current_user.admin? || current_user.manager?) && timesheet.pending? %>
+                      <%= button_to "Approve", approve_timesheet_path(timesheet), method: :patch, class: "text-emerald-500 hover:text-emerald-700" %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
         </div>
-      <% end %>
-    <% else %>
-      <p class="text-center my-10">No timesheets found.</p>
-    <% end %>
+      </div>
+    </div>
   </div>
-</div>
+</section>
