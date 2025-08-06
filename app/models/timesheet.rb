@@ -25,12 +25,22 @@ class Timesheet < ApplicationRecord
     status == STATUSES[:rejected]
   end
 
+  def started?
+    clock_in_at.present? && clock_out_at.blank?
+  end
+
   def clocked_out?
     clock_out_at.present?
   end
 
   def status_name
-    STATUSES.key(status).to_s
+    if auto_clock_off?
+      "Auto"
+    elsif started?
+      "Started"
+    else
+      STATUSES.key(status).to_s
+    end
   end
 
   def duration_in_hours

@@ -17,6 +17,8 @@ class RostersController < ApplicationController
   def show
     @locations = Location.all
     @selected_location_id = params[:location_id]
+    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    @show_all_days = params[:show_all_days] == "true"
   end
 
   # GET /rosters/new
@@ -87,7 +89,7 @@ class RostersController < ApplicationController
       roster.status = Roster::STATUSES[:draft]
       roster.save!
     end
-    redirect_to roster_path(roster, location_id: params[:location_id])
+    redirect_to roster_path(roster, location_id: params[:location_id], date: params[:date])
   end
 
   # POST /rosters/:id/copy_previous_week
