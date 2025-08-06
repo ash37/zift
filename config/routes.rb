@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       patch :approve
       get :clock_off_form
       patch :clock_off
+      patch :match_roster_times
     end
     collection do
       get "week(/:date)", to: "timesheets#index", as: "week"

@@ -1,5 +1,6 @@
 # app/controllers/shifts_controller.rb
 class ShiftsController < ApplicationController
+  include ActionView::RecordIdentifier
   before_action :set_shift, only: %i[show edit update destroy]
 
   # GET /shifts
@@ -20,13 +21,13 @@ class ShiftsController < ApplicationController
       start_time: params[:date].to_date.beginning_of_day + 9.hours,
       end_time: params[:date].to_date.beginning_of_day + 17.hours
     )
-    render partial: "form_modal", locals: { shift: @shift }
+    render partial: "shifts/form_modal", locals: { shift: @shift }
   end
 
   # GET /shifts/1/edit
   def edit
     @selected_location_id = params[:location_id]
-    render partial: "form_modal", locals: { shift: @shift }
+    render partial: "shifts/form_modal", locals: { shift: @shift }
   end
 
   # POST /shifts (Handles form submission from the modal)
@@ -42,7 +43,16 @@ class ShiftsController < ApplicationController
         format.turbo_stream
         format.html { redirect_to roster_path(@shift.roster_id), notice: "Shift created." }
       else
-        format.turbo_stream { render partial: "form_modal", status: :unprocessable_entity, locals: { shift: @shift } }
+        format.turbo_stream do
+          flash.now[:alert] = @shift.errors.full_messages.to_sentence
+          render turbo_stream: [
+            turbo_stream.replace("assign_shift_modal",
+              partial: "shifts/form_modal",
+              locals: { shift: @shift }),
+            turbo_stream.replace("flash",
+              partial: "layouts/flash")
+          ], status: :unprocessable_entity
+        end
         format.html { render :new, status: :unprocessable_entity }
       end
     end
@@ -82,7 +92,27 @@ class ShiftsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.turbo_stream { render partial: "form_modal", status: :unprocessable_entity, locals: { shift: @shift } }
+        format.turbo_stream do
+          flash.now[:alert] = @shift.errors.full_messages.to_sentence
+          if is_drag_and_drop
+            # Drag-and-drop failed validation: Revert the shift and show a flash message.
+            render turbo_stream: [
+              turbo_stream.replace("flash", partial: "layouts/flash"),
+              turbo_stream.replace(dom_id(@roster, "cell_content_#{@old_user.id}_#{@old_date}"),
+                partial: "rosters/cell_content",
+                locals: { roster: @roster, user: @old_user, date: @old_date, selected_location_id: @selected_location_id })
+            ], status: :unprocessable_entity
+          else
+            # Modal form submission failed validation: Re-render the modal with errors.
+            render turbo_stream: [
+              turbo_stream.replace("assign_shift_modal",
+                partial: "shifts/form_modal",
+                locals: { shift: @shift }),
+              turbo_stream.replace("flash",
+                partial: "layouts/flash")
+            ], status: :unprocessable_entity
+          end
+        end
         format.html { render :edit, status: :unprocessable_entity }
       end
     end

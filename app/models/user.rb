@@ -6,6 +6,7 @@ class User < ApplicationRecord
   belongs_to :location, optional: true
   has_many :shifts, dependent: :destroy
   has_many :timesheets, dependent: :destroy
+  has_many :unavailability_requests, dependent: :destroy
 
   ROLES = {
     employee: 0,

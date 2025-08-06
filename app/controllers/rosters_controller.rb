@@ -66,6 +66,11 @@ class RostersController < ApplicationController
 
   # POST /rosters/:id/publish
   def publish
+    if @roster.shifts.empty?
+      redirect_to @roster, alert: "There are unassigned shifts in this roster. Are you sure you want to publish?"
+      return
+    end
+
     @roster.update(status: Roster::STATUSES[:published])
     redirect_to @roster, notice: "Roster published."
   end

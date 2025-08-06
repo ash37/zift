@@ -1,5 +1,5 @@
 class TimesheetsController < ApplicationController
-  before_action :set_timesheet, only: %i[ show edit update destroy approve clock_off_form clock_off ]
+  before_action :set_timesheet, only: %i[ show edit update destroy approve clock_off_form clock_off match_roster_times ]
 
   # GET /timesheets
   def index
@@ -114,6 +114,14 @@ class TimesheetsController < ApplicationController
       redirect_to timesheets_path, notice: "Timesheet approved."
     else
       redirect_to timesheets_path, alert: "Could not approve timesheet."
+    end
+  end
+
+  def match_roster_times
+    if @timesheet.update(clock_in_at: @timesheet.shift.start_time, clock_out_at: @timesheet.shift.end_time)
+      redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), notice: "Timesheet updated to match roster."
+    else
+      redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), alert: "Could not update timesheet."
     end
   end
 

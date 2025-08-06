@@ -73,7 +73,16 @@ export default class extends Controller {
       },
       body: JSON.stringify(body)
     })
-    .then(response => response.text())
+    .then(response => {
+      if (!response.ok && response.status === 422) {
+        // If the server responds with a validation error,
+        // we need to revert the drag on the frontend.
+        // We use SortableJS's native `closest` and `sort` methods to do this.
+        const originalSortable = Sortable.get(event.from);
+        originalSortable.sort(originalSortable.toArray(), true);
+      }
+      return response.text()
+    })
     .then(html => {
       Turbo.renderStreamMessage(html)
     });

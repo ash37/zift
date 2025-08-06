@@ -3,8 +3,8 @@
   upcoming_shifts = current_user.shifts.joins(:roster).where(rosters: { status: Roster::STATUSES[:published] }).where("shifts.start_time >= ?", Date.tomorrow.beginning_of_day).order(:start_time).limit(5)
 %>
 
-<section class="container px-4 py-4 mx-auto">
-  <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Hi, <%= current_user.first_name %></h2>
+<section class="container px-4 py-4 mx-auto bg-indigo-50">
+  <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hi, <%= current_user.first_name %></h2>
   <p class="mt-2 text-gray-600 dark:text-gray-300">Here are your upcoming shifts.</p>
 
   <div class="mt-6 space-y-8">

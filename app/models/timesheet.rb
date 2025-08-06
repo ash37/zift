@@ -11,6 +11,7 @@ class Timesheet < ApplicationRecord
   }.freeze
 
   validates :status, inclusion: { in: STATUSES.values }
+  validate :clock_out_after_clock_in
 
   def pending?
     status == STATUSES[:pending]
@@ -39,5 +40,15 @@ class Timesheet < ApplicationRecord
 
   def rostered_hours
     shift.duration_in_hours
+  end
+
+  private
+
+  def clock_out_after_clock_in
+    return if clock_out_at.blank? || clock_in_at.blank?
+
+    if clock_out_at <= clock_in_at
+      errors.add(:clock_out_at, "must be after the clock in time")
+    end
   end
 end

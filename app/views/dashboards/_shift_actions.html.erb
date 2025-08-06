@@ -2,11 +2,33 @@
 <% timesheet ||= nil %>
 
 <% if !upcoming %>
-  <div class="flex items-center gap-x-4">
+  <div x-data="{
+      clockedInAt: '<%= timesheet&.clock_in_at&.iso8601 %>',
+      canClockOut: true,
+      init() {
+          if (!this.clockedInAt || this.clockedInAt === '') {
+              this.canClockOut = true;
+              return;
+          }
+          const fifteenMinutes = 15 * 60 * 1000;
+          const clockInTime = new Date(this.clockedInAt).getTime();
+          const now = new Date().getTime();
+          this.canClockOut = (now - clockInTime) > fifteenMinutes;
+
+          if (!this.canClockOut) {
+              const remainingTime = fifteenMinutes - (now - clockInTime);
+              setTimeout(() => { this.canClockOut = true; }, remainingTime);
+          }
+      }
+  }" class="flex items-center gap-x-4">
     <% if timesheet&.clocked_out? %>
       <span class="px-3 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">Completed</span>
     <% elsif timesheet %>
-      <%= link_to "Clock Off", clock_off_form_timesheet_path(timesheet), class: "px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600" %>
+      <a :href="canClockOut ? '<%= clock_off_form_timesheet_path(timesheet) %>' : '#'"
+         :class="{ 'opacity-50 cursor-not-allowed': !canClockOut }"
+         class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600">
+        Clock Off
+      </a>
     <% else %>
       <%= button_to "Clock On", clock_on_shift_path(shift), method: :post, class: "px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600" %>
     <% end %>

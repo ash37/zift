@@ -14,7 +14,8 @@
     <% if @shifts.any? %>
       <% @shifts.each do |shift| %>
         <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render shift %>
+          <%# Pass selected_location_id as nil since it's not relevant on this page %>
+          <%= render shift, selected_location_id: nil %>
           <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
             <%= link_to "Show", shift, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
             <%= link_to "Edit", edit_shift_path(shift), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
