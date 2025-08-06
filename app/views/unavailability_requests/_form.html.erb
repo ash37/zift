@@ -1,54 +1,75 @@
+<%# app/views/unavailability_requests/_form.html.erb %>
 <%= form_with(model: unavailability_request, class: "contents") do |form| %>
-  <div x-data="{ allDay: <%= unavailability_request.all_day? %> }">
+  <div x-data="{ type: 'once', allDay: <%= unavailability_request.all_day? %> }">
     <input type="hidden" name="unavailability_request[all_day]" x-bind:value="allDay">
 
-    <% if unavailability_request.errors.any? %>
-      <div id="error_explanation" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">
-        <h2 class="font-bold"><%= pluralize(unavailability_request.errors.count, "error") %> prohibited this request from being saved:</h2>
-        <ul class="list-disc ml-6 mt-2">
-          <% unavailability_request.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white"><%= unavailability_request.new_record? ? 'New Unavailability Request' : 'Edit Unavailability Request' %></h2>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <div>
-        <%= form.label :starts_at, "Start Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= form.date_field :starts_at, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
-      </div>
-      <div>
-        <%= form.label :ends_at, "End Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= form.date_field :ends_at, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
-      </div>
-    </div>
+      <% if unavailability_request.errors.any? %>
+        <div id="error_explanation" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">
+          <h2 class="font-bold"><%= pluralize(unavailability_request.errors.count, "error") %> prohibited this request from being saved:</h2>
+          <ul class="list-disc ml-6 mt-2">
+            <% unavailability_request.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
 
-    <div class="my-6">
-      <label class="flex items-center">
-        <input type="checkbox" x-model="allDay" class="form-checkbox h-5 w-5 text-violet-600 rounded">
-        <span class="ml-2 text-gray-700">All day</span>
-      </label>
-    </div>
-
-    <div x-show="!allDay" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <div>
-        <%= label_tag "unavailability_request[starts_at_time]", "Start Time", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= time_field_tag "unavailability_request[starts_at_time]", unavailability_request.starts_at&.strftime('%H:%M'), class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
+      <%# ... (Top part of the form is unchanged) ... %>
+       <div class="mb-6">
+        <label class="flex items-center">
+          <input type="checkbox" x-model="allDay" class="form-checkbox h-5 w-5 text-violet-600 rounded">
+          <span class="ml-2 text-gray-700">All day</span>
+        </label>
       </div>
-      <div>
-        <%= label_tag "unavailability_request[ends_at_time]", "End Time", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= time_field_tag "unavailability_request[ends_at_time]", unavailability_request.ends_at&.strftime('%H:%M'), class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
+
+      <div x-show="type === 'once'" x-transition>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <%= form.label :starts_at, "Start Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= form.date_field :starts_at, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
+          </div>
+          <div>
+            <%= form.label :ends_at, "End Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= form.date_field :ends_at, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
+          </div>
+          <div :class="{'hidden': allDay}" class="sm:col-span-2 grid grid-cols-2 gap-6">
+            <div>
+              <label for="unavailability_request_starts_at_time" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+              <%= select_tag "unavailability_request[starts_at_time]",
+                             options_for_select(time_options_for_select, selected_time_for(unavailability_request.starts_at) || '09:00'),
+                             class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2",
+                             "x-bind:disabled": "allDay" %>
+            </div>
+            <div>
+              <label for="unavailability_request_ends_at_time" class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+              <%= select_tag "unavailability_request[ends_at_time]",
+                             options_for_select(time_options_for_select, selected_time_for(unavailability_request.ends_at) || '17:00'),
+                             class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2",
+                             "x-bind:disabled": "allDay" %>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+      <%# ... (Repeating section would go here) ... %>
 
-    <div class="mt-6">
-      <%= form.label :reason, "Comment", class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= form.text_area :reason, rows: 3, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2", placeholder: "Add a comment..." %>
-    </div>
+      <div class="mt-8 flex items-end gap-x-4">
+        
+        <div class="flex-grow">
+          <%# FIX: Changed label from "Comment" to "Reason" %>
+          <%= form.label :reason, "Reason", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :reason, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2", placeholder: "Add a reason..." %>
+        </div>
 
-    <div class="mt-8 flex justify-end">
-      <%= form.submit "Save", class: "bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6 py-2 rounded-md shadow-sm cursor-pointer" %>
+        <div class="flex-shrink-0">
+          <%# FIX: Updated button styling %>
+          <%= form.submit "Save", class: "px-8 py-2.5 leading-5 text-white font-semibold transition-colors duration-300 transform bg-gray-700 rounded-3xl hover:bg-gray-600 focus:outline-none focus:bg-gray-600 h-full" %>
+        </div>
+        
+      </div>
+
     </div>
   </div>
 <% end %>
