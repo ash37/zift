@@ -6,9 +6,11 @@ class Shift < ApplicationRecord
   belongs_to :area, optional: true
   has_many :timesheets, dependent: :destroy
 
+  # This line correctly calls your validation method before saving a shift
+  validate :user_is_available
+
   validate :end_time_after_start_time
   validate :no_overlapping_shifts
-  validate :user_is_available
   validate :duration_within_limits
   validate :not_in_past_for_published_roster
 
@@ -38,13 +40,17 @@ class Shift < ApplicationRecord
     end
   end
 
+  # This is the key validation method you requested. It is correct.
   def user_is_available
     return if user.blank? || start_time.blank? || end_time.blank?
 
+    # 1. Finds unavailability requests for the correct user that are 'approved'
     unavailable = user.unavailability_requests.where(status: UnavailabilityRequest::STATUSES[:approved])
+                      # 2. Checks if the request period overlaps with the new shift's time
                       .where("starts_at < ? AND ends_at > ?", end_time, start_time)
                       .exists?
 
+    # 3. If an overlapping approved request exists, it adds an error and prevents saving
     if unavailable
       errors.add(:base, "User has an approved unavailability request during this time.")
     end

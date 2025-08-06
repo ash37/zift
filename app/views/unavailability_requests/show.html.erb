@@ -1,15 +1,11 @@
-<% content_for :title, "Showing unavailability request" %>
-
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
-
-  <h1 class="font-bold text-4xl">Showing unavailability request</h1>
-
-  <%= render @unavailability_request %>
-
-  <%= link_to "Edit this unavailability request", edit_unavailability_request_path(@unavailability_request), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to unavailability requests", unavailability_requests_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this unavailability request", @unavailability_request, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <section class="relative max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md">
+    <%= link_to unavailability_requests_path, class: "absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-600" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    <% end %>
+    <h2 class="text-lg font-semibold text-gray-700 capitalize">Request Details</h2>
+    <%= render @unavailability_request %>
+  </section>
 </div>

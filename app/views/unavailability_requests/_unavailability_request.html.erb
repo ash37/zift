@@ -1,22 +1,18 @@
-<div id="<%= dom_id unavailability_request %>" class="w-full sm:w-auto my-5 space-y-5">
+<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
   <div>
-    <strong class="block font-medium mb-1">User:</strong>
-    <%= unavailability_request.user_id %>
+    <label class="text-gray-700">Employee</label>
+    <p class="mt-2 p-2 bg-gray-100 rounded-md"><%= unavailability_request.user.name %></p>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Starts at:</strong>
-    <%= unavailability_request.starts_at %>
+    <label class="text-gray-700">Period</label>
+    <p class="mt-2 p-2 bg-gray-100 rounded-md"><%= unavailability_request.starts_at.strftime("%a, %d %b %Y, %l:%M %p") %> to <%= unavailability_request.ends_at.strftime("%a, %d %b %Y, %l:%M %p") %></p>
+  </div>
+  <div class="sm:col-span-2">
+    <label class="text-gray-700">Reason</label>
+    <p class="mt-2 p-2 bg-gray-100 rounded-md"><%= unavailability_request.reason %></p>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Ends at:</strong>
-    <%= unavailability_request.ends_at %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Reason:</strong>
-    <%= unavailability_request.reason %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Status:</strong>
-    <%= unavailability_request.status %>
+    <label class="text-gray-700">Status</label>
+    <p class="mt-2 p-2 bg-gray-100 rounded-md"><%= unavailability_request.status_name %></p>
   </div>
 </div>

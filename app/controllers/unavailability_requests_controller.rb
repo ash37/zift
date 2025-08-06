@@ -1,70 +1,78 @@
+# app/controllers/unavailability_requests_controller.rb
 class UnavailabilityRequestsController < ApplicationController
-  before_action :set_unavailability_request, only: %i[ show edit update destroy ]
+  before_action :set_unavailability_request, only: %i[ show edit update approve decline ]
 
-  # GET /unavailability_requests or /unavailability_requests.json
   def index
-    @unavailability_requests = UnavailabilityRequest.all
+    if current_user.admin? || current_user.manager?
+      @unavailability_requests = UnavailabilityRequest.order(starts_at: :desc)
+    else
+      @unavailability_requests = current_user.unavailability_requests.order(starts_at: :desc)
+    end
   end
 
-  # GET /unavailability_requests/1 or /unavailability_requests/1.json
   def show
   end
 
-  # GET /unavailability_requests/new
   def new
     @unavailability_request = UnavailabilityRequest.new
   end
 
-  # GET /unavailability_requests/1/edit
   def edit
   end
 
-  # POST /unavailability_requests or /unavailability_requests.json
   def create
-    @unavailability_request = UnavailabilityRequest.new(unavailability_request_params)
+    @unavailability_request = current_user.unavailability_requests.build(processed_unavailability_params)
+    @unavailability_request.status = UnavailabilityRequest::STATUSES[:pending]
 
-    respond_to do |format|
-      if @unavailability_request.save
-        format.html { redirect_to @unavailability_request, notice: "Unavailability request was successfully created." }
-        format.json { render :show, status: :created, location: @unavailability_request }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @unavailability_request.errors, status: :unprocessable_entity }
-      end
+    if @unavailability_request.save
+      redirect_to unavailability_requests_path, notice: "Unavailability request was successfully submitted."
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /unavailability_requests/1 or /unavailability_requests/1.json
   def update
-    respond_to do |format|
-      if @unavailability_request.update(unavailability_request_params)
-        format.html { redirect_to @unavailability_request, notice: "Unavailability request was successfully updated." }
-        format.json { render :show, status: :ok, location: @unavailability_request }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @unavailability_request.errors, status: :unprocessable_entity }
-      end
+    if @unavailability_request.update(processed_unavailability_params)
+      redirect_to unavailability_requests_path, notice: "Unavailability request was successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
-  # DELETE /unavailability_requests/1 or /unavailability_requests/1.json
-  def destroy
-    @unavailability_request.destroy!
+  def approve
+    @unavailability_request.update(status: UnavailabilityRequest::STATUSES[:approved])
+    redirect_to unavailability_requests_path, notice: "Request approved."
+  end
 
-    respond_to do |format|
-      format.html { redirect_to unavailability_requests_path, status: :see_other, notice: "Unavailability request was successfully destroyed." }
-      format.json { head :no_content }
-    end
+  def decline
+    @unavailability_request.update(status: UnavailabilityRequest::STATUSES[:declined])
+    redirect_to unavailability_requests_path, notice: "Request declined."
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_unavailability_request
-      @unavailability_request = UnavailabilityRequest.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def unavailability_request_params
-      params.expect(unavailability_request: [ :user_id, :starts_at, :ends_at, :reason, :status ])
+  def set_unavailability_request
+    @unavailability_request = UnavailabilityRequest.find(params[:id])
+  end
+
+  def unavailability_request_params
+    params.require(:unavailability_request).permit(:reason, :starts_at, :ends_at, :starts_at_time, :ends_at_time, :all_day)
+  end
+
+  def processed_unavailability_params
+    attrs = unavailability_request_params.to_h
+    start_date_str = attrs[:starts_at]
+    end_date_str = attrs[:ends_at]
+    start_time_str = attrs[:starts_at_time]
+    end_time_str = attrs[:ends_at_time]
+
+    if attrs[:all_day] == "true"
+      attrs[:starts_at] = Time.zone.parse(start_date_str)&.beginning_of_day if start_date_str.present?
+      attrs[:ends_at] = Time.zone.parse(end_date_str)&.end_of_day if end_date_str.present?
+    else
+      attrs[:starts_at] = Time.zone.parse("#{start_date_str} #{start_time_str}") if start_date_str.present? && start_time_str.present?
+      attrs[:ends_at] = Time.zone.parse("#{end_date_str} #{end_time_str}") if end_date_str.present? && end_time_str.present?
     end
+    attrs.except(:starts_at_time, :ends_at_time, :all_day)
+  end
 end

@@ -39,7 +39,12 @@ Rails.application.routes.draw do
       get "week(/:date)", to: "timesheets#index", as: "week"
     end
   end
-
+resources :unavailability_requests do
+    member do
+      patch :approve
+      patch :decline
+    end
+  end
   resources :unavailability_requests
 
   resources :rosters do

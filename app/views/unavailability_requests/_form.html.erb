@@ -1,42 +1,54 @@
 <%= form_with(model: unavailability_request, class: "contents") do |form| %>
-  <% if unavailability_request.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(unavailability_request.errors.count, "error") %> prohibited this unavailability_request from being saved:</h2>
+  <div x-data="{ allDay: <%= unavailability_request.all_day? %> }">
+    <input type="hidden" name="unavailability_request[all_day]" x-bind:value="allDay">
 
-      <ul class="list-disc ml-6">
-        <% unavailability_request.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+    <% if unavailability_request.errors.any? %>
+      <div id="error_explanation" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">
+        <h2 class="font-bold"><%= pluralize(unavailability_request.errors.count, "error") %> prohibited this request from being saved:</h2>
+        <ul class="list-disc ml-6 mt-2">
+          <% unavailability_request.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div>
+        <%= form.label :starts_at, "Start Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.date_field :starts_at, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
+      </div>
+      <div>
+        <%= form.label :ends_at, "End Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.date_field :ends_at, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
+      </div>
     </div>
-  <% end %>
 
-  <div class="my-5">
-    <%= form.label :user_id %>
-    <%= form.text_field :user_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": unavailability_request.errors[:user_id].none?, "border-red-400 focus:outline-red-600": unavailability_request.errors[:user_id].any?}] %>
-  </div>
+    <div class="my-6">
+      <label class="flex items-center">
+        <input type="checkbox" x-model="allDay" class="form-checkbox h-5 w-5 text-violet-600 rounded">
+        <span class="ml-2 text-gray-700">All day</span>
+      </label>
+    </div>
 
-  <div class="my-5">
-    <%= form.label :starts_at %>
-    <%= form.datetime_field :starts_at, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": unavailability_request.errors[:starts_at].none?, "border-red-400 focus:outline-red-600": unavailability_request.errors[:starts_at].any?}] %>
-  </div>
+    <div x-show="!allDay" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div>
+        <%= label_tag "unavailability_request[starts_at_time]", "Start Time", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= time_field_tag "unavailability_request[starts_at_time]", unavailability_request.starts_at&.strftime('%H:%M'), class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
+      </div>
+      <div>
+        <%= label_tag "unavailability_request[ends_at_time]", "End Time", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= time_field_tag "unavailability_request[ends_at_time]", unavailability_request.ends_at&.strftime('%H:%M'), class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" %>
+      </div>
+    </div>
 
-  <div class="my-5">
-    <%= form.label :ends_at %>
-    <%= form.datetime_field :ends_at, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": unavailability_request.errors[:ends_at].none?, "border-red-400 focus:outline-red-600": unavailability_request.errors[:ends_at].any?}] %>
-  </div>
+    <div class="mt-6">
+      <%= form.label :reason, "Comment", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= form.text_area :reason, rows: 3, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2", placeholder: "Add a comment..." %>
+    </div>
 
-  <div class="my-5">
-    <%= form.label :reason %>
-    <%= form.text_field :reason, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": unavailability_request.errors[:reason].none?, "border-red-400 focus:outline-red-600": unavailability_request.errors[:reason].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :status %>
-    <%= form.number_field :status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": unavailability_request.errors[:status].none?, "border-red-400 focus:outline-red-600": unavailability_request.errors[:status].any?}] %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+    <div class="mt-8 flex justify-end">
+      <%= form.submit "Save", class: "bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6 py-2 rounded-md shadow-sm cursor-pointer" %>
+    </div>
   </div>
 <% end %>
