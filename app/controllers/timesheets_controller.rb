@@ -119,9 +119,9 @@ class TimesheetsController < ApplicationController
 
   def match_roster_times
     if @timesheet.update(clock_in_at: @timesheet.shift.start_time, clock_out_at: @timesheet.shift.end_time)
-      redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), notice: "Timesheet updated to match roster."
+    redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week)
     else
-      redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), alert: "Could not update timesheet."
+    redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), alert: "Could not update timesheet."
     end
   end
 

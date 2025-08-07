@@ -1,0 +1,41 @@
+<% content_for :title, "Reports" %>
+
+<%= render 'sub_nav' %>
+
+<section>
+  <div class="flex flex-col w-full px-4 py-10 bg-zinc-200">
+    <h1 class="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl dark:text-white">
+      Timesheet <span class="text-violet-500">Notes</span>
+    </h1>
+
+    <div class="grid w-full grid-cols-1 gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <% @timesheets.each do |timesheet| %>
+        <div class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl dark:bg-gray-800">
+          <div class="flex items-center justify-between">
+            <h1 class="text-lg font-semibold text-gray-800 dark:text-white"><%= timesheet.shift.location.name %></h1>
+            <span class="px-3 py-1 text-xs text-violet-800 uppercase bg-violet-200 rounded-full dark:bg-violet-300 dark:text-violet-900"><%= timesheet.shift.start_time.strftime("%a, %d %b") %></span>
+          </div>
+
+          <div>
+            <p class="ml-8 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.shift.area&.name %></p>
+            <% if timesheet.shift.note.present? %>
+              <p class="ml-8 text-sm text-gray-600 dark:text-gray-300"><em><%= timesheet.shift.note %></em></p>
+            <% end %>
+            <div class="flex items-center mt-2 bg-violet-100 rounded-3xl p-1">
+              <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-violet-100 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 class="ml-2 text-gray-700 dark:text-gray-200"><%= timesheet.user.name %></h2>
+            </div>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.notes %></p>
+            <% if timesheet.travel.present? && timesheet.travel > 0 %>
+              <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><strong>Travel on this shift:</strong> <%= timesheet.travel %>km</p>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

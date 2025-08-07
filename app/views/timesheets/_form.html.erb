@@ -20,7 +20,7 @@
   <% end %>
 
   <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white pt-12"><%= @timesheet.user.name %></h2>
-  
+
   <div class="flex items-center gap-x-2 mt-2 text-gray-700 dark:text-gray-200">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
       <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
@@ -42,8 +42,8 @@
     <% end %>
 
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-    
-      
+
+
       <%= form.fields_for :shift, @timesheet.shift do |shift_form| %>
         <div x-data="{ open: false, selectedArea: '<%= @timesheet.shift.area&.name || "Select an Area" %>' }">
           <label class="text-gray-700 dark:text-gray-200">Area</label>
@@ -86,7 +86,7 @@
         <%= form.number_field :travel, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
       </div>
     </div>
-    
+
     <div class="mt-2 hidden sm:block">
       <p class="text-sm font-semibold text-orange-600">Scheduled: <%= format_shift_time(@timesheet.shift.start_time) %> - <%= format_shift_time(@timesheet.shift.end_time) %></p>
     </div>
@@ -96,9 +96,10 @@
       <%= form.text_area :notes, rows: 4, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
     </div>
 
-  
 
-    <div class="flex justify-end mt-6">
+
+    <div class="flex justify-end items-center mt-6">
+      <%= link_to "Match Roster", match_roster_times_timesheet_path(@timesheet), method: :patch, class: "text-violet-800 px-4 py-2.5 hover:bg-violet-100 hover:rounded-3xl" %>
       <%= form.submit "Approve", class: "px-8 py-2.5 leading-5 font-semibold text-white transition-colors duration-300 transform bg-green-600 rounded-3xl hover:bg-green-500 focus:outline-none focus:bg-green-700" %>
     </div>
   <% end %>

@@ -3,7 +3,6 @@
 <%= render 'sub_nav' %>
 
 <div class="container px-0 sm:px-4 mx-auto">
-  <!-- Desktop Table -->
   <div class="hidden sm:block">
     <div class="flex flex-col mt-6">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -51,13 +50,13 @@
                         <%
                           status_classes = case timesheet.status_name.downcase
                                            when 'approved'
-                                             'bg-emerald-100/60'
+                                             'bg-green-100 text-green-800'
                                            when 'rejected'
-                                             'bg-red-100/60'
+                                             'bg-red-100 text-red-800'
                                            when 'started', 'auto'
-                                             'bg-orange-100/60'
+                                             'bg-orange-100 text-orange-800'
                                            else # pending
-                                             'bg-yellow-100/60'
+                                             'bg-yellow-100 text-yellow-800'
                                            end
                         %>
                         <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 <%= status_classes %>">
@@ -76,10 +75,16 @@
                     </td>
                     <td class="px-4 py-4 text-sm whitespace-nowrap text-right">
                       <% if timesheet && (current_user.admin? || current_user.manager?) %>
-                        <% if timesheet.pending? %>
-                          <%= button_to "Approve", approve_timesheet_path(timesheet), method: :patch, class: "text-emerald-500 hover:text-emerald-700" %>
-                        <% end %>
-                        <%= button_to "Match Roster", match_roster_times_timesheet_path(timesheet), method: :patch, class: "text-blue-500 hover:text-blue-700" %>
+                        <div class="flex items-center gap-x-3 justify-end">
+                          <% if timesheet.pending? %>
+                            <%= link_to "Match Roster", match_roster_times_timesheet_path(timesheet), method: :patch, class: "text-violet-800 hover:bg-violet-100 hover:rounded-3xl px-2 py-1" %>
+                            <%= button_to approve_timesheet_path(timesheet), method: :patch, class: "bg-green-500 hover:bg-green-700 text-white font-semibold p-2 rounded-full" do %>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                              </svg>
+                            <% end %>
+                          <% end %>
+                        </div>
                       <% end %>
                     </td>
                   </tr>
@@ -92,7 +97,6 @@
     </div>
   </div>
 
-  <!-- Mobile Cards -->
   <div class="sm:hidden">
     <% @shifts.group_by { |s| s.start_time.to_date }.each do |date, shifts_for_day| %>
       <div class="mt-1">
@@ -114,20 +118,26 @@
                     <p class="text-sm text-gray-600 dark:text-gray-300">Worked: <%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></p>
                   <% end %>
                   <p class="text-xs text-gray-500 dark:text-gray-400"><%= [shift.area&.name, shift.location.name].compact.join(' - ') %></p>
-                  <p class="text-xs text-violet-700 dark:text-violet-600">Scheduled: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+                  <%
+                    rostered_time_class = "text-xs text-violet-700 dark:text-violet-600"
+                    if timesheet && (timesheet.duration_in_hours - shift.duration_in_hours).abs > 0.01
+                      rostered_time_class = "text-xs text-orange-500 dark:text-orange-400"
+                    end
+                  %>
+                  <p class="<%= rostered_time_class %>">Scheduled: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
                 </div>
                 <div class="text-right">
                   <% if timesheet %>
                     <%
                       status_classes = case timesheet.status_name.downcase
                                        when 'approved'
-                                         'bg-emerald-100/60 text-emerald-800'
+                                         'bg-green-100 text-green-800'
                                        when 'rejected'
-                                         'bg-red-100/60 text-red-800'
+                                         'bg-red-100 text-red-800'
                                        when 'started', 'auto'
-                                         'bg-orange-100/60 text-orange-800'
+                                         'bg-orange-100 text-orange-800'
                                        else # pending
-                                         'bg-yellow-100/60 text-yellow-800'
+                                         'bg-yellow-100 text-yellow-800'
                                        end
                     %>
                     <div class="inline-flex items-center px-2 py-1 rounded-full gap-x-1 text-xs <%= status_classes %>">
@@ -138,9 +148,14 @@
                       <% end %>
                       <%= timesheet.status_name.titleize %>
                     </div>
-                    <% if (timesheet.duration_in_hours - shift.duration_in_hours).abs > 0.01 %>
-                      <div class="mt-1" title="Worked hours do not match rostered hours.">
-                        <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.21 3.03-1.742 3.03H4.42c-1.532 0-2.492-1.696-1.742-3.03l5.58-9.92zM10 13a1 1 0 110-2 1 1 0 010 2zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    <% if timesheet && (current_user.admin? || current_user.manager?) && timesheet.pending? %>
+                      <div class="flex items-center gap-x-3 justify-end mt-2">
+                        <%= link_to "Match", match_roster_times_timesheet_path(timesheet), method: :patch, class: "text-violet-800 hover:bg-violet-100 hover:rounded-3xl px-2 py-1" %>
+                        <%= button_to approve_timesheet_path(timesheet), method: :patch, class: "bg-green-500 hover:bg-green-700 text-white font-semibold p-2 rounded-full" do %>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                        <% end %>
                       </div>
                     <% end %>
                   <% else %>

@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   end
   resources :shifts
   resources :recurrences
+  resources :reports, only: [ :index ]
 
   post "shifts/:id/clock_on", to: "timesheets#clock_on", as: "clock_on_shift"
 
