@@ -2,18 +2,17 @@
 
 <section class="container px-4 py-4 mx-auto">
   <div class="flex justify-between items-center">
-  <%# Left Side: Title and user count %>
-  <div class="flex items-center gap-x-3">
-    <h2 class="text-lg font-medium text-gray-800 dark:text-white">Team</h2>
-    <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400"><%= pluralize(@users.count, 'user') %></span>
-  </div>
+    <%# Left Side: Title and user count %>
+    <div class="flex items-center gap-x-3">
+      <h2 class="text-lg font-medium text-gray-800 dark:text-white">Team</h2>
+      <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400"><%= pluralize(@users.count, 'user') %></span>
+    </div>
 
-  <%# Right Side: Add user button %>
-  <div>
-    <%= link_to "Add", admin_new_user_path, class: "rounded-lg px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white font-medium" %>
+    <%# Right Side: Add user button %>
+    <div>
+      <%= link_to "Add", admin_new_user_path, class: "tracking-wide rounded-3xl px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white font-semibold" %>
+    </div>
   </div>
-</div>
-
 
   <div class="flex flex-col mt-6">
     <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -22,24 +21,30 @@
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-800">
               <tr>
-                
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Name
                 </th>
-               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Email
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <%# FIX: Hide this column on mobile screens %>
+                <th scope="col" class="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Role
                 </th>
-               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <%# FIX: Hide this column on mobile screens %>
+                <th scope="col" class="hidden sm:table-cell relative px-6 py-3">
                   <span class="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
               <% @users.each do |user| %>
-                <tr>
+                <%# FIX: Add Stimulus controller and data attributes to make the row clickable %>
+                <tr data-controller="clickable-row"
+                    data-action="click->clickable-row#visit"
+                    data-clickable-row-url-value="<%= user_path(user) %>"
+                    class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+
                   <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                     <div class="flex items-center gap-x-2">
                       <div>
@@ -48,9 +53,10 @@
                     </div>
                   </td>
                   <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= user.email %></td>
-                  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= user.role_name %>
-</td>
-                  <td class="px-4 py-4 text-sm whitespace-nowrap">
+                  <%# FIX: Hide this column on mobile screens %>
+                  <td class="hidden sm:table-cell px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= user.role_name %></td>
+                  <%# FIX: Hide this column on mobile screens %>
+                  <td class="hidden sm:table-cell px-4 py-4 text-sm whitespace-nowrap">
                     <div class="flex items-center gap-x-3">
                       <%= link_to edit_user_path(user), class: "text-gray-500 hover:text-yellow-500" do %>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">

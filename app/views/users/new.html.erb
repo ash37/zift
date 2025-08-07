@@ -1,8 +1,7 @@
+<%# app/views/users/new.html.erb %>
 <% content_for :title, "New user" %>
 
-<div class="flex items-center justify-center min-h-screen">
-  
-
+<%# FIX: Use a container that provides padding but doesn't force centering on all screen sizes. %>
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <%= render "form", user: @user %>
-
 </div>
