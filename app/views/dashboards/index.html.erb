@@ -1,5 +1,5 @@
 <%
-  today_shifts = current_user.shifts.includes(:timesheets).joins(:roster).where(rosters: { status: Roster::STATUSES[:published] }).where("shifts.start_time >= ? AND shifts.start_time < ?", Date.today.beginning_of_day, Date.today.end_of_day).order('shifts.start_time ASC')
+  today_shifts = current_user.shifts.includes(:timesheets).joins(:roster).where(rosters: { status: Roster::STATUSES[:published] }).where("shifts.start_time >= ? AND shifts.start_time < ?", Date.today.beginning_of_day, Date.today.end_of_day).left_joins(:timesheets).where("timesheets.id IS NULL OR timesheets.clock_out_at IS NULL").order('shifts.start_time ASC')
   upcoming_shifts = current_user.shifts.joins(:roster).where(rosters: { status: Roster::STATUSES[:published] }).where("shifts.start_time >= ?", Date.tomorrow.beginning_of_day).order(:start_time).limit(5)
 %>
 
