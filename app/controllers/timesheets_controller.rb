@@ -80,29 +80,29 @@ class TimesheetsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /timesheets/1
-  def update
-    # The form is now an "Approve" form, so we merge the approved status.
-    updated_params = timesheet_params.merge(status: Timesheet::STATUSES[:approved])
+ # PATCH/PUT /timesheets/1
+ def update
+  # The form is now an "Approve" form, so we merge the approved status.
+  updated_params = timesheet_params.merge(status: Timesheet::STATUSES[:approved])
 
-    shift_date = @timesheet.shift.start_time.to_date
+  shift_date = @timesheet.shift.start_time.to_date
 
-    if params[:timesheet][:clock_in_at].present?
-      clock_in_time = Time.zone.parse(params[:timesheet][:clock_in_at])
-      updated_params[:clock_in_at] = clock_in_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
-    end
-
-    if params[:timesheet][:clock_out_at].present?
-      clock_out_time = Time.zone.parse(params[:timesheet][:clock_out_at])
-      updated_params[:clock_out_at] = clock_out_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
-    end
-
-    if @timesheet.update(updated_params)
-      redirect_to timesheets_path, notice: "Timesheet was successfully updated and approved."
-    else
-      render :edit, status: :unprocessable_entity
-    end
+  if params[:timesheet][:clock_in_at].present?
+    clock_in_time = Time.zone.parse(params[:timesheet][:clock_in_at])
+    updated_params[:clock_in_at] = clock_in_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
   end
+
+  if params[:timesheet][:clock_out_at].present?
+    clock_out_time = Time.zone.parse(params[:timesheet][:clock_out_at])
+    updated_params[:clock_out_at] = clock_out_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
+  end
+
+  if @timesheet.update(updated_params)
+    redirect_to timesheets_path
+  else
+    render :edit, status: :unprocessable_entity
+  end
+end
 
   # DELETE /timesheets/1
   def destroy
