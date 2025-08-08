@@ -91,7 +91,7 @@ class TimesheetsController < ApplicationController
         clock_in_at: Time.current,
         status: Timesheet::STATUSES[:pending]
       )
-      redirect_to dashboards_path, notice: "Clocked on successfully."
+      redirect_to dashboards_path
     else
       redirect_to dashboards_path, alert: "You are already clocked on for this shift."
     end
@@ -103,31 +103,31 @@ class TimesheetsController < ApplicationController
 
   def clock_off
     if @timesheet.update(clock_off_params.merge(clock_out_at: Time.current))
-      redirect_to dashboards_path, notice: "Clocked off successfully."
+      redirect_to dashboards_path
     else
       render :clock_off_form, status: :unprocessable_entity
     end
   end
 
-    def approve
-      if @timesheet.update(status: Timesheet::STATUSES[:approved])
-    respond_to do |format|
-      format.html { redirect_to timesheets_path }
-      format.turbo_stream
-        end
-      else
-    redirect_to timesheets_path, alert: "Could not approve timesheet."
+  def approve
+    if @timesheet.update(status: Timesheet::STATUSES[:approved])
+      respond_to do |format|
+        format.html { redirect_to timesheets_path }
+        format.turbo_stream
       end
+    else
+      redirect_to timesheets_path, alert: "Could not approve timesheet."
     end
+  end
 
   def match_roster_times
     if @timesheet.update(clock_in_at: @timesheet.shift.start_time, clock_out_at: @timesheet.shift.end_time)
-    respond_to do |format|
-      format.html { redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week) }
-      format.turbo_stream
-     end
+      respond_to do |format|
+        format.html { redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week) }
+        format.turbo_stream
+      end
     else
-    redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), alert: "Could not update timesheet."
+      redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), alert: "Could not update timesheet."
     end
   end
 
