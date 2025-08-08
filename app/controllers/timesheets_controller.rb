@@ -109,17 +109,23 @@ class TimesheetsController < ApplicationController
     end
   end
 
-  def approve
-    if @timesheet.update(status: Timesheet::STATUSES[:approved])
-      redirect_to timesheets_path, notice: "Timesheet approved."
-    else
-      redirect_to timesheets_path, alert: "Could not approve timesheet."
+    def approve
+      if @timesheet.update(status: Timesheet::STATUSES[:approved])
+    respond_to do |format|
+      format.html { redirect_to timesheets_path }
+      format.turbo_stream
+        end
+      else
+    redirect_to timesheets_path, alert: "Could not approve timesheet."
+      end
     end
-  end
 
   def match_roster_times
     if @timesheet.update(clock_in_at: @timesheet.shift.start_time, clock_out_at: @timesheet.shift.end_time)
-    redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week)
+    respond_to do |format|
+      format.html { redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week) }
+      format.turbo_stream
+     end
     else
     redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), alert: "Could not update timesheet."
     end

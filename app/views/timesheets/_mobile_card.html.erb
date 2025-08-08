@@ -1,0 +1,54 @@
+<% timesheet = shift.timesheets.first %>
+<div id="<%= dom_id(shift, :mobile) %>"
+  <% if timesheet %>
+    data-controller="clickable-row"
+    data-action="click->clickable-row#visit"
+    data-clickable-row-url-value="<%= edit_timesheet_path(timesheet) %>"
+  <% end %>
+  class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl dark:bg-gray-800"
+>
+  <div class="flex items-center justify-between">
+    <h1 class="text-lg font-semibold text-gray-800 dark:text-white"><%= shift.user.name %></h1>
+    <% if timesheet %>
+      <%
+        status_classes = case timesheet.status_name.downcase
+                         when 'approved'
+                           'bg-green-100 text-green-800'
+                         when 'rejected'
+                           'bg-red-100 text-red-800'
+                         when 'started', 'auto'
+                           'bg-orange-100 text-orange-800'
+                         else # pending
+                           'bg-yellow-100 text-yellow-800'
+                         end
+      %>
+      <span class="px-3 py-1 text-xs uppercase rounded-full <%= status_classes %>"><%= timesheet.status_name.titleize %></span>
+    <% else %>
+      <span class="px-3 py-1 text-xs uppercase bg-gray-100/60 rounded-full">Not Started</span>
+    <% end %>
+  </div>
+
+  <div>
+    <p class="text-sm text-gray-600 dark:text-gray-300"><%= shift.location.name %> - <%= shift.area&.name %></p>
+    <% if timesheet %>
+      <p class="text-sm text-gray-600 dark:text-gray-300">Worked: <%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></p>
+    <% end %>
+    <%
+      rostered_time_class = "text-xs text-violet-700 dark:text-violet-600"
+      if timesheet && (timesheet.duration_in_hours - shift.duration_in_hours).abs > 0.01
+        rostered_time_class = "text-xs text-orange-500 dark:text-orange-400"
+      end
+    %>
+    <p class="<%= rostered_time_class %>">Scheduled: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+    <% if timesheet && (current_user.admin? || current_user.manager?) && timesheet.pending? %>
+      <div class="flex items-center gap-x-3 justify-end mt-2">
+        <%= link_to "Match", match_roster_times_timesheet_path(timesheet), method: :patch, class: "text-violet-800 hover:bg-violet-100 hover:rounded-3xl px-2 py-1" %>
+        <%= button_to approve_timesheet_path(timesheet), method: :patch, class: "bg-green-500 hover:bg-green-700 text-white font-semibold p-2 rounded-full" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

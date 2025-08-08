@@ -1,0 +1,7 @@
+<%= turbo_stream.replace dom_id(@timesheet.shift) do %>
+  <%= render "timesheets/shift_row", shift: @timesheet.shift %>
+<% end %>
+
+<%= turbo_stream.replace dom_id(@timesheet.shift, :mobile) do %>
+  <%= render "timesheets/mobile_card", shift: @timesheet.shift %>
+<% end %>

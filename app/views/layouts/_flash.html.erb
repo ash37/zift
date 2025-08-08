@@ -1,6 +1,6 @@
 <%# app/views/layouts/_flash.html.erb %>
 <% flash.each do |type, message| %>
-  <% if type == "notice" %>
+  <% if type == "notice" && !["Signed in successfully.", "Signed out successfully."].include?(message) %>
     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md" role="alert">
       <p><%= message %></p>
     </div>
