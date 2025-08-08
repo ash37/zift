@@ -14,7 +14,13 @@
     <% if timesheet %>
       <div><%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></div>
     <% end %>
-    <div class="text-xs text-gray-400">Rostered: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></div>
+    <div class="text-xs text-gray-400">
+      <% if shift.roster.draft? %>
+        <span class="text-orange-500">Unscheduled</span>
+      <% else %>
+        Rostered: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %>
+      <% end %>
+    </div>
   </td>
   <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
     <% if timesheet %>

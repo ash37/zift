@@ -1,5 +1,9 @@
 <%
-  today_shifts = current_user.shifts.includes(:timesheets).joins(:roster).where(rosters: { status: Roster::STATUSES[:published] }).where("shifts.start_time >= ? AND shifts.start_time < ?", Date.today.beginning_of_day, Date.today.end_of_day).left_joins(:timesheets).where("timesheets.id IS NULL OR timesheets.clock_out_at IS NULL").order('shifts.start_time ASC')
+  today_shifts = current_user.shifts.includes(:timesheets)
+                                  .where("shifts.start_time >= ? AND shifts.start_time < ?", Date.today.beginning_of_day, Date.today.end_of_day)
+                                  .left_joins(:timesheets)
+                                  .where("timesheets.id IS NULL OR timesheets.clock_out_at IS NULL")
+                                  .order('shifts.start_time ASC')
   upcoming_shifts = current_user.shifts.joins(:roster).where(rosters: { status: Roster::STATUSES[:published] }).where("shifts.start_time >= ?", Date.tomorrow.beginning_of_day).order(:start_time).limit(5)
 %>
 
@@ -9,7 +13,10 @@
 
   <div class="mt-6 space-y-8">
     <div>
-      <h3 class="text-md font-medium text-gray-700 dark:text-gray-200">Today</h3>
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200">Today</h3>
+        <%= link_to "Start Unscheduled Shift", new_timesheet_path, class: "bg-white text-gray-400 font-semibold py-1 px-4 rounded-3xl" %>
+      </div>
       <div class="mt-4 space-y-4">
         <% if today_shifts.any? %>
           <% today_shifts.each do |shift| %>

@@ -13,19 +13,30 @@ class TimesheetsController < ApplicationController
 
     week_range = @start_date.beginning_of_day..(@start_date + 6.days).end_of_day
 
-    base_scope = Shift.joins(:roster)
-                      .where(rosters: { status: Roster::STATUSES[:published] })
-                      .where(start_time: week_range)
-                      .order("shifts.start_time ASC")
+    # Get all shifts from published rosters for the week
+    published_shifts = Shift.joins(:roster)
+                            .where(rosters: { status: Roster::STATUSES[:published] })
+                            .where(start_time: week_range)
+
+    # Get all shifts from draft rosters for the week that have a timesheet
+    unscheduled_shifts = Shift.joins(:roster)
+                              .joins(:timesheets)
+                              .where(rosters: { status: Roster::STATUSES[:draft] })
+                              .where(start_time: week_range)
+
+    # Combine the two sets of shifts
+    @shifts = Shift.from("(#{published_shifts.to_sql} UNION #{unscheduled_shifts.to_sql}) AS shifts")
+                   .order("shifts.start_time ASC")
+
 
     if @selected_location_id.present?
-      base_scope = base_scope.where(location_id: @selected_location_id)
+      @shifts = @shifts.where(location_id: @selected_location_id)
     end
 
     if current_user.admin? || current_user.manager?
-      @shifts = base_scope.all
+      @shifts = @shifts.all
     else
-      @shifts = base_scope.where(user_id: current_user.id)
+      @shifts = @shifts.where(user_id: current_user.id)
     end
   end
 
@@ -35,7 +46,8 @@ class TimesheetsController < ApplicationController
 
   # GET /timesheets/new
   def new
-    @timesheet = Timesheet.new
+    @timesheet = Timesheet.new(user: current_user, clock_in_at: Time.current)
+    @timesheet.build_shift(user: current_user)
   end
 
   # GET /timesheets/1/edit
@@ -44,11 +56,26 @@ class TimesheetsController < ApplicationController
 
   # POST /timesheets
   def create
-    @timesheet = Timesheet.new(timesheet_params)
+    starts_on = Date.today.beginning_of_week
+    roster = Roster.find_or_create_by!(starts_on: starts_on, status: Roster::STATUSES[:draft])
 
-    if @timesheet.save
-      redirect_to @timesheet, notice: "Timesheet was successfully created."
+    @shift = Shift.new(shift_params.merge(
+      roster: roster,
+      user: current_user,
+      start_time: Time.current,
+      end_time: Time.current + 8.hours
+    ))
+
+    @timesheet = @shift.timesheets.build(
+      user: current_user,
+      clock_in_at: Time.current,
+      status: Timesheet::STATUSES[:pending]
+    )
+
+    if @shift.save
+      redirect_to dashboards_path
     else
+      @timesheet = @shift.timesheets.first || @shift.timesheets.build
       render :new, status: :unprocessable_entity
     end
   end
@@ -142,5 +169,9 @@ class TimesheetsController < ApplicationController
 
     def clock_off_params
       params.require(:timesheet).permit(:notes, :travel)
+    end
+
+    def shift_params
+      params.require(:timesheet).require(:shift_attributes).permit(:location_id)
     end
 end
