@@ -31,7 +31,11 @@
   <div>
     <p class="text-sm text-gray-600 dark:text-gray-300"><%= shift.location.name %> - <%= shift.area&.name %></p>
     <% if timesheet %>
-      <p class="text-sm text-gray-600 dark:text-gray-300">Worked: <%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></p>
+      <% if timesheet.notes&.include?("Auto-generated: Missed clock on.") %>
+        <p class="text-sm text-orange-500 dark:text-orange-400">Unattended</p>
+      <% else %>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Worked: <%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></p>
+      <% end %>
     <% end %>
     <% if shift.roster.draft? %>
       <p class="text-xs text-orange-500 dark:text-orange-400">Unscheduled</p>

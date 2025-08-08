@@ -12,7 +12,11 @@
   <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= shift.start_time.strftime("%a, %d %b") %></td>
   <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
     <% if timesheet %>
-      <div><%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></div>
+      <% if timesheet.notes&.include?("Auto-generated: Missed clock on.") %>
+        <div class="text-orange-500">Unattended</div>
+      <% else %>
+        <div><%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></div>
+      <% end %>
     <% end %>
     <div class="text-xs text-gray-400">
       <% if shift.roster.draft? %>
