@@ -1,6 +1,6 @@
 class RostersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_roster, only: %i[show edit update destroy publish copy_previous_week revert_to_draft]
+  before_action :set_roster, only: %i[show edit update destroy publish copy_previous_week revert_to_draft publish_with_email]
 
   # GET /rosters
   def index
@@ -75,6 +75,15 @@ class RostersController < ApplicationController
 
     @roster.update(status: Roster::STATUSES[:published])
     redirect_to @roster, notice: "Roster published."
+  end
+
+  def publish_with_email
+    @roster.update(status: Roster::STATUSES[:published])
+    @roster.shifts.map(&:user).uniq.each do |user|
+      RosterMailer.with(user: user, roster: @roster).roster_published.deliver_now
+    end
+    @roster.update(emails_sent_at: Time.current)
+    redirect_to @roster, notice: "Roster published and emails sent."
   end
 
   def revert_to_draft

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Hi <%= @user.first_name %>,</h1>
+    <p>
+      Your roster for the week of <%= @roster.starts_on.strftime('%B %d') %> has been published.
+    </p>
+    <h2>Your Shifts:</h2>
+    <ul>
+      <% @shifts.each do |shift| %>
+        <li>
+          <strong><%= shift.start_time.strftime('%A, %B %d') %>:</strong>
+          <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %>
+          at <%= shift.location.name %>
+        </li>
+      <% end %>
+    </ul>
+    <p>
+      You can view the full roster on your app dashboard.
+    </p>
+  </body>
+</html>

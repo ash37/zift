@@ -51,6 +51,7 @@ resources :unavailability_requests do
   resources :rosters do
     member do
       post :publish
+      post :publish_with_email
       post :revert_to_draft
       post :copy_previous_week
     end

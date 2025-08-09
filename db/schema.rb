@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_06_133209) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_09_100514) do
   create_table "areas", force: :cascade do |t|
     t.string "name"
     t.string "export_code"
@@ -18,6 +18,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_133209) do
     t.integer "location_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "archived_at"
     t.index ["location_id"], name: "index_areas_on_location_id"
   end
 
@@ -44,6 +45,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_133209) do
     t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "emails_sent_at"
   end
 
   create_table "shifts", force: :cascade do |t|
@@ -93,6 +95,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_133209) do
     t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "frequency"
+    t.integer "repeat_day"
     t.index ["user_id"], name: "index_unavailability_requests_on_user_id"
   end
 
