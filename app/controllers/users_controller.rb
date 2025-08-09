@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!
-  before_action :set_user, only: %i[show edit update destroy]
+  before_action :set_user, only: %i[ show edit update destroy ]
 
   # GET /users
   def index
@@ -9,11 +8,16 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
+    @upcoming_shifts = @user.shifts.joins(:roster)
+                              .where(rosters: { status: Roster::STATUSES[:published] })
+                              .where("shifts.start_time >= ?", Time.current)
+                              .order(:start_time)
+                              .limit(5)
+    @unavailability_requests = @user.unavailability_requests.where(status: 1).order(:starts_at)
   end
 
   # GET /users/new
   def new
-    authorize_admin!
     @user = User.new
   end
 
@@ -23,53 +27,38 @@ class UsersController < ApplicationController
 
   # POST /users
   def create
-    authorize_admin!
     @user = User.new(user_params)
 
-    respond_to do |format|
-      if @user.save
-        format.html { redirect_to users_path, notice: "User was successfully created." }
-        format.json { render :show, status: :created, location: @user }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
+    if @user.save
+      redirect_to @user, notice: "User was successfully created."
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /users/1
   def update
-    respond_to do |format|
-      if @user.update(user_params)
-        format.html { redirect_to @user, notice: "User was successfully updated." }
-        format.json { render :show, status: :ok, location: @user }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
+    if @user.update(user_params)
+      redirect_to @user, notice: "User was successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
   # DELETE /users/1
   def destroy
     @user.destroy!
-    respond_to do |format|
-      format.html { redirect_to users_path, notice: "User was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    redirect_to users_url, notice: "User was successfully destroyed.", status: :see_other
   end
 
   private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_user
+      @user = User.find(params[:id])
+    end
 
-  def set_user
-    @user = User.find(params[:id])
-  end
-
-  def user_params
-    params.require(:user).permit(:name, :email, :role, :location_id, :password, :password_confirmation)
-  end
-
-  def authorize_admin!
-    redirect_to root_path, alert: "Not authorized" unless current_user&.admin?
-  end
+    # Only allow a list of trusted parameters through.
+    def user_params
+      params.require(:user).permit(:first_name, :last_name, :email, :phone, :role, :location_id)
+    end
 end

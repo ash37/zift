@@ -1,15 +1,72 @@
-<% content_for :title, "Showing user" %>
+<% content_for :title, @user.name %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<div class="bg-zinc-100 min-h-screen">
+  <section class="container mx-auto px-4 py-10">
+    <div class="w-full max-w-4xl mx-auto">
 
-  <h1 class="font-bold text-4xl">Showing user</h1>
+      <div class="bg-white rounded-2xl p-6 flex items-center justify-between">
+        <div class="flex items-center min-w-0">
+          <div class="text-left">
+            <h1 class="text-2xl font-bold text-gray-800 truncate"><%= @user.name %></h1>
+            <p class="text-gray-600 break-all sm:break-normal"><%= @user.email %></p>
+          </div>
+        </div>
+        <div class="ml-4">
+          <%= link_to "Edit", edit_user_path(@user), class: "text-violet-700" %>
+        </div>
+      </div>
 
-  <%= render @user %>
+      <div class="mt-8">
+        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center justify-between">
+          Upcoming Shifts
+          <a href="#upcoming-shifts" onclick="document.getElementById('upcoming-shifts').classList.toggle('hidden'); this.querySelector('svg').classList.toggle('rotate-180'); return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-6 w-6 text-gray-500 transition-transform duration-300">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+            </svg>
+          </a>
+        </h3>
+        <div id="upcoming-shifts" class="bg-white rounded-2xl p-6 hidden">
+          <% if @upcoming_shifts.any? %>
+            <ul class="space-y-4">
+              <% @upcoming_shifts.each do |shift| %>
+                <li class="flex justify-between items-center">
+                  <div>
+                    <p class="font-semibold"><%= shift.location.name %></p>
+                    <p class="text-sm text-gray-600"><%= shift.start_time.strftime("%a, %d %b") %>: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+                  </div>
+                  <span class="px-3 py-1 text-xs text-violet-800 uppercase bg-violet-200 rounded-full"><%= shift.area&.name || "General" %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-gray-500">No upcoming shifts scheduled.</p>
+          <% end %>
+        </div>
+      </div>
 
-  <%= link_to "Edit this user", edit_user_path(@user), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to users", users_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this user", @user, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+      <div class="mt-8">
+        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center justify-between">
+          Approved Unavailability
+          <a href="#approved-unavailability" onclick="document.getElementById('approved-unavailability').classList.toggle('hidden'); this.querySelector('svg').classList.toggle('rotate-180'); return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-6 w-6 text-gray-500 transition-transform duration-300">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+            </svg>
+          </a>
+        </h3>
+        <div id="approved-unavailability" class="hidden">
+        <% if @unavailability_requests.any? %>
+          <% @unavailability_requests.each do |request| %>
+            <div class="bg-white rounded-2xl p-6 mb-4">
+              <p class="font-semibold"><%= request.starts_at.strftime("%^b %e") %> - <%= request.ends_at.strftime("%^b %e, %Y") %></p>
+              <p class="text-sm text-gray-600"><%= request.reason %></p>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-gray-500">No approved unavailability requests.</p>
+        <% end %>
+        </div>
+      </div>
+
+    </div>
+  </section>
 </div>
