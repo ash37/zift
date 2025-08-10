@@ -1,6 +1,12 @@
 <% content_for :title, "Roster for #{@roster.starts_on.strftime('%B %d, %Y')}" %>
 
-<%= render "sub_nav", selected_location_id: @selected_location_id %>
+<div class="hidden sm:block">
+  <%= render "sub_nav", selected_location_id: @selected_location_id %>
+</div>
+
+<div class="sm:hidden">
+  <%= render "mobile_sub_nav", selected_location_id: @selected_location_id %>
+</div>
 
 <%# We add a style block here to define the custom styles for drag-and-drop. %>
 <style>
@@ -24,13 +30,54 @@
 </style>
 
 
-
-<div class="hidden sm:block bg-zinc-100">
-  <%= render 'roster_table', roster: @roster, selected_location_id: @selected_location_id, show_all_days: @show_all_days %>
-</div>
-
-<div class="sm:hidden bg-zinc-100">
-  <%= render 'mobile_roster_table', roster: @roster, selected_location_id: @selected_location_id, date: @date %>
+<div class="bg-zinc-100 p-4 sm:p-6 rounded-lg">
+  <%# Calendar Table %>
+  <table class="w-full border-separate table-fixed" style="border-spacing: 0;">
+    <thead>
+      <tr>
+        <th class="w-48 text-left font-semibold p-2">EMPLOYEE</th>
+        <% 7.times do |i| %>
+          <% date = @roster.starts_on + i.days %>
+          <th class="text-center font-normal p-2">
+            <p class="text-xs text-zinc-500"><%= date.strftime("%a").upcase %></p>
+            <p class="text-lg font-bold <%= date == Date.today ? 'text-violet-600' : 'text-zinc-800' %>">
+              <%= date.strftime("%d") %>
+            </p>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% User.all.each do |user| %>
+        <tr class="align-top">
+          <td class="p-2 border-t border-zinc-200">
+            <div class="font-semibold text-zinc-800"><%= user.name %></div>
+            <div id="<%= dom_id(user, 'hours_total') %>">
+              <%= render 'rosters/user_hours', roster: @roster, user: user, selected_location_id: @selected_location_id %>
+            </div>
+          </td>
+          <% 7.times do |i| %>
+            <% date = @roster.starts_on + i.days %>
+            <td class="p-1 border-t border-zinc-200">
+              <%= render 'rosters/cell_content', roster: @roster, user: user, date: date, selected_location_id: @selected_location_id %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+    <%# This new table footer will display the daily total hours. %>
+    <tfoot>
+      <tr class="text-center">
+        <td class="p-2 border-t-2 border-zinc-300 text-left text-sm font-semibold text-zinc-800">TOTALS</td>
+        <% 7.times do |i| %>
+          <% date = @roster.starts_on + i.days %>
+          <td class="p-2 border-t-2 border-zinc-300">
+            <%= render 'rosters/daily_hours', roster: @roster, date: date, selected_location_id: @selected_location_id %>
+          </td>
+        <% end %>
+      </tr>
+    </tfoot>
+  </table>
 </div>
 
 <%# This frame will be used to load the 'new shift' modal %>
