@@ -92,13 +92,15 @@ class RostersController < ApplicationController
   end
 
   def show_by_date
-    starts_on = params[:date] ? Date.parse(params[:date]) : Date.today.beginning_of_week
+    current_date = params[:date] ? Date.parse(params[:date]) : Date.today
+    starts_on = current_date.beginning_of_week
+
     roster = Roster.find_or_initialize_by(starts_on: starts_on)
     if roster.new_record?
       roster.status = Roster::STATUSES[:draft]
       roster.save!
     end
-    redirect_to roster_path(roster, location_id: params[:location_id], date: params[:date])
+    redirect_to roster_path(roster, location_id: params[:location_id], date: current_date)
   end
 
   # POST /rosters/:id/copy_previous_week
