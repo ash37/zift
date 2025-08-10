@@ -15,18 +15,19 @@
           </div>
 
           <div>
-            <p class="ml-8 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.shift.area&.name %></p>
-            <% if timesheet.shift.note.present? %>
-              <p class="ml-8 text-sm text-gray-600 dark:text-gray-300"><em><%= timesheet.shift.note %></em></p>
-            <% end %>
+            
             <div class="flex items-center mt-2 bg-violet-100 rounded-3xl p-1">
               <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-violet-100 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h2 class="ml-2 text-gray-700 dark:text-gray-200"><%= timesheet.user.name %></h2>
+              <h2 class="ml-2 text-gray-600 text-sm"><%= timesheet.user.name %></h2>
             </div>
+            <p class="ml-4 mt-2 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.shift.area&.name %>
+            <% if timesheet.shift.note.present? %>
+              : <em><%= timesheet.shift.note %></em></p>
+            <% end %>
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.notes %></p>
             <% if timesheet.travel.present? && timesheet.travel > 0 %>
               <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><strong>Travel on this shift:</strong> <%= timesheet.travel %>km</p>
