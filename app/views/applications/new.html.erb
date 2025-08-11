@@ -1,20 +1,177 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold mb-4">Apply for a Position</h1>
-  <%= form_with(model: @user, url: applications_path, method: :post) do |form| %>
-    <%= render "devise/shared/error_messages", resource: @user %>
+<!-- OUTER WRAPPER -->
+<!-- Mobile: pt-4 px-0  →  >=sm: py-12 px-6 (lg:px-8) -->
+<div class="bg-zinc-100 pt-4 px-0 sm:py-12 sm:px-6 lg:px-8">
 
-    <div class="mb-4">
-      <%= form.label :name %>
-      <%= form.text_field :name, required: true, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
+  <!-- CARD WRAPPER -->
+  <!-- Mobile: full width, no rounding  →  >=sm: centered, max-w-2xl, rounded-3xl -->
+  <div class="mt-6 w-full rounded-none bg-white p-8 sm:mt-10 sm:w-1/2 sm:mx-auto sm:rounded-3xl">
+
+    <div class="text-center mb-8">
+      <!-- your heading / intro here -->
+      <span class="text-4xl font-bold text-gray-800">Join our</span>
+      <span class="text-4xl font-bold text-violet-700">team</span>
+      <p class="mt-6 text-gray-600">
+        Join our team and bring positive change to peoples lives. Careers in the support sector offer flexible working hours that are close to home and great pay rates.
+      </p>
     </div>
-    <div class="mb-4">
-      <%= form.label :email %>
-      <%= form.email_field :email, required: true, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
-    </div>
-    <div class="mb-4">
-      <%= form.label :phone %>
-      <%= form.text_field :phone, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
-    </div>
-    <%= form.submit "Submit Application", class: "bg-violet-500 text-white font-bold py-2 px-4 rounded-3xl" %>
-  <% end %>
+
+    <%= form_with(model: @user, url: applications_path, method: :post, html: { class: "space-y-6" }) do |form| %>
+      <%= render "devise/shared/error_messages", resource: @user %>
+
+      <!-- Name -->
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium text-gray-700 mt-8 mb-1" %>
+        <%= form.text_field :name, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Enter your full name" %>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <%= form.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.email_field :email, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "you@example.com" %>
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <%= form.label :phone, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :phone, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Your contact number" %>
+      </div>
+
+      <!-- Date of Birth (type into visible field; hidden native input posts ISO yyyy-mm-dd) -->
+<div
+  x-data="{
+    iso: '<%= @user.date_of_birth.present? ? @user.date_of_birth.strftime('%Y-%m-%d') : '' %>',
+    display: '',
+    err: '',
+    pad(n){ return String(n).padStart(2,'0') },
+    fmt(iso){
+      if(!iso) return '';
+      const [y,m,d] = iso.split('-');
+      const MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      return `${d} ${MON[parseInt(m,10)-1]} ${y}`;
+    },
+    parseDisplay(s){
+      if(!s) return null;
+      s = s.trim().replace(/\s+/g,' ');
+      const m = s.match(/^(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})$/); // e.g., 10 AUG 1983
+      if(!m) return null;
+      const day = parseInt(m[1],10);
+      const monKey = m[2].slice(0,3).toLowerCase();
+      const year = parseInt(m[3],10);
+      const idx = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(monKey);
+      if(idx < 0 || day < 1 || day > 31) return null;
+      return { day, month: idx+1, year };
+    },
+    toIso(){
+      const p = this.parseDisplay(this.display);
+      if(!p){ this.iso=''; this.err='Use format DD MON YYYY (e.g., 10 AUG 1983)'; return; }
+      this.err='';
+      this.iso = `${p.year}-${this.pad(p.month)}-${this.pad(p.day)}`;
+    },
+    init(){ this.display = this.fmt(this.iso) }
+  }"
+  x-init="init()"
+  class="relative"
+>
+  <label class="block text-sm font-medium text-gray-700 mb-1">Date of birth</label>
+
+  <!-- Visible, typable display field -->
+  <input
+    type="text"
+    x-model="display"
+    @input="toIso()"
+    placeholder="10 AUG 1983"
+    class="block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500 uppercase tracking-wide"
+  />
+  <p class="mt-1 text-xs text-red-600" x-show="err" x-text="err"></p>
+
+  <!-- Native date input: truly hidden; value kept in ISO via x-model -->
+  <%= form.date_field :date_of_birth,
+        value: (@user.date_of_birth&.strftime('%Y-%m-%d')),
+        class: "hidden",
+        "x-model" => "iso" %>
+</div>
+
+
+      <!-- Suburb -->
+      <div>
+        <%= form.label :suburb, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :suburb, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "e.g., Rockhampton" %>
+      </div>
+
+      <!-- Postcode -->
+      <div>
+        <%= form.label :postcode, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :postcode, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "4701", inputmode: "numeric", pattern: "\\d*" %>
+      </div>
+
+      <!-- Obtained Screening (YES/NO segmented) -->
+      <div x-data="{ val: '<%= @user.obtained_screening.to_s %>' }" class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Obtained screening</label>
+        <input type="hidden" name="user[obtained_screening]" :value="val">
+        <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
+          <button type="button"
+                  @click="val='yes'"
+                  class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                  :class="val==='yes' ? 'bg-violet-700 text-white' : 'text-gray-700'">Yes</button>
+          <button type="button"
+                  @click="val='no'"
+                  class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                  :class="val==='no' ? 'bg-violet-700 text-white' : 'text-gray-700'">No</button>
+        </div>
+      </div>
+
+      <!-- Disability Experience (YES/NO segmented) -->
+      <div x-data="{ val: '<%= @user.disability_experience.to_s %>' }" class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Disability experience</label>
+        <input type="hidden" name="user[disability_experience]" :value="val">
+        <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
+          <button type="button" @click="val='yes'"
+                  class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                  :class="val==='yes' ? 'bg-violet-700 text-white' : 'text-gray-700'">Yes</button>
+          <button type="button" @click="val='no'"
+                  class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                  :class="val==='no' ? 'bg-violet-700 text-white' : 'text-gray-700'">No</button>
+        </div>
+      </div>
+
+      <!-- Other Employment (YES/NO segmented) -->
+      <div x-data="{ val: '<%= @user.other_employment.to_s %>' }" class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Other employment</label>
+        <input type="hidden" name="user[other_employment]" :value="val">
+        <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
+          <button type="button" @click="val='yes'"
+                  class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                  :class="val==='yes' ? 'bg-violet-700 text-white' : 'text-gray-700'">Yes</button>
+          <button type="button" @click="val='no'"
+                  class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                  :class="val==='no' ? 'bg-violet-700 text-white' : 'text-gray-700'">No</button>
+        </div>
+      </div>
+
+      <!-- Licence (YES/NO segmented) -->
+      <div x-data="{ val: '<%= @user.licence.to_s %>' }" class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Licence</label>
+        <input type="hidden" name="user[licence]" :value="val">
+        <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
+          <button type="button" @click="val='yes'"
+                  class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                  :class="val==='yes' ? 'bg-violet-700 text-white' : 'text-gray-700'">Yes</button>
+          <button type="button" @click="val='no'"
+                  class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                  :class="val==='no' ? 'bg-violet-700 text-white' : 'text-gray-700'">No</button>
+        </div>
+      </div>
+
+      <!-- Availability -->
+      <div>
+        <%= form.label :availability, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :availability, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "e.g., Weekdays 9–3, Weekends nights" %>
+      </div>
+
+      <!-- Submit -->
+      <div class="pt-4">
+        <%= form.submit "Submit Application", class: "w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-4 rounded-3xl shadow-lg transition-transform transform hover:scale-105" %>
+      </div>
+    <% end %>
+  </div>
 </div>

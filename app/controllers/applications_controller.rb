@@ -23,6 +23,10 @@ class ApplicationsController < ApplicationController
   private
 
   def application_params
-    params.require(:user).permit(:name, :email, :phone)
+    params.require(:user).permit(
+      :name, :email, :phone, :obtained_screening, :date_of_birth,
+      :suburb, :postcode, :disability_experience, :other_employment,
+      :licence, :availability
+    )
   end
 end
