@@ -4,14 +4,19 @@ Rails.application.routes.draw do
   # Public pages
   get "welcome/index"
   get "dashboards", to: "dashboards#index"
+  resources :applications, only: [ :new, :create ]
 
-  # Devise authentication
-  devise_for :users, skip: [ :registrations ]
+  resources :applications, only: [ :new, :create ] do
+    get "success", on: :collection
+  end
 
-  # Allow self-registration (optional, only if needed)
-  as :user do
-    get   "users/sign_up", to: "devise/registrations#new",    as: :new_user_registration
-    post  "users",         to: "devise/registrations#create", as: :user_registration
+  # Devise authentication - now with custom registrations controller
+  devise_for :users, controllers: { registrations: "users/registrations" }
+
+  # Allow self-registration and onboarding
+  devise_scope :user do
+    # This is the special link from the email
+    get "users/invitation/accept", to: "users/registrations#edit", as: "accept_user_invitation"
   end
 
   # Admin-managed user creation (separate from Devise)
@@ -19,7 +24,11 @@ Rails.application.routes.draw do
   post "users/create", to: "users#create", as: :admin_create_user
 
   # Core resources
-  resources :users, except: [ :new, :create ]
+  resources :users, except: [ :new, :create ] do
+    member do
+      post :employ
+    end
+  end
   resources :locations do
     resources :areas, only: [ :create ]
   end
@@ -40,7 +49,7 @@ Rails.application.routes.draw do
       get "week(/:date)", to: "timesheets#index", as: "week"
     end
   end
-resources :unavailability_requests do
+  resources :unavailability_requests do
     member do
       patch :approve
       patch :decline
@@ -62,8 +71,4 @@ resources :unavailability_requests do
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # PWA (optional, uncomment if needed)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 end

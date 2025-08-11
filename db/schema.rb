@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_09_100514) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_11_030910) do
   create_table "areas", force: :cascade do |t|
     t.string "name"
     t.string "export_code"
@@ -114,6 +114,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_100514) do
     t.string "confirmation_token"
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
+    t.string "status"
+    t.string "gender"
+    t.string "obtained_screening"
+    t.date "date_of_birth"
+    t.string "address"
+    t.string "suburb"
+    t.string "state"
+    t.string "postcode"
+    t.string "emergency_name"
+    t.string "emergency_phone"
+    t.string "disability_experience"
+    t.string "other_experience"
+    t.string "other_employment"
+    t.string "licence"
+    t.string "availability"
+    t.text "bio"
+    t.string "known_client"
+    t.string "resident"
+    t.string "education"
+    t.string "qualification"
+    t.string "bank_account"
+    t.string "bsb"
+    t.string "tfn"
+    t.string "training"
+    t.string "departure"
+    t.string "yellow_expiry"
+    t.string "blue_expiry"
+    t.string "tfn_threshold"
+    t.string "debt"
+    t.string "super_name"
+    t.string "super_number"
+    t.string "invitation_token"
+    t.datetime "invitation_sent_at"
+    t.string "phone"
     t.index ["location_id"], name: "index_users_on_location_id"
   end
 

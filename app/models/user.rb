@@ -1,7 +1,15 @@
-# app/models/user.rb
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+
+  def self.serialize_from_session(key, salt)
+    record = to_adapter.get(key)
+    record if record && record.authenticatable_salt == salt
+  end
+
+  def self.serialize_into_session(record)
+    [ record.to_key, record.authenticatable_salt ]
+  end
 
   belongs_to :location, optional: true
   has_many :shifts, dependent: :destroy
@@ -13,6 +21,20 @@ class User < ApplicationRecord
     manager: 1,
     admin: 2
   }.freeze
+
+  STATUSES = {
+    applicant: "applicant",
+    contacted: "contacted",
+    employee: "employee",
+    ended: "ended"
+  }.freeze
+
+  validates :status, inclusion: { in: STATUSES.values }, allow_nil: true
+
+  scope :applicants, -> { where(status: STATUSES[:applicant]) }
+  scope :employees, -> { where(status: STATUSES[:employee]) }
+  scope :contacted, -> { where(status: STATUSES[:contacted]) }
+  scope :ended, -> { where(status: STATUSES[:ended]) }
 
   def role_name
     ROLES.key(role)&.to_s&.titleize || "—"
@@ -41,5 +63,16 @@ class User < ApplicationRecord
 
   def last_name
     name.split.last
+  end
+
+  protected
+
+  # This method is called by Devise to check if a password is required.
+  def password_required?
+    # Don't require a password if an invitation is being sent.
+    return false if invitation_token_changed? && invitation_token.present?
+
+    # Otherwise, require password if user has a role or is setting a password.
+    role.present? || password.present? || password_confirmation.present?
   end
 end

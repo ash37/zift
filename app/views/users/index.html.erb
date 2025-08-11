@@ -1,5 +1,10 @@
 <% content_for :title, "Users" %>
-
+<div class="mb-4">
+  <%= link_to "Employees", users_path, class: "px-3 py-2 rounded-md #{params[:filter].nil? ? 'bg-violet-500 text-white' : 'bg-gray-200 text-gray-700'}" %>
+  <%= link_to "Applicants", users_path(filter: 'applicants'), class: "px-3 py-2 rounded-md #{params[:filter] == 'applicants' ? 'bg-violet-500 text-white' : 'bg-gray-200 text-gray-700'}" %>
+  <%= link_to "Contacted", users_path(filter: 'contacted'), class: "px-3 py-2 rounded-md #{params[:filter] == 'contacted' ? 'bg-violet-500 text-white' : 'bg-gray-200 text-gray-700'}" %>
+  <%= link_to "Ended", users_path(filter: 'ended'), class: "px-3 py-2 rounded-md #{params[:filter] == 'ended' ? 'bg-violet-500 text-white' : 'bg-gray-200 text-gray-700'}" %>
+</div>
 <section class="container px-4 py-4 mx-auto">
   <div class="flex justify-between items-center">
     <%# Left Side: Title and user count %>

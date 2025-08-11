@@ -1,0 +1,20 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold mb-4">Apply for a Position</h1>
+  <%= form_with(model: @user, url: applications_path, method: :post) do |form| %>
+    <%= render "devise/shared/error_messages", resource: @user %>
+
+    <div class="mb-4">
+      <%= form.label :name %>
+      <%= form.text_field :name, required: true, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
+    </div>
+    <div class="mb-4">
+      <%= form.label :email %>
+      <%= form.email_field :email, required: true, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
+    </div>
+    <div class="mb-4">
+      <%= form.label :phone %>
+      <%= form.text_field :phone, class: "block w-full rounded-md border-gray-300 shadow-sm" %>
+    </div>
+    <%= form.submit "Submit Application", class: "bg-violet-500 text-white font-bold py-2 px-4 rounded-3xl" %>
+  <% end %>
+</div>

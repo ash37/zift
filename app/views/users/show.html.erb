@@ -3,7 +3,11 @@
 <div class="bg-zinc-100 min-h-screen">
   <section class="container mx-auto px-4 py-10">
     <div class="w-full max-w-4xl mx-auto">
-
+<% if @user.status == User::STATUSES[:applicant] %>
+  <div class="mt-4">
+    <%= button_to "Employ Applicant", employ_user_path(@user), method: :post, class: "bg-green-500 text-white font-bold py-2 px-4 rounded-3xl" %>
+  </div>
+<% end %>
       <div class="bg-white rounded-2xl p-6 flex items-center justify-between">
         <div class="flex items-center min-w-0">
           <div class="text-left">

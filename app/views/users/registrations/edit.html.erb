@@ -1,0 +1,41 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-4">Set Up Your Account</h1>
+    <p class="mb-6 text-gray-600">Welcome aboard! Please set a password and complete your profile to get started.</p>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%= f.hidden_field :invitation_token, value: @token %>
+
+      <h2 class="text-xl font-semibold mb-2">Account Security</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="mb-4">
+          <%= f.label :password, "New Password", class: "block font-medium" %>
+          <% if @minimum_password_length %>
+            <em class="text-sm text-gray-500">(<%= @minimum_password_length %> characters minimum)</em>
+          <% end %>
+          <%= f.password_field :password, autocomplete: "new-password", class: "block w-full mt-1 rounded-md border-gray-300 shadow-sm" %>
+        </div>
+        <div class="mb-4">
+          <%= f.label :password_confirmation, "Confirm New Password", class: "block font-medium" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "block w-full mt-1 rounded-md border-gray-300 shadow-sm" %>
+        </div>
+      </div>
+
+      <hr class="my-6">
+      
+      <h2 class="text-xl font-semibold mb-2">Your Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="mb-4">
+          <%= f.label :address, class: "block font-medium" %>
+          <%= f.text_field :address, class: "block w-full mt-1 rounded-md border-gray-300 shadow-sm" %>
+        </div>
+        </div>
+
+      <div class="mt-6">
+        <%= f.submit "Complete Setup", class: "w-full bg-violet-500 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-3xl" %>
+      </div>
+    <% end %>
+  </div>
+</div>
