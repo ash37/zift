@@ -4,7 +4,7 @@ class TimesheetsController < ApplicationController
   # GET /timesheets
   def index
     if params[:date].blank?
-      redirect_to week_timesheets_path(date: Date.today.beginning_of_week.to_s) and return
+      redirect_to week_timesheets_path(date: Date.today.beginning_of_week(:wednesday).to_s) and return
     end
 
     @start_date = Date.parse(params[:date])
@@ -150,11 +150,11 @@ class TimesheetsController < ApplicationController
   def match_roster_times
     if @timesheet.update(clock_in_at: @timesheet.shift.start_time, clock_out_at: @timesheet.shift.end_time)
       respond_to do |format|
-        format.html { redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week) }
+        format.html { redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week(:wednesday)) }
         format.turbo_stream
       end
     else
-      redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week), alert: "Could not update timesheet."
+      redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week(:wednesday)), alert: "Could not update timesheet."
     end
   end
 

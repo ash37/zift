@@ -4,7 +4,7 @@ class RostersController < ApplicationController
 
   # GET /rosters
   def index
-    starts_on = Date.today.beginning_of_week
+    starts_on = Date.today.beginning_of_week(:wednesday)
     roster = Roster.find_or_initialize_by(starts_on: starts_on)
     if roster.new_record?
       roster.status = Roster::STATUSES[:draft]
@@ -93,7 +93,7 @@ class RostersController < ApplicationController
 
   def show_by_date
     current_date = params[:date] ? Date.parse(params[:date]) : Date.today
-    starts_on = current_date.beginning_of_week
+    starts_on = current_date.beginning_of_week(:wednesday)
 
     roster = Roster.find_or_initialize_by(starts_on: starts_on)
     if roster.new_record?
