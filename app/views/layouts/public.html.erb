@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disability Support Services Rockhampton | Qcare</title>
+    <%= favicon_link_tag 'icon.png' %>
+    <meta name="description" content="Qcare provides trusted and personalised disability support services in Rockhampton. In-home care, community access, and more. Reach out today.">
+    <link rel="canonical" href="https://qcare.au/rockhampton-disability-support" />
+    <meta property="og:title" content="Disability Support Services Rockhampton | Qcare" />
+    <meta property="og:description" content="Compassionate and professional disability support services in Rockhampton, QLD." />
+    <meta property="og:url" content="https://qcare.au/rockhampton-disability-support" />
+    <meta property="og:image" content="<%= image_url('qcare-preview.jpg') %>" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Qcare",
+      "image": "<%= image_url('qcare_logo.png') %>",
+      "url": "https://qcare.au/rockhampton-disability-support",
+      "telephone": "+61448129224",
+      "email": "ak@qcare.au",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "PO BOX 5553 Red Hill",
+        "addressLocality": "Rockhampton",
+        "addressRegion": "QLD",
+        "postalCode": "4701",
+        "addressCountry": "AU"
+      },
+      "areaServed": {
+        "@type": "Place",
+        "name": "Rockhampton"
+      }
+    }
+    </script>
+    <style>
+        body,
+        html {
+            font-family: "Lato", sans-serif;
+            scroll-behavior: smooth !important;
+        }
+    </style>
+</head>
+
+<body>
+    <%= yield %>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+</body>
+</html>

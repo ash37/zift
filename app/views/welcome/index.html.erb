@@ -1,16 +1,392 @@
-<div class="text-center py-24">
-  <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-    Welcome to Qcare
-  </h1>
-  <p class="mt-6 text-lg leading-8 text-gray-600">
-    Your shift scheduling, simplified.
-  </p>
-  <div class="mt-10 flex items-center justify-center gap-x-6">
-    <% if user_signed_in? %>
-      <%= link_to "Go to Dashboard", dashboards_path, class: "rounded-md bg-violet-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600" %>
-    <% else %>
-      <%= link_to "Get started", new_application_path, class: "rounded-md bg-violet-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600" %>
-      <%= link_to "Log in <span aria-hidden='true'>→</span>".html_safe, new_user_session_path, class: "text-sm font-semibold leading-6 text-gray-900" %>
-    <% end %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disability Support Services Rockhampton | Qcare</title>
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <meta name="description" content="Qcare provides trusted and personalised disability support services in Rockhampton. In-home care, community access, and more. Reach out today.">
+  <link rel="canonical" href="https://qcare.au/rockhampton-disability-support" />
+  <meta property="og:title" content="Disability Support Services Rockhampton | Qcare" />
+  <meta property="og:description" content="Compassionate and professional disability support services in Rockhampton, QLD." />
+  <meta property="og:url" content="https://qcare.au/rockhampton-disability-support" />
+  <meta property="og:image" content="https://qcare.au/qcare-preview.jpg" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+  
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Qcare",
+    "image": "https://qcare.au/imgs/qcare_logo.png",
+    "url": "https://qcare.au/rockhampton-disability-support",
+    "telephone": "+61448129224",
+    "email": "ak@qcare.au",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "PO BOX 5553 Red Hill",
+      "addressLocality": "Rockhampton",
+      "addressRegion": "QLD",
+      "postalCode": "4701",
+      "addressCountry": "AU"
+    },
+    "areaServed": {"@type": "Place", "name": "Rockhampton"}
+  }
+  </script>
+
+  <style>
+    :root {
+      --purple-50: #f5f3ff;
+      --purple-600: #7e22ce;
+      --purple-700: #6b21a8;
+      --purple-800: #581c87;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --black: #000;
+      --white: #fff;
+      --container: 1200px;
+      --radius-xl: 1rem;
+    }
+
+    html, body { font-family: "Lato", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; color: var(--gray-800); background: #fff; scroll-behavior: smooth; }
+
+    /* Containers & utilities */
+    .container { max-width: var(--container); margin: 0 auto; padding: 0 16px; }
+    .btn { display:inline-block; background: var(--purple-700); color:#fff; font-weight:500; padding:10px 20px; border-radius:999px; text-decoration:none; transition:background .2s ease; }
+    .btn:hover { background: var(--gray-200); }
+    .visually-hidden { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+
+    /* Call bar */
+    .callbar { display:block; width:100%; text-align:center; padding:10px 16px; background: var(--purple-50); color: var(--purple-700); font-weight:400; text-decoration:none; }
+    .callbar:hover { background:#ede9fe; }
+
+    /* Header / Nav */
+    header { position: relative; z-index: 20; background: #fff; }
+    .nav { display:flex; align-items:center; justify-content:space-between; padding: 20px 0; }
+    .brand img { height:44px; vertical-align:middle; }
+    .nav-links { display:flex; align-items:center; gap:20px; }
+    .nav-links a { color: var(--gray-600); font-weight:400; text-decoration:none; }
+    .nav-links a:hover { color: var(--purple-800); }
+    /* Ensure button color inside nav is not overridden */
+    .nav-links .btn, a.btn { color:#fff; }
+
+    /* Mobile menu (CSS only) */
+    #nav-toggle { display:none; }
+    .hamburger { display:none; background:none; border:0; font-size:28px; cursor:pointer; }
+
+    @media (max-width: 992px) {
+      .hamburger { display:block; }
+      .nav-links { display:none; flex-direction:column; align-items:flex-start; padding:16px 0; }
+      #nav-toggle:checked ~ .nav-links { display:flex; }
+    }
+
+    /* Hero */
+    .hero { position:relative; overflow:hidden; background:#fff; }
+    .hero-inner { position:relative; z-index: 1; }
+    .hero-grid { display:grid; grid-template-columns: 1fr; padding: 10px 0 130px; }
+    .hero h1 { font-size: 44px; line-height:1.1; margin: 0; font-weight: 600; color:#2e1065; text-shadow: 0 0 6px #fff, 0 0 10px #fff; }
+    .hero h1 .accent { color: var(--purple-700); text-shadow: 0 0 6px #fff, 0 0 10px #fff; }
+
+    .hero-bg-mobile, .hero-bg-desktop { position:absolute; inset:0; z-index:0; display:none; }
+    .hero-bg-mobile img, .hero-bg-desktop img { width:100%; height:100%; object-fit:cover; }
+
+    .hero-cta { display:none; justify-content:center; padding: 16px 0 24px; }
+
+    @media (max-width: 767px) {
+      .hero-grid { padding-bottom: 80px; }
+      .hero h1 { font-size: 36px; }
+      .hero-bg-mobile { display:block; }
+      .hero-cta { display:flex; }
+    }
+    @media (min-width: 768px) {
+      .hero-bg-desktop { display:flex; align-items:center; justify-content:center; background:#fff; }
+      .hero h1 { font-size: 64px; }
+      .hero-grid { grid-template-columns: 2fr 1fr; padding-bottom: 260px; }
+    }
+
+    /* Three feature cards */
+    .strip { background:#000; color:#fff; }
+    .cards { display:grid; gap:24px; padding: 24px 0 32px; }
+    .card { background: #f3f4f6; color: #111; border-radius: var(--radius-xl); padding: 24px; text-align:center; }
+    .card h3 { margin: 0 0 8px; font-size: 20px; color: #111; font-weight:600; }
+    .card p { margin: 0 0 12px; color:#6b7280; }
+    .card a { color: var(--purple-700); text-decoration:none; font-weight:400; font-size:14px; }
+    .card a:hover { text-decoration:underline; }
+
+    @media (min-width: 768px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+    /* Section heading */
+    .section { background:#fff; padding: 20px 0; }
+    .section .heading { text-align:center; max-width: 760px; margin: 0 auto; padding: 20px 0; }
+    .section .heading h2 { font-size: 44px; margin: 0; font-weight:700; }
+    .section .heading .script { color: var(--purple-700); font-family: 'Pacifico', cursive; font-weight:400; }
+    .section .heading .sub { display:block; color:#6b7280; margin-top: 12px; font-size: 20px; line-height: 26px; }
+
+    /* Dotted background list */
+    .dotted { background-color:#fff; background-image: radial-gradient(#db80ff 0.5px, transparent 0.5px), radial-gradient(#db80ff 0.5px, #ffffff 0.5px); background-size:20px 20px; background-position:0 0, 10px 10px; }
+
+    .service-grid { display:grid; gap: 24px; padding: 20px 0 40px; }
+    .service { display:flex; align-items:flex-start; gap:16px; }
+    .service img { width:80px; height:80px; object-fit:contain; }
+    .service h4 { margin: 0 0 6px; font-size: 24px; color: var(--purple-700); font-weight:700; }
+    .service p { margin: 0; color:#6b7280; }
+
+    @media (min-width: 768px) { .service-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1200px) { .service-grid { grid-template-columns: repeat(3, 1fr); } .service { flex-direction: column; } }
+
+    /* Welcome panel (Rails ERB-safe, no Tailwind) */
+    .welcome { text-align:center; padding: 96px 0; }
+    .welcome h1 { font-size: 40px; margin:0; font-weight:800; letter-spacing: -0.01em; color:#111827; }
+    .welcome p { margin: 16px auto 0; max-width: 56ch; font-size: 18px; line-height: 1.7; color:#4b5563; }
+    .welcome-actions { margin-top: 40px; display:flex; gap:24px; align-items:center; justify-content:center; flex-wrap:wrap; }
+    .link-plain { font-size: 16px; font-weight:700; color:#111827; text-decoration:none; }
+    .link-plain:hover { text-decoration:underline; }
+
+    /* Footer */
+    footer { background:#fff; border-top: 1px solid var(--gray-200); }
+    .footer-inner { padding: 40px 0 60px; }
+    .footer-grid { display:grid; gap:24px; }
+    .footer-title { font-weight:500; color:#111827; margin:0; font-size: 20px; }
+
+    .subscribe { display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+    .input { padding: 10px 16px; border:1px solid var(--gray-200); border-radius:999px; font-size:16px; outline: none; }
+    .input:focus { border-color: var(--purple-700); box-shadow: 0 0 0 3px rgba(107,33,168,.15); }
+
+    .links { display:flex; flex-direction:column; gap:8px; margin-top: 16px; }
+    .links a { color:#4b5563; text-decoration:none; }
+    .links a:hover { color: var(--purple-600); text-decoration: underline; }
+
+    .footer-bottom { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top: 24px; border-top: 1px solid var(--gray-200); }
+    .brand-foot img { height:44px; }
+    .social { display:flex; gap:12px; }
+    .social a { color:#6b7280; text-decoration:none; display:inline-flex; }
+    .social a:hover { color: var(--purple-600); }
+
+    @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr; } }
+    @media (min-width: 992px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr; } }
+  </style>
+</head>
+
+<body>
+  <!-- Call bar -->
+  <a href="tel:0448129224" class="callbar">📞 Call us — Qcare Central Queensland</a>
+
+  <!-- Header / Nav -->
+  <header>
+    <div class="container">
+      <nav class="nav" aria-label="Global">
+        <a class="brand" href="/index.html" aria-label="Qcare home">
+          <%= image_tag "qcare_logo.png", alt: "Qcare Logo", class: "h-10 w-auto" %>
+        </a>
+
+        <!-- Mobile hamburger (CSS only via checkbox) -->
+        <input type="checkbox" id="nav-toggle" />
+        <label class="hamburger" for="nav-toggle" aria-label="Toggle navigation" title="Menu">&#9776;</label>
+
+        <div class="nav-links">
+          <a href="#services">Services</a>
+          <a href="#ndis">NDIS</a>
+          <a href="#careers">Careers</a>
+          <a href="#feedback">Feedback</a>
+          <a href="/get_started.html" class="btn">Get started</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="hero" class="hero">
+    <!-- Background layers -->
+    <div class="hero-bg-mobile">
+    <%= image_tag "bg_small.gif", alt: "Disability Support in Rockhampton" %>
+    </div>
+    <div class="hero-bg-desktop">
+      <div class="container" style="display:flex; align-items:center; justify-content:center; height:100%;">
+        <%= image_tag "bg_hero.gif", alt: "Disability Support in Rockhampton", class: "max-width: 100%; height: auto;" %>
+      </div>
+    </div>
+
+    <!-- Foreground content -->
+    <div class="hero-inner">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <h1>
+              Disability support workers making everyday activities
+              <span class="accent">seamless</span>
+            </h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mobile CTA -->
+  <div class="hero-cta">
+    <a href="/get_started.html" class="btn" style="width:75%; text-align:center;">Get started</a>
   </div>
-</div>
+
+  <!-- Cards strip -->
+  <section class="strip" id="services">
+    <div class="container">
+      <div class="cards">
+        <article class="card">
+          <h3>Our Services</h3>
+          <p>Qcare provides disability support services in the Rockhampton and Central Queensland region. We aim to improve the lives of people in our community by working closely to develop the right plan and supports to make your everyday activities seamless.</p>
+          <a href="#">read more →</a>
+        </article>
+
+        <article class="card">
+          <h3>NDIS Funded</h3>
+          <p>Get flexibility from your NDIS package. You get to choose support workers that are right for you. Qcare is a registered NDIS provider so you can feel confident in our services if your funds are agency managed, plan managed or self managed.</p>
+          <a href="#">read more →</a>
+        </article>
+
+        <article class="card">
+          <h3>Careers</h3>
+          <p>Join our team and bring positive change to people's lives. Careers in the care sector offer flexible working hours that are close to home and great pay rates. You’ll also gain valuable skills, make meaningful connections, and grow in a role that truly makes a difference.</p>
+          <a href="#">read more →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section heading -->
+  <section class="section" aria-labelledby="how-we-help">
+    <div class="container">
+      <div class="heading">
+        <h2 id="how-we-help">How we can <span class="script">help</span></h2>
+        <span class="sub">Quality support changing lives for the better.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services grid with dotted bg -->
+  <section class="dotted">
+    <div class="container">
+      <div class="service-grid">
+        <div class="service">
+          <%= image_tag "icon_wheelchair.gif", alt: "Personal Care" %>
+          <div>
+            <h4>Personal Care</h4>
+            <p>Showering, toileting, and mealtime assistance at home or in the community</p>
+          </div>
+        </div>
+
+        <div class="service">
+          <%= image_tag "icon_study.gif", alt: "Education" %>
+          <div>
+            <h4>Education</h4>
+            <p>Strategies to help you achieve your goals around work, school / tafe / Uni</p>
+          </div>
+        </div>
+
+        <div class="service">
+          <%= image_tag "icon_cleaning.gif", alt: "Household Tasks" %>
+          <div>
+            <h4>Household Tasks</h4>
+            <p>Cleaning, yard maintenance and assistance with household tasks</p>
+          </div>
+        </div>
+
+        <div class="service">
+          <%= image_tag "icon_food_prep.gif", alt: "In Home Care" %>
+          <div>
+            <h4>In home Care</h4>
+            <p>Help with morning and evening routines, medical prompts and meal preparation</p>
+          </div>
+        </div>
+
+        <div class="service">
+          <%= image_tag "icon_adventure.gif", alt: "Community Access" %>
+          <div>
+            <h4>Community Access</h4>
+            <p>Support to get out and about, take a class, exercise, volunteer or go to gatherings</p>
+          </div>
+        </div>
+
+        <div class="service">
+          <%= image_tag "icon_transport.gif", alt: "Transport" %>
+          <div>
+            <h4>Transport</h4>
+            <p>Help to get your chores done or any travel to get out and about</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Welcome panel (Rails-friendly; no Tailwind) -->
+  <section class="welcome" id="welcome">
+    <div class="container">
+      <h1>Welcome to Qcare</h1>
+      <p>Your shift scheduling, simplified.</p>
+      <div class="welcome-actions">
+        <% if user_signed_in? %>
+          <%= link_to "Go to Dashboard", dashboards_path, class: "btn" %>
+        <% else %>
+          <%= link_to "Get started", new_application_path, class: "btn" %>
+          <%= link_to "Log in <span aria-hidden='true'>→</span>".html_safe, new_user_session_path, class: "link-plain" %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-grid">
+        <section>
+          <h3 class="footer-title">Subscribe to our <span style="color:var(--purple-700); font-family:'Pacifico', cursive; font-weight:400;">newsletter</span> for any updates.</h3>
+          <form class="subscribe" action="#" method="post" onsubmit="return false;">
+            <label for="email" class="visually-hidden">Email Address</label>
+            <input id="email" type="email" required class="input" placeholder="Email Address" />
+            <button class="btn" type="submit">Subscribe</button>
+          </form>
+        </section>
+
+        <section>
+          <p class="footer-title">Quick Link</p>
+          <nav class="links" aria-label="Quick links">
+            <a href="#">Home</a>
+            <a href="#">Who We Are</a>
+            <a href="#">Our Philosophy</a>
+          </nav>
+        </section>
+
+        <section>
+          <p class="footer-title">Industries</p>
+          <nav class="links" aria-label="Industries">
+            <a href="#">Retail &amp; E-Commerce</a>
+            <a href="#">Information Technology</a>
+            <a href="#">Finance &amp; Insurance</a>
+          </nav>
+        </section>
+      </div>
+
+      <div class="footer-bottom">
+        <a class="brand-foot" href="/">
+          <img src="./imgs/Qcare_logo.png" alt="QCare Logo" />
+        </a>
+        <div class="social" aria-label="Social links">
+          <a href="#" aria-label="Reddit"><i class="bi bi-reddit"></i></a>
+          <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" aria-label="Github"><i class="bi bi-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
