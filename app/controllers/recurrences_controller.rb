@@ -1,4 +1,5 @@
 class RecurrencesController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_recurrence, only: %i[ show edit update destroy ]
 
   # GET /recurrences or /recurrences.json

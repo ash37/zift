@@ -1,5 +1,6 @@
 # app/controllers/shifts_controller.rb
 class ShiftsController < ApplicationController
+  before_action :authenticate_user!
   include ActionView::RecordIdentifier
   before_action :set_shift, only: %i[show edit update destroy]
 

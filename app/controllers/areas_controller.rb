@@ -1,15 +1,16 @@
 # app/controllers/areas_controller.rb
 class AreasController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_location
 
   def create
     @area = @location.areas.build(area_params)
 
     if @area.save
-      redirect_to location_path(@location), notice: 'Area was successfully created.'
+      redirect_to location_path(@location), notice: "Area was successfully created."
     else
       @areas = @location.areas
-      render 'locations/show', status: :unprocessable_entity
+      render "locations/show", status: :unprocessable_entity
     end
   end
 

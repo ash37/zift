@@ -1,5 +1,6 @@
 # app/controllers/unavailability_requests_controller.rb
 class UnavailabilityRequestsController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_unavailability_request, only: %i[ show edit update approve decline ]
 
   def index

@@ -4,7 +4,6 @@ Rails.application.routes.draw do
   # Public pages
   get "welcome/index"
   get "dashboards", to: "dashboards#index"
-  resources :applications, only: [ :new, :create ]
 
   resources :applications, only: [ :new, :create ] do
     get "success", on: :collection
@@ -49,13 +48,13 @@ Rails.application.routes.draw do
       get "week(/:date)", to: "timesheets#index", as: "week"
     end
   end
+
   resources :unavailability_requests do
     member do
       patch :approve
       patch :decline
     end
   end
-  resources :unavailability_requests
 
   resources :rosters do
     member do

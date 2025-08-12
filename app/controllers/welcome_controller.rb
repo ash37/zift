@@ -1,6 +1,6 @@
 class WelcomeController < ApplicationController
-  before_action :authenticate_user!
+  # This controller is now public, so no authentication is required.
   def index
-    redirect_to dashboards_path if user_signed_in?
+    # This will render the public welcome page in app/views/welcome/index.html.erb
   end
 end

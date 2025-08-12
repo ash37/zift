@@ -1,4 +1,5 @@
 class ReportsController < ApplicationController
+  before_action :authenticate_user!
   def index
     @locations = Location.all
     @selected_location_id = params[:location_id]

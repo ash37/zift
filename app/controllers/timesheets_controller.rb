@@ -1,4 +1,5 @@
 class TimesheetsController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_timesheet, only: %i[ show edit update destroy approve clock_off_form clock_off match_roster_times ]
 
   # GET /timesheets
