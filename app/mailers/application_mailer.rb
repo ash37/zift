@@ -1,6 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
   default from: "from@example.com"
-  layout "mailer"
+  # layout "mailer" - Remove this line
 
   helper_method :format_shift_time
 

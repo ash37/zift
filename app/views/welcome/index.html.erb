@@ -151,8 +151,17 @@
     .welcome h1 { font-size: 40px; margin:0; font-weight:800; letter-spacing: -0.01em; color:#111827; }
     .welcome p { margin: 16px auto 0; max-width: 56ch; font-size: 18px; line-height: 1.7; color:#4b5563; }
     .welcome-actions { margin-top: 40px; display:flex; gap:24px; align-items:center; justify-content:center; flex-wrap:wrap; }
-    .link-plain { font-size: 16px; font-weight:700; color:#111827; text-decoration:none; }
-    .link-plain:hover { text-decoration:underline; }
+     .link-plain {
+      font-size: 14px;
+      font-weight: 400;
+      color: #111827;
+      text-decoration: none;
+      margin-left: auto;
+      display: inline-block;
+    }
+    .link-plain:hover {
+      text-decoration: underline;
+    }
 
     /* Footer */
     footer { background:#fff; border-top: 1px solid var(--gray-200); }
@@ -185,6 +194,18 @@
 
   <!-- Header / Nav -->
   <header>
+  <div class="container">
+      <nav class="nav" aria-label="Global">
+        
+           <% if user_signed_in? %>
+          <%= link_to "My Schedule", dashboards_path, class: "btn" %>
+        <% else %>
+          <%= link_to "Log in <span aria-hidden='true'>→</span>".html_safe, new_user_session_path, class: "link-plain" %>
+        <% end %>
+          
+        </div>
+      </nav>
+    </div>
     <div class="container">
       <nav class="nav" aria-label="Global">
         <a class="brand" href="/index.html" aria-label="Qcare home">
@@ -200,10 +221,16 @@
           <a href="#ndis">NDIS</a>
           <a href="#careers">Careers</a>
           <a href="#feedback">Feedback</a>
-          <a href="/get_started.html" class="btn">Get started</a>
+           <% if user_signed_in? %>
+          <%= link_to "My Schedule", dashboards_path, class: "btn" %>
+        <% else %>
+          <%= link_to "Get started", new_application_path, class: "btn" %>
+        <% end %>
+          
         </div>
       </nav>
     </div>
+    
   </header>
 
   <!-- Hero -->
@@ -349,12 +376,12 @@
     <div class="container footer-inner">
       <div class="footer-grid">
         <section>
-          <h3 class="footer-title">Subscribe to our <span style="color:var(--purple-700); font-family:'Pacifico', cursive; font-weight:400;">newsletter</span> for any updates.</h3>
-          <form class="subscribe" action="#" method="post" onsubmit="return false;">
-            <label for="email" class="visually-hidden">Email Address</label>
-            <input id="email" type="email" required class="input" placeholder="Email Address" />
-            <button class="btn" type="submit">Subscribe</button>
-          </form>
+          <p class="footer-title">Quick Link</p>
+          <nav class="links" aria-label="Quick links">
+            <a href="#">Home</a>
+            <a href="#">Who We Are</a>
+            <a href="#">Our Philosophy</a>
+          </nav>
         </section>
 
         <section>
@@ -377,8 +404,8 @@
       </div>
 
       <div class="footer-bottom">
-        <a class="brand-foot" href="/">
-          <img src="./imgs/Qcare_logo.png" alt="QCare Logo" />
+        <a class="brand" href="/index.html" aria-label="Qcare home">
+          <%= image_tag "qcare_logo.png", alt: "Qcare Logo", class: "h-10 w-auto" %>
         </a>
         <div class="social" aria-label="Social links">
           <a href="#" aria-label="Reddit"><i class="bi bi-reddit"></i></a>

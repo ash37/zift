@@ -1,4 +1,6 @@
 class RosterMailer < ApplicationMailer
+  layout false # Add this line
+
   def roster_published
     @user = params[:user]
     @roster = params[:roster]
