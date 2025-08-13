@@ -29,9 +29,6 @@
     </tr>
   </tbody>
 </table>
-
-
-
 <table class="w-full border-separate table-fixed" style="border-spacing: 0;">
   <thead>
     <tr>
@@ -40,7 +37,7 @@
     </tr>
   </thead>
   <tbody>
-    <% User.all.each do |user| %>
+    <% User.where.not(role: nil).each do |user| %>
       <tr class="align-top">
         <td class="p-2 border-t border-zinc-200">
           <div class="font-semibold text-zinc-800"><%= user.first_name %><br><%= user.last_name %></div>
