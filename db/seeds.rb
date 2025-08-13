@@ -23,3 +23,8 @@ User.create!(
   role: :admin,
   location: location
 )
+
+# Create Shift Types for Xero Mapping
+[ 'Weekday', 'Weeknight', 'Saturday', 'Sunday', 'Public Holiday' ].each do |name|
+  ShiftType.find_or_create_by!(name: name)
+end

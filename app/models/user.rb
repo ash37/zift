@@ -15,6 +15,7 @@ class User < ApplicationRecord
   has_many :shifts, dependent: :destroy
   has_many :timesheets, dependent: :destroy
   has_many :unavailability_requests, dependent: :destroy
+  has_many :timesheet_export_lines
 
   ROLES = {
     employee: 0,

@@ -49,6 +49,13 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :admin do
+    resource :xero_connection, only: [ :show, :new, :create, :destroy, :update ] do
+      get :callback, on: :collection
+    end
+    resources :shift_types, only: [ :index, :update, :create ]
+  end
+
   resources :unavailability_requests do
     member do
       patch :approve

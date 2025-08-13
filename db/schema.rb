@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_11_030910) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_13_130405) do
   create_table "areas", force: :cascade do |t|
     t.string "name"
     t.string "export_code"
@@ -48,6 +48,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_030910) do
     t.datetime "emails_sent_at"
   end
 
+  create_table "shift_types", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "xero_earnings_rate_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_shift_types_on_name", unique: true
+  end
+
   create_table "shifts", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "location_id", null: false
@@ -69,6 +77,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_030910) do
     t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "timesheet_export_lines", force: :cascade do |t|
+    t.integer "timesheet_export_id", null: false
+    t.integer "user_id", null: false
+    t.string "earnings_rate_id", null: false
+    t.json "daily_units", null: false
+    t.string "xero_timesheet_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["timesheet_export_id"], name: "index_timesheet_export_lines_on_timesheet_export_id"
+    t.index ["user_id"], name: "index_timesheet_export_lines_on_user_id"
+  end
+
+  create_table "timesheet_exports", force: :cascade do |t|
+    t.string "idempotency_key", null: false
+    t.date "pay_period_start", null: false
+    t.date "pay_period_end", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "exported_count", default: 0
+    t.integer "total_count", default: 0
+    t.text "error_blob"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["idempotency_key"], name: "index_timesheet_exports_on_idempotency_key", unique: true
   end
 
   create_table "timesheets", force: :cascade do |t|
@@ -148,7 +181,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_030910) do
     t.string "invitation_token"
     t.datetime "invitation_sent_at"
     t.string "phone"
+    t.string "xero_employee_id"
     t.index ["location_id"], name: "index_users_on_location_id"
+  end
+
+  create_table "xero_connections", force: :cascade do |t|
+    t.string "tenant_id", null: false
+    t.string "access_token", null: false
+    t.string "refresh_token", null: false
+    t.string "scopes", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_xero_connections_on_tenant_id", unique: true
   end
 
   add_foreign_key "areas", "locations"
@@ -156,6 +201,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_030910) do
   add_foreign_key "shifts", "locations"
   add_foreign_key "shifts", "rosters"
   add_foreign_key "shifts", "users"
+  add_foreign_key "timesheet_export_lines", "timesheet_exports"
+  add_foreign_key "timesheet_export_lines", "users"
   add_foreign_key "timesheets", "shifts"
   add_foreign_key "timesheets", "users"
   add_foreign_key "unavailability_requests", "users"
