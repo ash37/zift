@@ -14,12 +14,10 @@
                 (is_today ? "text-violet-600" : nil)
               ].compact.join(" ") do %>
 
-            <!-- Tiny text for day -->
             <span class="font-bold tracking-wide mt-2" style="font-size: 8px;">
               <%= date_for_button.strftime("%a").upcase %>
             </span>
 
-            <!-- Tiny text for date -->
             <span class="mb-2" style="font-size: 12px;">
               <%= date_for_button.strftime("%d") %>
             </span>
@@ -29,6 +27,9 @@
     </tr>
   </tbody>
 </table>
+
+
+
 <table class="w-full border-separate table-fixed" style="border-spacing: 0;">
   <thead>
     <tr>
@@ -41,6 +42,9 @@
       <tr class="align-top">
         <td class="p-2 border-t border-zinc-200">
           <div class="font-semibold text-zinc-800"><%= user.first_name %><br><%= user.last_name %></div>
+          <div id="<%= dom_id(user, 'hours_total') %>">
+            <%= render 'rosters/user_hours', roster: @roster, user: user, selected_location_id: @selected_location_id %>
+          </div>
         </td>
         <td class="p-1 border-t border-zinc-200">
           <%= render 'rosters/cell_content', roster: @roster, user: user, date: @date, selected_location_id: @selected_location_id %>
@@ -48,4 +52,12 @@
       </tr>
     <% end %>
   </tbody>
+  <tfoot>
+    <tr class="text-center">
+      <td class="p-2 border-t-2 border-zinc-300 text-left text-sm font-semibold text-zinc-800">TOTALS</td>
+      <td class="p-2 border-t-2 border-zinc-300">
+        <%= render 'rosters/daily_hours', roster: @roster, date: @date, selected_location_id: @selected_location_id %>
+      </td>
+    </tr>
+  </tfoot>
 </table>

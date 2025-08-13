@@ -2,7 +2,6 @@
   area = shift.area
   roster_is_draft = shift.roster.draft?
   show_location_name = selected_location_id.blank?
-
   # Base classes for the main container
   main_div_classes = "p-2.5 rounded-lg relative shadow-lg flex flex-col justify-between h-full"
   main_div_style = ""
@@ -28,16 +27,15 @@
   default_edit_icon_bg_class = roster_is_draft ? 'bg-gray-200 hover:bg-gray-300' : 'bg-violet-600/50 hover:bg-violet-600/90'
 %>
 
-<%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: "cursor-grab relative group h-full" do %>
+<%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: "cursor-grab relative group h-full p-1" do %>
   <div style="<%= main_div_style %>" class="<%= main_div_classes %>">
     
-    <!-- Top Section: Time and Edit Icon -->
     <div class="flex justify-between items-start">
       <div>
         <p class="text-sm font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
       </div>
       <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-        <%= link_to edit_shift_path(shift, location_id: selected_location_id) do %>
+         <%= link_to edit_shift_path(shift, location_id: selected_location_id) do %>
           <span class="inline-block p-1 rounded-full <%= area&.color.present? ? edit_icon_bg_class : default_edit_icon_bg_class %>">
             <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
           </span>
@@ -45,7 +43,7 @@
       </div>
     </div>
     
-    <!-- Middle Section: Area, Note, Location -->
+    
     <div class="space-y-1">
       <h3 class="text-xs font-light opacity-80"><%= area&.name %></h3>
       <% if shift.note.present? %>
@@ -56,7 +54,6 @@
       <% end %>
     </div>
 
-    <!-- Bottom Section: Hours -->
     <div class="flex items-center justify-between">
       <% duration_in_hours = (shift.end_time - shift.start_time) / 3600.0 %>
       <span class="<%= area&.color.present? ? child_bg_class : default_child_bg_class %> px-2 py-0.5 rounded-md text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
