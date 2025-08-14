@@ -119,12 +119,13 @@ class Admin::XeroConnectionsController < ApplicationController
 
     # Added accounting.settings.read so we can call Organisation to detect region.
     # Keep payroll.* scopes for employees, pay items/settings and timesheets.
-    scopes = "openid profile email payroll.employees payroll.settings payroll.timesheets offline_access accounting.settings.read"
+    scopes = "offline_access accounting.settings.read payroll.employees payroll.employees.read payroll.settings openid profile email payroll.timesheets"
 
     # CSRF state
     state = SecureRandom.hex(16)
     session[:xero_oauth_state] = state
 
+    Rails.logger.info("SCOPES from #{__FILE__}:#{__LINE__} => #{scopes}")
     Rails.logger.info("Xero redirect_uri => #{redirect_uri}")
     Rails.logger.info("XERO_SCOPES => #{scopes}")
 
@@ -134,7 +135,8 @@ class Admin::XeroConnectionsController < ApplicationController
       client_id:     client_id,
       redirect_uri:  redirect_uri,
       scope:         scopes,
-      state:         state
+      state:         state,
+      prompt:        "consent"
     )
     auth_url = "https://login.xero.com/identity/connect/authorize?#{q}"
     redirect_to auth_url, allow_other_host: true
@@ -195,7 +197,8 @@ class Admin::XeroConnectionsController < ApplicationController
         session[:xero_pending_token] = {
           access_token:  access_token,
           refresh_token: refresh_token,
-          expires_at:    expires_at.iso8601
+          expires_at:    expires_at.iso8601,
+          scope:         token["scope"]
         }
         session[:xero_tenant_options] = connections
         return redirect_to admin_xero_connection_path(tenant_picker: 1), notice: "Choose a Xero organisation to connect."
@@ -504,7 +507,7 @@ class Admin::XeroConnectionsController < ApplicationController
       tenant_id:     chosen["tenantId"],
       access_token:  tok[:access_token],
       refresh_token: tok[:refresh_token],
-      scopes:        nil,
+      scopes:        tok[:scope],
       expires_at:    Time.iso8601(tok[:expires_at])
     )
 

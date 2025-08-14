@@ -54,6 +54,7 @@ Rails.application.routes.draw do
       get :callback, on: :collection
     end
     resources :shift_types, only: [ :index, :update, :create ]
+    resources :xero_timesheet_exports, only: [ :new, :create ] # Add this line
   end
 
   resources :unavailability_requests do

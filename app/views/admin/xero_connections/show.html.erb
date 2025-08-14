@@ -1,5 +1,25 @@
 <div class="container mx-auto mt-10 px-4 py-10">
+  <% if @connection %>
+    <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-6">
+      <div class="text-lg font-semibold text-gray-800 mb-2">Active scopes & tenant</div>
+      <div class="text-gray-700">
+        <% tenant_display = (@connection.respond_to?(:tenant_name) && @connection.tenant_name.present?) ? @connection.tenant_name : '—' %>
+        Tenant: <%= tenant_display %> (<%= @connection.tenant_id %>)
+      </div>
+      <div class="text-gray-700 mt-1">
+        Stored scopes: <%= @connection.scopes %>
+      </div>
+      <p class="text-xs text-gray-500 mt-2">
+        Scopes are granted by Xero during connection. Reconnecting your account will update them.
+      </p>
+    </div>
+  <% end %>
   <h1 class="text-3xl font-bold mb-6">Xero Integration</h1>
+
+  <div class="mb-4">
+    <%= link_to "Reconnect Xero with required scopes", new_admin_xero_connection_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" , data: { turbo: false } %>
+    <p class="text-sm text-gray-600 mt-1">Scopes: offline_access accounting.settings.read payroll.employees payroll.employees.read payroll.settings</p>
+  </div>
 
   <% if @connection %>
     <div class="bg-white p-6 rounded-lg shadow-md">
