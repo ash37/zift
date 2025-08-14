@@ -52,9 +52,12 @@ Rails.application.routes.draw do
   namespace :admin do
     resource :xero_connection, only: [ :show, :new, :create, :destroy, :update ] do
       get :callback, on: :collection
+      # Add these two lines for user mapping
+      get :edit_user_mappings, on: :collection
+      patch :update_user_mappings, on: :collection
     end
     resources :shift_types, only: [ :index, :update, :create ]
-    resources :xero_timesheet_exports, only: [ :new, :create ] # Add this line
+    resources :xero_timesheet_exports, only: [ :index, :new, :create ]
   end
 
   resources :unavailability_requests do

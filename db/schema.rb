@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_13_130405) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_14_105103) do
   create_table "areas", force: :cascade do |t|
     t.string "name"
     t.string "export_code"
@@ -46,6 +46,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_13_130405) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "emails_sent_at"
+    t.text "public_holidays"
   end
 
   create_table "shift_types", force: :cascade do |t|

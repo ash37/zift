@@ -10,6 +10,13 @@ class Timesheet < ApplicationRecord
     rejected: 2
   }.freeze
 
+  # Scope to find unapproved timesheets (status is nil or pending)
+  scope :unapproved, -> {
+    vals = [ nil ]
+    vals << self::STATUS_PENDING if const_defined?(:STATUS_PENDING)
+    where(status: vals)
+  }
+
   validates :status, inclusion: { in: STATUSES.values }
   validate :clock_out_after_clock_in
 

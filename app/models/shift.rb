@@ -19,6 +19,30 @@ class Shift < ApplicationRecord
     ((end_time - start_time) / 3600.0)
   end
 
+  def determine_rate_name_for_time(time)
+    date = time.to_date
+    # Check for Public Holiday first, as it has the highest precedence.
+    if roster.public_holiday?(date)
+      return "Public Holiday"
+    end
+
+    case time.wday
+    when 6 # Saturday
+      "Saturday"
+    when 0 # Sunday
+      "Sunday"
+    else # Weekday
+      hour = time.hour
+      if hour >= 22 # 10 PM or later
+        "Weeknight (after 2 hours)"
+      elsif hour >= 20 # 8 PM to 9:59 PM
+        "Weeknight (first 2 hours)"
+      else
+        "Weekday"
+      end
+    end
+  end
+
   private
 
   def end_time_after_start_time

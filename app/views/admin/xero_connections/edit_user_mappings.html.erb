@@ -1,0 +1,46 @@
+<div class="container mx-auto mt-10 px-4 py-10">
+  <h1 class="text-3xl font-bold mb-6">Map Users to Xero Employees</h1>
+
+  <div class="bg-white p-6 rounded-lg shadow-md">
+    <p class="mb-6 text-gray-600">
+      Select the corresponding Xero employee for each user in the system. Users without a mapping will not be included in payroll exports.
+    </p>
+
+    <%= form_with url: update_user_mappings_admin_xero_connection_path, method: :patch, local: true do |form| %>
+      <table class="min-w-full divide-y divide-gray-200 mb-6">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Our User</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Xero Employee</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @users.each do |user| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <%= user.name %>
+                <span class="block text-xs text-gray-500"><%= user.email %></span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= select_tag "mappings[#{user.id}]",
+                      options_from_collection_for_select(
+                        @xero_employees,
+                        :employee_id,
+                        ->(employee) { "#{employee.first_name} #{employee.last_name}" },
+                        selected: user.xero_employee_id
+                      ),
+                      include_blank: 'Not Mapped',
+                      class: "block w-full rounded-md border-gray-300 shadow-sm" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <div class="flex items-center space-x-4">
+        <%= form.submit "Save Mappings", class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded" %>
+        <%= link_to "Cancel", admin_xero_connection_path, class: "text-gray-600 hover:text-gray-800" %>
+      </div>
+    <% end %>
+  </div>
+</div>

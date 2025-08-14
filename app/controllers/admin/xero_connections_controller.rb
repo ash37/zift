@@ -1,6 +1,5 @@
 # app/controllers/admin/xero_connections_controller.rb
 require "ostruct"
-# app/controllers/admin/xero_connections_controller.rb
 class Admin::XeroConnectionsController < ApplicationController
   before_action :authenticate_user!
   # before_action :require_admin!
@@ -236,13 +235,90 @@ class Admin::XeroConnectionsController < ApplicationController
     redirect_to admin_xero_connection_path, notice: "Disconnected from Xero."
   end
 
+  def edit_user_mappings
+    client = xero_api_client
+    return unless client
+
+    tenant_id = XeroConnection.first.tenant_id
+    api = payroll_api_for(tenant_id, client)
+
+    @users = User.where.not(role: nil).order(:name)
+    employees_hashes = []
+
+    begin
+      Rails.logger.info("Calling API: #{api.class}.get_employees ...")
+      resp = api.get_employees(tenant_id)
+      employees_hashes = Array(resp&.employees)
+      Rails.logger.info("SDK employees OK count=#{employees_hashes.size}")
+    rescue XeroRuby::ApiError => e
+      code    = (e.respond_to?(:code) ? e.code : nil)
+      headers = (e.respond_to?(:response_headers) ? e.response_headers : {}) || {}
+      corr    = headers["xero-correlation-id"] || headers["Xero-Correlation-Id"]
+      Rails.logger.warn("Xero: get_employees failed code=#{code} corr=#{corr} hdrs=#{headers.inspect}")
+
+      if code.to_i == 404
+        access_token = XeroConnection.first.access_token
+        url = "https://api.xero.com/payroll.xro/1.0/Employees?pagesize=200"
+
+        if defined?(XeroHttp)
+          res, rcorr, json = XeroHttp.get_json(url: url, access_token: access_token, tenant_id: tenant_id)
+          Rails.logger.info("Raw AU probe Employees?pagesize=200 -> status=#{res.code} bytes=#{res.body&.bytesize || 0}")
+          if res.code.to_i == 200 && json["Employees"].is_a?(Array)
+            employees_hashes = json["Employees"]
+            Rails.logger.info("Xero: Raw employees OK count=#{employees_hashes.size}")
+          else
+            Rails.logger.warn("Xero: Raw employees GET failed #{res.code} corr=#{rcorr}")
+          end
+        else
+          raw = HTTParty.get(
+            url,
+            headers: { "Authorization" => "Bearer #{access_token}", "Xero-Tenant-Id" => tenant_id, "Accept" => "application/json" }
+          )
+          Rails.logger.info("Raw AU probe Employees?pagesize=200 -> status=#{raw.code} bytes=#{raw.body.to_s.bytesize}")
+          if raw.code.to_i == 200 && raw.body.present?
+            begin
+              parsed = JSON.parse(raw.body)
+              employees_hashes = parsed["Employees"].is_a?(Array) ? parsed["Employees"] : []
+              Rails.logger.info("Xero: Raw employees OK count=#{employees_hashes.size}")
+            rescue JSON::ParserError
+              Rails.logger.warn("Raw AU employees response was not valid JSON")
+            end
+          end
+        end
+      elsif [ 401, 403 ].include?(code.to_i)
+        redirect_to(admin_xero_connection_path, alert: "Could not fetch employees from Xero (#{code}). Please reconnect. Corr: #{corr}") and return
+      else
+        redirect_to(admin_xero_connection_path, alert: "Could not fetch employees from Xero (#{code}). Corr: #{corr}.") and return
+      end
+    end
+
+    # **THE FIX IS HERE**
+    # Convert the array of hashes into an array of OpenStruct objects
+    # so the view can use dot notation (e.g., employee.first_name).
+    @xero_employees = employees_hashes.map do |hash|
+      OpenStruct.new(
+        employee_id: hash["EmployeeID"],
+        first_name: hash["FirstName"],
+        last_name: hash["LastName"]
+      )
+    end
+  end
+
+  def update_user_mappings
+    mappings = params.require(:mappings)
+    mappings.each do |user_id, xero_employee_id|
+      user = User.find(user_id)
+      user.update_column(:xero_employee_id, xero_employee_id.presence) # Use presence to save nil if dropdown is blank
+    end
+    redirect_to admin_xero_connection_path, notice: "User mappings have been updated."
+  end
+
   private
 
   def xero_api_client
     connection = XeroConnection.first
     return nil unless connection
 
-    # Refresh token if it's about to expire (tokens last ~30m)
     if connection.expires_at <= Time.current + 5.minutes
       client_id     = Rails.application.credentials.xero[:client_id]
       client_secret = Rails.application.credentials.xero[:client_secret]
@@ -252,12 +328,11 @@ class Admin::XeroConnectionsController < ApplicationController
         body:    { grant_type: "refresh_token", refresh_token: connection.refresh_token },
         basic_auth: { username: client_id, password: client_secret }
       )
-
       if response.success?
         data = response.parsed_response
         connection.update!(
           access_token:  data["access_token"],
-          refresh_token: data["refresh_token"], # rotate!
+          refresh_token: data["refresh_token"],
           expires_at:    Time.current + data["expires_in"].to_i.seconds
         )
       else
@@ -277,80 +352,52 @@ class Admin::XeroConnectionsController < ApplicationController
     client
   end
 
-  # --- Region detection helpers ---------------------------------------------
-
-  # Robustly detect the tenant's country via Accounting -> Organisation.
-  # Requires the accounting.settings.read scope and Accept: application/json.
   def organisation_country_code(tenant_id, access_token)
     res = HTTParty.get(
       "https://api.xero.com/api.xro/2.0/Organisation",
-      headers: {
-        "Authorization"   => "Bearer #{access_token}",
-        "Xero-Tenant-Id"  => tenant_id,
-        "Accept"          => "application/json"
-      }
+      headers: { "Authorization" => "Bearer #{access_token}", "Xero-Tenant-Id" => tenant_id, "Accept" => "application/json" }
     )
     Rails.logger.info("GET /api.xro/2.0/Organisation -> #{res.code}")
     return res.parsed_response.dig("Organisations", 0, "CountryCode") if res.code == 200
     nil
   end
 
-  # Choose the correct regional Payroll API (AU/NZ/UK).
-  # 1) ENV override (XERO_PAYROLL_REGION) – AU/NZ/UK (we accept UK or GB)
-  # 2) Country detection from Organisation
-  # 3) Fallback probe (AU -> NZ -> UK)
   def payroll_api_for(tenant_id, api_client)
     connection   = XeroConnection.first or return nil
     access_token = connection.access_token
-
-    # --- 1) ENV override (handy for testing) ---
     override = ENV["XERO_PAYROLL_REGION"].to_s.strip.upcase
     if override.present?
       Rails.logger.info("XERO_PAYROLL_REGION override => #{override}")
       case override
-      when "AU"
-        return XeroRuby::PayrollAuApi.new(api_client)
-      when "NZ"
-        return XeroRuby::PayrollNzApi.new(api_client)
-      when "UK", "GB"
-        return XeroRuby::PayrollUkApi.new(api_client)
+      when "AU" then return XeroRuby::PayrollAuApi.new(api_client)
+      when "NZ" then return XeroRuby::PayrollNzApi.new(api_client)
+      when "UK", "GB" then return XeroRuby::PayrollUkApi.new(api_client)
       else
         Rails.logger.warn("Unknown XERO_PAYROLL_REGION '#{override}', falling back to auto-detect")
       end
     end
 
-    # --- 2) Country-driven choice ---
     cc = organisation_country_code(tenant_id, access_token)
     Rails.logger.info("Xero tenant CountryCode => #{cc.inspect}")
     case cc
-    when "AU" then return XeroRuby::PayrollAuApi.new(api_client) # v1.0, no probing
-    when "NZ" then return XeroRuby::PayrollNzApi.new(api_client) # v2.0
-    when "GB" then return XeroRuby::PayrollUkApi.new(api_client) # v2.0
+    when "AU" then return XeroRuby::PayrollAuApi.new(api_client)
+    when "NZ" then return XeroRuby::PayrollNzApi.new(api_client)
+    when "GB" then return XeroRuby::PayrollUkApi.new(api_client)
     end
 
-    # --- 3) Fallback probe (handles odd org responses / demo tenants / SDK drift) ---
-    [
-      XeroRuby::PayrollAuApi,
-      XeroRuby::PayrollNzApi,
-      XeroRuby::PayrollUkApi
-    ].each do |klass|
+    [ XeroRuby::PayrollAuApi, XeroRuby::PayrollNzApi, XeroRuby::PayrollUkApi ].each do |klass|
       api = klass.new(api_client)
       begin
         case klass.name
         when "XeroRuby::PayrollAuApi"
           res = HTTParty.get(
             "https://api.xero.com/payroll.xro/1.0/Employees?pagesize=1",
-            headers: {
-              "Authorization"  => "Bearer #{access_token}",
-              "Xero-Tenant-Id" => tenant_id,
-              "Accept"         => "application/json"
-            }
+            headers: { "Authorization" => "Bearer #{access_token}", "Xero-Tenant-Id" => tenant_id, "Accept" => "application/json" }
           )
           if res.code == 200
             Rails.logger.info("Payroll API fallback selected: #{klass.name}")
             return api
           elsif res.code == 404
-            # try next
           else
             raise XeroRuby::ApiError.new(code: res.code, response_body: res.body)
           end
@@ -360,45 +407,30 @@ class Admin::XeroConnectionsController < ApplicationController
           return api
         end
       rescue XeroRuby::ApiError => e
-        # 404 means "wrong region" – try next. Any other error should bubble up.
         raise e unless e.code == 404
       end
     end
-
-    nil # payroll not provisioned or user lacks permission
+    nil
   end
-
-  # --- Sync actions ----------------------------------------------------------
 
   def sync_employees
     client = xero_api_client
     return unless client
-
     xero_tenant_id = XeroConnection.first.tenant_id
-    payroll        = payroll_api_for(xero_tenant_id, client)
-
+    payroll = payroll_api_for(xero_tenant_id, client)
     unless payroll
-      return redirect_to admin_xero_connection_path,
-                         alert: "Payroll not available for this tenant (not provisioned or insufficient permissions)."
+      return redirect_to admin_xero_connection_path, alert: "Payroll not available for this tenant."
     end
-
     is_au = payroll.is_a?(XeroRuby::PayrollAuApi)
-
     employees = []
     if is_au
-      # AU: Authoritative raw fetch from Payroll v1 (SDK sometimes yields empty body)
-      Rails.logger.info("AU region detected \u2013 using authoritative raw Payroll v1 employees fetch...")
+      Rails.logger.info("AU region detected – using authoritative raw Payroll v1 employees fetch...")
       raw = HTTParty.get(
         "https://api.xero.com/payroll.xro/1.0/Employees",
-        headers: {
-          "Authorization"  => "Bearer #{XeroConnection.first.access_token}",
-          "Xero-Tenant-Id" => xero_tenant_id,
-          "Accept"         => "application/json"
-        }
+        headers: { "Authorization" => "Bearer #{XeroConnection.first.access_token}", "Xero-Tenant-Id" => xero_tenant_id, "Accept" => "application/json" }
       )
       ct = raw.headers && raw.headers["content-type"]
       Rails.logger.info("Raw AU fetch status=#{raw.code}, content-type=#{ct}, bytes=#{raw.body.to_s.bytesize}")
-
       if raw.code == 200 && raw.body.present?
         begin
           obj = JSON.parse(raw.body)
@@ -416,7 +448,7 @@ class Admin::XeroConnectionsController < ApplicationController
           employees = []
         end
       else
-        Rails.logger.info("Raw AU fetch yielded no data \u2013 falling back to SDK get_employees")
+        Rails.logger.info("Raw AU fetch yielded no data – falling back to SDK get_employees")
         begin
           resp = payroll.get_employees(xero_tenant_id)
           employees = Array(resp&.employees)
@@ -430,7 +462,6 @@ class Admin::XeroConnectionsController < ApplicationController
         end
       end
     else
-      # NZ/UK via SDK (v2)
       Rails.logger.info("Calling API: #{payroll.class}.get_employees ...")
       begin
         resp = payroll.get_employees(xero_tenant_id)
@@ -446,7 +477,6 @@ class Admin::XeroConnectionsController < ApplicationController
     end
 
     Rails.logger.info("Employees fetched (post-branch): count=#{employees.size}")
-
     if employees.any?
       updated_count = 0
       with_email = 0
@@ -458,10 +488,8 @@ class Admin::XeroConnectionsController < ApplicationController
           updated_count += 1 if user.update(xero_employee_id: xe.employee_id)
         end
       end
-      redirect_to admin_xero_connection_path,
-                  notice: "Sync complete. Found #{employees.count} employees (#{with_email} with emails), updated #{updated_count} users by email."
+      redirect_to admin_xero_connection_path, notice: "Sync complete. Found #{employees.count} employees (#{with_email} with emails), updated #{updated_count} users by email."
     else
-      # Double-check payroll provisioning to give a more helpful message
       begin
         settings = payroll.get_settings(xero_tenant_id)
         provisioned = settings&.settings.present?
@@ -472,19 +500,16 @@ class Admin::XeroConnectionsController < ApplicationController
       if defined?(@raw_employees_status) && @raw_employees_status
         probe = " (raw AU probe HTTP #{@raw_employees_status}, bytes #{(@raw_employees_len || 0)})"
       end
-      message = provisioned ?
-        "Sync complete. No active employees found in Xero#{probe}." :
-        "Payroll appears not provisioned for this tenant or you lack permissions#{probe}."
+      message = provisioned ? "Sync complete. No active employees found in Xero#{probe}." : "Payroll appears not provisioned for this tenant or you lack permissions#{probe}."
       redirect_to admin_xero_connection_path, notice: message
     end
 
   rescue XeroRuby::ApiError => e
-    msg =
-      case e.code
-      when 401 then "Error syncing employees: 401 Unauthorized. Please reconnect."
-      when 404 then "Error syncing employees: 404 Not Found. Likely wrong payroll region for this tenant or payroll not provisioned."
-      else           "Error syncing employees: #{e.code} #{e.message}"
-      end
+    msg = case e.code
+    when 401 then "Error syncing employees: 401 Unauthorized. Please reconnect."
+    when 404 then "Error syncing employees: 404 Not Found. Likely wrong payroll region for this tenant or payroll not provisioned."
+    else "Error syncing employees: #{e.code} #{e.message}"
+    end
     redirect_to admin_xero_connection_path, alert: msg
   end
 
@@ -494,14 +519,11 @@ class Admin::XeroConnectionsController < ApplicationController
     unless opts && tok
       return redirect_to admin_xero_connection_path, alert: "No pending Xero connection found. Please connect again."
     end
-
     tenant_id = params[:tenant_id].to_s
     chosen = Array(opts).find { |c| c["tenantId"] == tenant_id }
     unless chosen
       return redirect_to admin_xero_connection_path, alert: "Selected tenant is not available."
     end
-
-    # Persist and clear session
     XeroConnection.destroy_all
     XeroConnection.create!(
       tenant_id:     chosen["tenantId"],
@@ -510,41 +532,25 @@ class Admin::XeroConnectionsController < ApplicationController
       scopes:        tok[:scope],
       expires_at:    Time.iso8601(tok[:expires_at])
     )
-
     session.delete(:xero_tenant_options)
     session.delete(:xero_pending_token)
-
     redirect_to admin_xero_connection_path, notice: "Connected to #{chosen["tenantName"]}."
   end
 
   def sync_pay_items
     client = xero_api_client
     return unless client
-
     xero_tenant_id = XeroConnection.first.tenant_id
-    payroll        = payroll_api_for(xero_tenant_id, client)
-
+    payroll = payroll_api_for(xero_tenant_id, client)
     unless payroll
-      return redirect_to admin_xero_connection_path,
-                         alert: "Payroll not available for this tenant (not provisioned or insufficient permissions)."
+      return redirect_to admin_xero_connection_path, alert: "Payroll not available for this tenant (not provisioned or insufficient permissions)."
     end
-
     Rails.logger.info("Calling API: #{payroll.class} (pay items) ...")
-
     pay_items = []
-
     if payroll.is_a?(XeroRuby::PayrollAuApi)
-      # AU Payroll v1: prefer raw HTTP as SDK may yield empty body
-      headers = {
-        "Authorization"  => "Bearer #{XeroConnection.first.access_token}",
-        "Xero-Tenant-Id" => xero_tenant_id,
-        "Accept"         => "application/json"
-      }
-
-      # Try /PayItems first (expected shape contains EarningsRates array)
+      headers = { "Authorization" => "Bearer #{XeroConnection.first.access_token}", "Xero-Tenant-Id" => xero_tenant_id, "Accept" => "application/json" }
       raw = HTTParty.get("https://api.xero.com/payroll.xro/1.0/PayItems", headers: headers)
       Rails.logger.info("Raw AU PayItems status=#{raw.code}, bytes=#{raw.body.to_s.bytesize}")
-
       parsed = nil
       if raw.code == 200 && raw.body.present?
         begin
@@ -553,21 +559,15 @@ class Admin::XeroConnectionsController < ApplicationController
           Rails.logger.warn("Raw AU PayItems response was not valid JSON")
         end
       end
-
       if parsed
         container = parsed["PayItems"] || parsed["payItems"] || {}
         earnings  = container["EarningsRates"] || container["earningsRates"] || []
         if earnings.is_a?(Array) && earnings.any?
           pay_items = earnings.map do |er|
-            {
-              id:   er["EarningsRateID"] || er["earningsRateID"] || er["EarningsRateId"] || er["earningsRateId"],
-              name: er["Name"] || er["name"]
-            }
+            { id: er["EarningsRateID"] || er["earningsRateID"] || er["EarningsRateId"] || er["earningsRateId"], name: er["Name"] || er["name"] }
           end
         end
       end
-
-      # Fallback to /EarningsRates if /PayItems didn’t yield anything
       if pay_items.empty?
         raw2 = HTTParty.get("https://api.xero.com/payroll.xro/1.0/EarningsRates", headers: headers)
         Rails.logger.info("Raw AU EarningsRates status=#{raw2.code}, bytes=#{raw2.body.to_s.bytesize}")
@@ -583,9 +583,7 @@ class Admin::XeroConnectionsController < ApplicationController
           end
         end
       end
-
     else
-      # NZ/UK (v2) – keep SDK path via settings
       begin
         settings = payroll.get_settings(xero_tenant_id)
         container = settings.settings&.pay_items
@@ -599,27 +597,22 @@ class Admin::XeroConnectionsController < ApplicationController
         end
       end
     end
-
     Rails.logger.info("Pay items fetched: count=#{pay_items.size}")
-
     if pay_items.any?
       pay_items.each do |er|
         next if er[:id].blank?
-        ShiftType.find_or_initialize_by(xero_earnings_rate_id: er[:id])
-                 .update(name: er[:name].presence || "(Unnamed earnings rate)")
+        ShiftType.find_or_initialize_by(xero_earnings_rate_id: er[:id]).update(name: er[:name].presence || "(Unnamed earnings rate)")
       end
       redirect_to admin_xero_connection_path, notice: "Successfully synced #{pay_items.count} pay items."
     else
       redirect_to admin_xero_connection_path, notice: "Sync complete. No pay items found."
     end
-
   rescue XeroRuby::ApiError => e
-    msg =
-      case e.code
-      when 401 then "Error syncing pay items: 401 Unauthorized. Please reconnect."
-      when 404 then "Error syncing pay items: 404 Not Found. Likely wrong payroll region for this tenant or payroll not provisioned."
-      else           "Error syncing pay items: #{e.code} #{e.message}"
-      end
+    msg = case e.code
+    when 401 then "Error syncing pay items: 401 Unauthorized. Please reconnect."
+    when 404 then "Error syncing pay items: 404 Not Found. Likely wrong payroll region for this tenant or payroll not provisioned."
+    else "Error syncing pay items: #{e.code} #{e.message}"
+    end
     redirect_to admin_xero_connection_path, alert: msg
   end
 end
