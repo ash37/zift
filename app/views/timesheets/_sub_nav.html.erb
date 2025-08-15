@@ -60,7 +60,19 @@
                 </div>
             </div>
         </div>
-        <%= link_to "New Timesheet", new_unscheduled_timesheets_path(date: @start_date), class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md" %>
+        
+      
+      <%= link_to new_unscheduled_timesheets_path(date: @start_date),
+    class: "p-4 rounded-full bg-gray-100 hover:bg-gray-200
+                      sm:px-4 sm:py-2 sm:rounded-3xl flex items-center justify-center gap-2 text-gray-700" do %>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-violet-500">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+</svg>
+
+  <span class="hidden sm:inline font-semibold text-gray-700">New Timesheet</span>
+<% end %>
+      
+      
       </div>
     </div>
   </div>
