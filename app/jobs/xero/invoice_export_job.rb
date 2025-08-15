@@ -41,15 +41,12 @@ module Xero
       api_client = XeroRuby::ApiClient.new
       accounting_api = XeroRuby::AccountingApi.new(api_client)
 
-      fallback_account_code = if connection.respond_to?(:sales_account_code) && connection.sales_account_code.present?
-        connection.sales_account_code
-      else
-        ENV[FALLBACK_ACCOUNT_ENV]
-      end
+      fallback_account_code = resolve_fallback_account_code(accounting_api, xero_tenant_id, connection)
 
       invoice_export.update(status: "processing")
       exported_count = 0
       Rails.logger.info("[Xero::InvoiceExportJob] Using tenant_id=#{xero_tenant_id} token_expires_at=#{connection.expires_at&.iso8601}")
+      Rails.logger.info("[Xero::InvoiceExportJob] Fallback account code resolved to: #{fallback_account_code.presence || '(none)'}")
 
       lines_by_location = invoice_export.invoice_export_lines.includes(:location, :area, :timesheet).group_by(&:location)
       Rails.logger.info("[Xero::InvoiceExportJob] Grouped lines by location: #{lines_by_location.transform_values { |arr| arr.size }}")
@@ -87,7 +84,7 @@ module Xero
             h[:account_code] = fallback_account_code if fallback_account_code.present?
             h
           end
-          Rails.logger.warn("[Xero::InvoiceExportJob] No fallback account code configured; set #{FALLBACK_ACCOUNT_ENV} or connection.sales_account_code to enable account-mode retry.") if fallback_account_code.blank?
+          Rails.logger.warn("[Xero::InvoiceExportJob] No fallback account code available after auto-detect; set #{FALLBACK_ACCOUNT_ENV} or add a revenue account in Xero if you want account-mode retry.") if fallback_account_code.blank?
 
           if item_line_items.any? { |li| li[:item_code].blank? || li[:quantity].nil? }
             Rails.logger.warn("[Xero::InvoiceExportJob] One or more line items missing item_code or quantity for location='#{location&.name}'. Will try fallback account_code if configured.")
@@ -207,6 +204,15 @@ module Xero
 
           Rails.logger.error("[Xero::InvoiceExportJob] ApiError create_invoices(#{attempt}) tenant=#{xero_tenant_id} location='#{location&.name}' status=#{status_code} corr=#{corr} short_corr=#{short(corr)} body=#{body.presence || '(empty)'}")
 
+          # Try raw HTTP create as a fallback for SDK 404/empty responses
+          http_invoice_id = http_create_invoice(xero_tenant_id, contact_hash, item_line_items)
+          if http_invoice_id.present?
+            Rails.logger.info("[Xero::InvoiceExportJob] Created invoice_id=#{http_invoice_id} via HTTP fallback (items) for location='#{location&.name}'")
+            lines.each { |line| line.update!(xero_invoice_id: http_invoice_id) }
+            exported_count += 1
+            next
+          end
+
           if status_code.to_i == 404 && attempt == :items
             if fallback_account_code.present?
               begin
@@ -225,6 +231,14 @@ module Xero
                 corr2 = (e2.response_headers || {})["xero-correlation-id"] rescue nil
                 status_code2 = e2.respond_to?(:code) ? e2.code : nil
                 Rails.logger.error("[Xero::InvoiceExportJob] Fallback account-mode ApiError status=#{status_code2} corr=#{corr2} short_corr=#{short(corr2)} body=#{body2.presence || '(empty)'}")
+                # Try raw HTTP create as a fallback for SDK 404/empty responses in account mode
+                http_invoice_id = http_create_invoice(xero_tenant_id, contact_hash, account_line_items)
+                if http_invoice_id.present?
+                  Rails.logger.info("[Xero::InvoiceExportJob] Created invoice_id=#{http_invoice_id} via HTTP fallback (account) for location='#{location&.name}'")
+                  lines.each { |line| line.update!(xero_invoice_id: http_invoice_id) }
+                  exported_count += 1
+                  next
+                end
                 msg2 = [
                   "Error for location #{location&.name}",
                   ("status=#{status_code2}" if status_code2),
@@ -414,6 +428,73 @@ module Xero
     end
     private :auto_create_items
 
+    # Raw HTTP POST to create an Invoice (works around SDK 404s on create_invoices).
+    # line_items_hashes should already be in SDK-style snake_case keys. We'll convert to Xero's expected casing.
+    def http_create_invoice(tenant_id, contact_hash, line_items_hashes)
+      token = XeroConnection.first&.access_token
+      raise "missing access_token" if token.blank?
+
+      url = "https://api.xero.com/api.xro/2.0/Invoices"
+
+      # Convert snake_case keys to the Xero payload keys (PascalCase) that we know work with raw HTTP.
+      xero_line_items = line_items_hashes.map do |li|
+        h = {}
+        h["ItemCode"]    = li[:item_code].to_s if li.key?(:item_code) && li[:item_code].present?
+        h["Description"] = li[:description].to_s if li.key?(:description)
+        h["Quantity"]    = li[:quantity].to_f if li.key?(:quantity)
+        h["UnitAmount"]  = li[:unit_amount].to_f if li.key?(:unit_amount)
+        h["AccountCode"] = li[:account_code].to_s if li.key?(:account_code) && li[:account_code].present?
+        h["TaxType"]     = li[:tax_type].to_s if li.key?(:tax_type)
+        h
+      end
+
+      xero_contact =
+        if contact_hash[:contact_id].present?
+          { "ContactID" => contact_hash[:contact_id].to_s }
+        else
+          { "Name" => contact_hash[:name].to_s }
+        end
+
+      payload = {
+        "Invoices" => [
+          {
+            "Type"       => "ACCREC",
+            "Contact"    => xero_contact,
+            "Date"       => Time.current.to_date.iso8601,
+            "DueDate"    => (Time.current.to_date + 7.days).iso8601,
+            "LineItems"  => xero_line_items,
+            "Status"     => "DRAFT"
+          }
+        ]
+      }
+
+      # Optional idempotency-key: reuse the most recent invoice_export idempotency_key if present.
+      # If not available in this scope, it is safe to omit — Xero will still accept the POST.
+      headers = {
+        "Authorization"  => "Bearer #{token}",
+        "Xero-Tenant-Id" => tenant_id,
+        "Content-Type"   => "application/json",
+        "Accept"         => "application/json"
+      }
+
+      Rails.logger.info("[Xero::InvoiceExportJob] HTTP create Invoice POST #{url}")
+      resp = HTTParty.post(url, headers: headers, body: payload.to_json)
+      corr = resp.headers["xero-correlation-id"] rescue nil
+      Rails.logger.info("[Xero::InvoiceExportJob] HTTP create Invoice status=#{resp.code} corr=#{corr} short_corr=#{short(corr)} bytes=#{resp.body.to_s.bytesize}")
+
+      if resp.code.to_i == 200
+        body = JSON.parse(resp.body) rescue {}
+        inv  = Array(body["Invoices"]).first
+        invoice_id = inv&.dig("InvoiceID")
+        return invoice_id if invoice_id.present?
+      end
+
+      nil
+    rescue => e
+      Rails.logger.warn("[Xero::InvoiceExportJob] HTTP create Invoice exception: #{e.class}: #{e.message}")
+      nil
+    end
+
     # Raw HTTP POST to create a single Item, working around SDK quirks.
     def create_item_http(tenant_id, code, fallback_account_code)
       token = XeroConnection.first&.access_token
@@ -458,6 +539,7 @@ module Xero
       Rails.logger.warn("[Xero::InvoiceExportJob] HTTP create Item exception for code=#{code.inspect}: #{e.class}: #{e.message}")
     end
     private :create_item_http
+    private :http_create_invoice
 
     private
 
@@ -495,5 +577,87 @@ module Xero
         false
       end
     end
+    def resolve_fallback_account_code(accounting_api, tenant_id, connection)
+      # 1) Prefer DB column *if it exists* and is set (won't blow up if column is missing)
+      if connection.respond_to?(:sales_account_code) && connection.sales_account_code.present?
+        Rails.logger.info("[Xero::InvoiceExportJob] Using connection.sales_account_code=#{connection.sales_account_code}")
+        return connection.sales_account_code.to_s
+      end
+
+      # 2) Then ENV
+      if ENV[FALLBACK_ACCOUNT_ENV].present?
+        Rails.logger.info("[Xero::InvoiceExportJob] Using ENV #{FALLBACK_ACCOUNT_ENV}=#{ENV[FALLBACK_ACCOUNT_ENV]}")
+        return ENV[FALLBACK_ACCOUNT_ENV].to_s
+      end
+
+      # 3) Auto-detect by asking Xero for Accounts
+      Rails.logger.info("[Xero::InvoiceExportJob] Auto-detecting fallback account code via Accounts API…")
+      accounts = []
+      begin
+        resp = accounting_api.get_accounts(tenant_id)
+        accounts = Array(resp&.accounts)
+      rescue XeroRuby::ApiError => e
+        corr = (e.response_headers || {})["xero-correlation-id"] rescue nil
+        status = e.respond_to?(:code) ? e.code : nil
+        Rails.logger.warn("[Xero::InvoiceExportJob] SDK get_accounts ApiError status=#{status} corr=#{corr} short_corr=#{short(corr)} body=#{e.response_body.to_s.presence || '(empty)'}; trying HTTP fallback")
+      end
+
+      if accounts.blank?
+        begin
+          accounts = fetch_accounts_http(tenant_id)
+        rescue => e
+          Rails.logger.warn("[Xero::InvoiceExportJob] HTTP fallback get Accounts failed: #{e.class}: #{e.message}")
+        end
+      end
+
+      # Choose a sensible revenue code
+      chosen = nil
+      if accounts.present?
+        # Normalise to simple Hash-like for scanning
+        normalized = accounts.map do |a|
+          if a.respond_to?(:code)
+            { code: a.code.to_s, name: a.respond_to?(:name) ? a.name.to_s : (a["Name"] || a[:Name]).to_s, type: (a.respond_to?(:type) ? a.type.to_s : (a["Type"] || a[:Type]).to_s) }
+          else
+            { code: (a["Code"] || a[:Code]).to_s, name: (a["Name"] || a[:Name]).to_s, type: (a["Type"] || a[:Type]).to_s }
+          end
+        end
+
+        chosen = normalized.find { |a| a[:code] == "200" && a[:type].casecmp?("REVENUE") }&.dig(:code)
+        chosen ||= normalized.find { |a| a[:type].casecmp?("REVENUE") }&.dig(:code)
+        chosen ||= normalized.find { |a| a[:code] == "200" }&.dig(:code)
+        chosen ||= normalized.find { |a| a[:name].to_s.downcase.include?("sales") }&.dig(:code)
+      end
+
+      if chosen.present?
+        Rails.logger.info("[Xero::InvoiceExportJob] Auto-detected revenue AccountCode=#{chosen}")
+        chosen.to_s
+      else
+        Rails.logger.warn("[Xero::InvoiceExportJob] Could not auto-detect a revenue AccountCode; account-mode fallback will be disabled.")
+        nil
+      end
+    end
+    private :resolve_fallback_account_code
+
+    def fetch_accounts_http(tenant_id)
+      token = XeroConnection.first&.access_token
+      raise "missing access_token" if token.blank?
+
+      url = "https://api.xero.com/api.xro/2.0/Accounts"
+      Rails.logger.info("[Xero::InvoiceExportJob] HTTP GET #{url}")
+      resp = HTTParty.get(url, headers: {
+        "Authorization" => "Bearer #{token}",
+        "Xero-Tenant-Id" => tenant_id,
+        "Accept" => "application/json"
+      })
+      corr = resp.headers["xero-correlation-id"] rescue nil
+      Rails.logger.info("[Xero::InvoiceExportJob] HTTP Accounts status=#{resp.code} corr=#{corr} short_corr=#{short(corr)} bytes=#{resp.body.to_s.bytesize}")
+      if resp.code.to_i == 200
+        body = JSON.parse(resp.body) rescue {}
+        Array(body["Accounts"]) # return raw array of hashes
+      else
+        []
+      end
+    end
+    private :fetch_accounts_http
   end
 end
