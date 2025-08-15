@@ -1,13 +1,16 @@
 # app/models/shift.rb
 class Shift < ApplicationRecord
+  # Add an attribute to control the validation
+  attr_accessor :bypass_unavailability_validation
+
   belongs_to :roster
   belongs_to :user
   belongs_to :location
   belongs_to :area, optional: true
   has_many :timesheets, dependent: :destroy
 
-  # This line correctly calls your validation method before saving a shift
-  validate :user_is_available
+  # Make the validation conditional
+  validate :user_is_available, unless: :bypass_unavailability_validation
 
   validate :end_time_after_start_time
   validate :no_overlapping_shifts

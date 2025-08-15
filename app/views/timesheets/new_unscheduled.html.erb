@@ -1,0 +1,38 @@
+<div class="container mx-auto mt-10 px-4 py-10">
+  <h1 class="text-3xl font-bold mb-6">Create Unscheduled Timesheet</h1>
+
+  <div class="bg-white p-6 rounded-lg shadow-md">
+    <%# The form now correctly submits all fields nested under :timesheet %>
+    <%= form_with(model: @timesheet, url: create_unscheduled_timesheets_path, method: :post, local: true) do |form| %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <%= form.label :user_id, "Employee", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.collection_select :user_id, @users, :id, :name, {}, { class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm" } %>
+        </div>
+        <div>
+          <%= form.label :location_id, "Location", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.collection_select :location_id, @locations, :id, :name, {}, { class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm" } %>
+        </div>
+        <div>
+          <%= form.label :date, "Date", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.date_field :date, value: @start_date, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm" %>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <%= form.label :clock_in_at, "Start Time", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.time_field :clock_in_at, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm" %>
+          </div>
+          <div>
+            <%= form.label :clock_out_at, "End Time", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.time_field :clock_out_at, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm" %>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 flex items-center space-x-4">
+        <%= form.submit "Create Timesheet", class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded" %>
+        <%= link_to "Cancel", week_timesheets_path(date: @start_date), class: "text-gray-600 hover:text-gray-800" %>
+      </div>
+    <% end %>
+  </div>
+</div>

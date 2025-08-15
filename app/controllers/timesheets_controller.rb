@@ -14,21 +14,17 @@ class TimesheetsController < ApplicationController
 
     week_range = @start_date.beginning_of_day..(@start_date + 6.days).end_of_day
 
-    # Get all shifts from published rosters for the week
     published_shifts = Shift.joins(:roster)
                             .where(rosters: { status: Roster::STATUSES[:published] })
                             .where(start_time: week_range)
 
-    # Get all shifts from draft rosters for the week that have a timesheet
     unscheduled_shifts = Shift.joins(:roster)
                               .joins(:timesheets)
                               .where(rosters: { status: Roster::STATUSES[:draft] })
                               .where(start_time: week_range)
 
-    # Combine the two sets of shifts
     @shifts = Shift.from("(#{published_shifts.to_sql} UNION #{unscheduled_shifts.to_sql}) AS shifts")
                    .order("shifts.start_time ASC")
-
 
     if @selected_location_id.present?
       @shifts = @shifts.where(location_id: @selected_location_id)
@@ -41,21 +37,14 @@ class TimesheetsController < ApplicationController
     end
   end
 
-  # GET /timesheets/1
-  def show
-  end
-
-  # GET /timesheets/new
   def new
     @timesheet = Timesheet.new(user: current_user, clock_in_at: Time.current)
     @timesheet.build_shift(user: current_user)
   end
 
-  # GET /timesheets/1/edit
   def edit
   end
 
-  # POST /timesheets
   def create
     starts_on = Date.today.beginning_of_week
     roster = Roster.find_or_create_by!(starts_on: starts_on, status: Roster::STATUSES[:draft])
@@ -81,11 +70,8 @@ class TimesheetsController < ApplicationController
     end
   end
 
- # PATCH/PUT /timesheets/1
  def update
-  # The form is now an "Approve" form, so we merge the approved status.
   updated_params = timesheet_params.merge(status: Timesheet::STATUSES[:approved])
-
   shift_date = @timesheet.shift.start_time.to_date
 
   if params[:timesheet][:clock_in_at].present?
@@ -105,7 +91,6 @@ class TimesheetsController < ApplicationController
   end
   end
 
-  # DELETE /timesheets/1
   def destroy
     @timesheet.destroy!
     redirect_to timesheets_url, notice: "Timesheet was successfully destroyed.", status: :see_other
@@ -126,7 +111,6 @@ class TimesheetsController < ApplicationController
   end
 
   def clock_off_form
-    # Renders the view
   end
 
   def clock_off
@@ -156,6 +140,56 @@ class TimesheetsController < ApplicationController
       end
     else
       redirect_to week_timesheets_path(date: @timesheet.shift.start_time.to_date.beginning_of_week(:wednesday)), alert: "Could not update timesheet."
+    end
+  end
+
+  def new_unscheduled
+    @users = User.where.not(role: nil).order(:name)
+    @locations = Location.order(:name)
+    @start_date = params[:date] ? Date.parse(params[:date]) : Date.current
+    @timesheet = Timesheet.new(
+      clock_in_at: @start_date.to_time.change(hour: 9),
+      clock_out_at: @start_date.to_time.change(hour: 17)
+    )
+  end
+
+  def create_unscheduled
+    # **THE FIX IS HERE**: Read all parameters from the nested :timesheet hash.
+    ts_params = params.require(:timesheet).permit(:user_id, :location_id, :date, :clock_in_at, :clock_out_at)
+
+    user = User.find(ts_params[:user_id])
+    location = Location.find(ts_params[:location_id])
+
+    start_time = Time.zone.parse("#{ts_params[:date]} #{ts_params[:clock_in_at]}")
+    end_time = Time.zone.parse("#{ts_params[:date]} #{ts_params[:clock_out_at]}")
+
+    roster = Roster.find_or_create_by!(starts_on: start_time.to_date.beginning_of_week(:wednesday), status: Roster::STATUSES[:draft])
+
+    shift = Shift.new(
+      user: user,
+      location: location,
+      roster: roster,
+      start_time: start_time,
+      end_time: end_time,
+      bypass_unavailability_validation: true
+    )
+
+    if shift.save
+      timesheet = Timesheet.create!(
+        shift: shift,
+        user_id: user.id,
+        clock_in_at: start_time,
+        clock_out_at: end_time,
+        status: Timesheet::STATUSES[:pending]
+      )
+      redirect_to week_timesheets_path(date: start_time.to_date), notice: "Unscheduled timesheet created successfully."
+    else
+      @users = User.where.not(role: nil).order(:name)
+      @locations = Location.order(:name)
+      @start_date = start_time.to_date
+      @timesheet = Timesheet.new(clock_in_at: start_time, clock_out_at: end_time)
+      flash.now[:alert] = shift.errors.full_messages.to_sentence
+      render :new_unscheduled, status: :unprocessable_entity
     end
   end
 

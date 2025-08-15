@@ -9,16 +9,14 @@ Rails.application.routes.draw do
     get "success", on: :collection
   end
 
-  # Devise authentication - now with custom registrations controller
+  # Devise authentication
   devise_for :users, controllers: { registrations: "users/registrations" }
 
-  # Allow self-registration and onboarding
   devise_scope :user do
-    # This is the special link from the email
     get "users/invitation/accept", to: "users/registrations#edit", as: "accept_user_invitation"
   end
 
-  # Admin-managed user creation (separate from Devise)
+  # Admin-managed user creation
   get  "users/new",    to: "users#new",    as: :admin_new_user
   post "users/create", to: "users#create", as: :admin_create_user
 
@@ -46,13 +44,15 @@ Rails.application.routes.draw do
     end
     collection do
       get "week(/:date)", to: "timesheets#index", as: "week"
+      # Add these lines for the new unscheduled timesheet feature
+      get "new_unscheduled", to: "timesheets#new_unscheduled", as: :new_unscheduled
+      post "create_unscheduled", to: "timesheets#create_unscheduled", as: :create_unscheduled
     end
   end
 
   namespace :admin do
     resource :xero_connection, only: [ :show, :new, :create, :destroy, :update ] do
       get :callback, on: :collection
-      # Add these two lines for user mapping
       get :edit_user_mappings, on: :collection
       patch :update_user_mappings, on: :collection
     end
