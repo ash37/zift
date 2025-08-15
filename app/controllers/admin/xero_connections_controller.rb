@@ -116,9 +116,9 @@ class Admin::XeroConnectionsController < ApplicationController
     client_id    = Rails.application.credentials.xero[:client_id]
     redirect_uri = callback_admin_xero_connection_url
 
-    # Added accounting.settings.read so we can call Organisation to detect region.
-    # Keep payroll.* scopes for employees, pay items/settings and timesheets.
-    scopes = "offline_access accounting.settings.read payroll.employees payroll.employees.read payroll.settings openid profile email payroll.timesheets"
+    # --- THIS IS THE FIX ---
+    # Added 'accounting.contacts' and 'accounting.transactions' for invoicing.
+    scopes = "offline_access openid profile email accounting.settings accounting.contacts accounting.transactions payroll.employees payroll.timesheets payroll.settings"
 
     # CSRF state
     state = SecureRandom.hex(16)
@@ -223,9 +223,10 @@ class Admin::XeroConnectionsController < ApplicationController
 
   def update
     case params[:sync]
-    when "employees"    then sync_employees
-    when "pay_items"    then sync_pay_items
-    when "select_tenant" then select_tenant
+    when "employees"      then sync_employees
+    when "pay_items"      then sync_pay_items
+    when "invoice_items"  then sync_invoice_items
+    when "select_tenant"  then select_tenant
     else redirect_to admin_xero_connection_path, alert: "Invalid sync action."
     end
   end
@@ -614,5 +615,108 @@ class Admin::XeroConnectionsController < ApplicationController
     else "Error syncing pay items: #{e.code} #{e.message}"
     end
     redirect_to admin_xero_connection_path, alert: msg
+  end
+
+  def sync_invoice_items
+    client = xero_api_client
+    return unless client
+
+    connection = XeroConnection.first
+    unless connection
+      redirect_to admin_xero_connection_path, alert: "No Xero connection found. Please connect first." and return
+    end
+
+    tenant_id  = connection.tenant_id
+    accounting = XeroRuby::AccountingApi.new(client)
+
+    created = 0
+    updated = 0
+    page    = 1
+
+    begin
+      loop do
+        Rails.logger.info "Calling API: AccountingApi.get_items page=#{page} ..."
+        resp = accounting.get_items(tenant_id, { page: page })
+
+        # Normalize response to an array of item objects/hashes
+        batch =
+          if resp.respond_to?(:items)
+            Array(resp.items)
+          elsif resp.is_a?(Hash)
+            Array(resp["Items"] || resp["items"])
+          else
+            []
+          end
+
+        break if batch.blank?
+
+        batch.each do |it|
+          # Extract fields defensively for SDK objects or hashes
+          xero_item_id = it.respond_to?(:item_id) ? it.item_id : (it["ItemID"] || it["ItemId"] || it["itemId"])
+          code         = it.respond_to?(:code)    ? it.code    : (it["Code"]   || it["code"])
+          name         = it.respond_to?(:name)    ? it.name    : (it["Name"]   || it["name"])
+          description  = it.respond_to?(:description) ? it.description : (it["Description"] || it["description"])
+          is_sold      = it.respond_to?(:is_sold) ? it.is_sold : it["IsSold"] || it["isSold"]
+          is_tracked   = it.respond_to?(:is_tracked_as_inventory) ? it.is_tracked_as_inventory : (it["IsTrackedAsInventory"] || it["isTrackedAsInventory"])
+
+          # Prefer unique match on xero_item_id if we have it, otherwise fall back to code
+          rec =
+            if xero_item_id.present? && XeroItem.column_names.include?("xero_item_id")
+              XeroItem.find_or_initialize_by(xero_item_id: xero_item_id)
+            else
+              # last resort: use code as identifier
+              identifier = code.presence || name # avoid totally blank keys
+              next if identifier.blank?
+              XeroItem.find_or_initialize_by(code: identifier)
+            end
+
+          # Assign attributes and count created/updated
+          was_new = rec.new_record?
+          rec.code        = code        if code.present?
+          rec.name        = name        if name.present?
+          rec.description = description if rec.respond_to?(:description)
+          rec.is_sold     = is_sold     if rec.respond_to?(:is_sold)
+          if rec.respond_to?(:is_tracked_as_inventory)
+            rec.is_tracked_as_inventory = is_tracked
+          end
+
+          # If we matched by code but model has xero_item_id column, set it
+          if xero_item_id.present? && rec.respond_to?(:xero_item_id) && rec.xero_item_id.blank?
+            rec.xero_item_id = xero_item_id
+          end
+
+          if rec.changed?
+            rec.save!
+            was_new ? created += 1 : updated += 1
+          end
+        end
+
+        # stop when the returned page is smaller than the typical page size
+        break if batch.size < 100
+        page += 1
+      end
+
+      if created.zero? && updated.zero?
+        flash[:alert] = "Sync finished but no invoice items were returned from Xero."
+      else
+        flash[:notice] = "Synced Xero invoice items: #{created} created, #{updated} updated."
+      end
+      redirect_to admin_xero_connection_path
+
+    rescue XeroRuby::ApiError => e
+      code    = (e.respond_to?(:code) ? e.code : nil)
+      headers = (e.respond_to?(:response_headers) ? e.response_headers : {}) || {}
+      corr    = headers["xero-correlation-id"] || headers["Xero-Correlation-Id"]
+
+      msg =
+        case code
+        when 401 then "Error syncing invoice items: 401 Unauthorized. Please reconnect."
+        when 403 then "Error syncing invoice items: 403 Forbidden. Check Xero scopes for items (accounting.settings.read)."
+        when 404 then "Error syncing invoice items: 404 Not Found."
+        else          "Error syncing invoice items: #{code} #{e.message}"
+        end
+
+      redirect_to admin_xero_connection_path, alert: [ msg, (corr ? "Corr: #{corr}" : nil) ].compact.join(" ")
+    end
   end
 end

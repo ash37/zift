@@ -1,4 +1,14 @@
 <div class="container mx-auto mt-10 px-4 py-10">
+  <% if params[:notice].present? %>
+    <div class="mb-4 rounded-md bg-green-50 border border-green-200 text-green-800 px-4 py-3">
+      <%= params[:notice] %>
+    </div>
+  <% end %>
+  <% if params[:alert].present? %>
+    <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-800 px-4 py-3">
+      <%= params[:alert] %>
+    </div>
+  <% end %>
   <% if @connection %>
     <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-6">
       <div class="text-lg font-semibold text-gray-800 mb-2">Active scopes & tenant</div>
@@ -28,8 +38,10 @@
       <div class="mt-4 flex flex-wrap gap-4">
         <%= button_to "Sync Employees", admin_xero_connection_path, params: { sync: 'employees' }, method: :patch, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
         <%= button_to "Sync Pay Items", admin_xero_connection_path, params: { sync: 'pay_items' }, method: :patch, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+        <%= button_to "Sync Invoice Items", sync_admin_xero_items_path, method: :post, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
         <%= button_to "Map Pay Items", admin_shift_types_path, method: :get, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
         <%= button_to "Map Users", edit_user_mappings_admin_xero_connection_path, method: :get, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+        <%= link_to "Area Mapping", admin_xero_item_mappings_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
         <%= button_to "Disconnect from Xero", admin_xero_connection_path, method: :delete, data: { confirm: "Are you sure?" }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
       </div>
     </div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_14_105103) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_15_203445) do
   create_table "areas", force: :cascade do |t|
     t.string "name"
     t.string "export_code"
@@ -19,7 +19,35 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_105103) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "archived_at"
+    t.string "xero_item_code"
     t.index ["location_id"], name: "index_areas_on_location_id"
+    t.index ["xero_item_code"], name: "index_areas_on_xero_item_code"
+  end
+
+  create_table "invoice_export_lines", force: :cascade do |t|
+    t.integer "invoice_export_id", null: false
+    t.integer "location_id", null: false
+    t.integer "area_id", null: false
+    t.string "xero_invoice_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "timesheet_id", null: false
+    t.string "description"
+    t.index ["area_id"], name: "index_invoice_export_lines_on_area_id"
+    t.index ["invoice_export_id"], name: "index_invoice_export_lines_on_invoice_export_id"
+    t.index ["location_id"], name: "index_invoice_export_lines_on_location_id"
+    t.index ["timesheet_id"], name: "index_invoice_export_lines_on_timesheet_id"
+  end
+
+  create_table "invoice_exports", force: :cascade do |t|
+    t.string "idempotency_key", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "exported_count", default: 0
+    t.integer "total_count", default: 0
+    t.text "error_blob"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["idempotency_key"], name: "index_invoice_exports_on_idempotency_key", unique: true
   end
 
   create_table "locations", force: :cascade do |t|
@@ -197,7 +225,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_105103) do
     t.index ["tenant_id"], name: "index_xero_connections_on_tenant_id", unique: true
   end
 
+  create_table "xero_items", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name"
+    t.string "xero_item_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_xero_items_on_code", unique: true
+    t.index ["xero_item_id"], name: "index_xero_items_on_xero_item_id", unique: true
+  end
+
   add_foreign_key "areas", "locations"
+  add_foreign_key "invoice_export_lines", "areas"
+  add_foreign_key "invoice_export_lines", "invoice_exports"
+  add_foreign_key "invoice_export_lines", "locations"
+  add_foreign_key "invoice_export_lines", "timesheets"
   add_foreign_key "shifts", "areas"
   add_foreign_key "shifts", "locations"
   add_foreign_key "shifts", "rosters"

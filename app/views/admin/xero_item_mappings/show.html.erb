@@ -1,0 +1,26 @@
+<!-- app/views/admin/xero_item_mappings/show.html.erb -->
+<h1>Xero Item Mappings</h1>
+
+<%= button_to "Sync Invoice Items", sync_admin_xero_item_mappings_path, method: :post, class: "btn btn-secondary" %>
+
+<%= form_with url: admin_xero_item_mappings_path, method: :put do %>
+  <% @areas.each do |area| %>
+    <div class="rounded border p-4 mb-4 bg-white shadow-sm">
+      <p><strong>Area:</strong> <%= area.name %></p>
+      <p><strong>Location:</strong> <%= area.location&.name.presence || "—" %></p>
+      <p><strong>Current export_code:</strong> <code><%= area.export_code.presence || "—" %></code></p>
+      <p>
+        <select name="mappings[<%= area.id %>]" class="form-select w-100 p-2 text-lg">
+          <option value=""></option>
+          <% @items.each do |it| %>
+            <% code = it[:code].to_s %>
+            <option value="<%= code %>" <%= "selected" if area.respond_to?(:xero_item_code) && area.xero_item_code == code %>>
+              <%= code %> — <%= it[:name] %>
+            </option>
+          <% end %>
+        </select>
+      </p>
+    </div>
+  <% end %>
+  <%= submit_tag "Save mappings", class: "btn btn-primary" %>
+<% end %>

@@ -27,7 +27,8 @@ Rails.application.routes.draw do
     end
   end
   resources :locations do
-    resources :areas, only: [ :create ]
+    # THE FIX IS HERE: Added edit and update to the areas resource
+    resources :areas, only: [ :create, :edit, :update ]
   end
   resources :shifts
   resources :recurrences
@@ -58,6 +59,15 @@ Rails.application.routes.draw do
     end
     resources :shift_types, only: [ :index, :update, :create ]
     resources :xero_timesheet_exports, only: [ :index, :new, :create ]
+    resources :xero_invoice_exports, only: [ :new, :create ]
+    resource :xero_item_mappings, only: [ :show, :update ] do
+      post :sync, on: :collection
+    end
+    resources :xero_items, only: [] do
+      collection do
+        post :sync
+      end
+    end
   end
 
   resources :unavailability_requests do

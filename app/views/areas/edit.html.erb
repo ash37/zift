@@ -1,0 +1,13 @@
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <section class="relative max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800">
+    <%= link_to location_path(@location), class: "absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    <% end %>
+
+    <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white">Edit Area</h2>
+    
+    <%= render "form", location: @location, area: @area %>
+  </section>
+</div>

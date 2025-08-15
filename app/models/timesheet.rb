@@ -1,6 +1,7 @@
 class Timesheet < ApplicationRecord
   belongs_to :user
   belongs_to :shift
+  has_many :invoice_export_lines, dependent: :destroy
 
   accepts_nested_attributes_for :shift
 
