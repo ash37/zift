@@ -146,6 +146,7 @@ class TimesheetsController < ApplicationController
   def new_unscheduled
     @users = User.where.not(role: nil).order(:name)
     @locations = Location.order(:name)
+    @areas = Area.all.to_json(only: [ :id, :name, :location_id ])
     @start_date = params[:date] ? Date.parse(params[:date]) : Date.current
     @timesheet = Timesheet.new(
       clock_in_at: @start_date.to_time.change(hour: 9),
@@ -154,11 +155,11 @@ class TimesheetsController < ApplicationController
   end
 
   def create_unscheduled
-    # **THE FIX IS HERE**: Read all parameters from the nested :timesheet hash.
-    ts_params = params.require(:timesheet).permit(:user_id, :location_id, :date, :clock_in_at, :clock_out_at)
+    ts_params = params.require(:timesheet).permit(:user_id, :location_id, :date, :clock_in_at, :clock_out_at, :area_id)
 
     user = User.find(ts_params[:user_id])
     location = Location.find(ts_params[:location_id])
+    area = Area.find(ts_params[:area_id]) if ts_params[:area_id].present?
 
     start_time = Time.zone.parse("#{ts_params[:date]} #{ts_params[:clock_in_at]}")
     end_time = Time.zone.parse("#{ts_params[:date]} #{ts_params[:clock_out_at]}")
@@ -168,6 +169,7 @@ class TimesheetsController < ApplicationController
     shift = Shift.new(
       user: user,
       location: location,
+      area: area,
       roster: roster,
       start_time: start_time,
       end_time: end_time,
@@ -186,6 +188,7 @@ class TimesheetsController < ApplicationController
     else
       @users = User.where.not(role: nil).order(:name)
       @locations = Location.order(:name)
+      @areas = Area.all.to_json(only: [ :id, :name, :location_id ])
       @start_date = start_time.to_date
       @timesheet = Timesheet.new(clock_in_at: start_time, clock_out_at: end_time)
       flash.now[:alert] = shift.errors.full_messages.to_sentence

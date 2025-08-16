@@ -1,6 +1,7 @@
 class Timesheet < ApplicationRecord
   belongs_to :user
-  belongs_to :shift
+  belongs_to :shift, optional: true
+  belongs_to :area, optional: true
   has_many :invoice_export_lines, dependent: :destroy
 
   accepts_nested_attributes_for :shift

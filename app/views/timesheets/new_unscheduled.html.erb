@@ -1,7 +1,7 @@
 <div class="container mx-auto mt-10 px-4 py-10">
   <h1 class="text-3xl font-bold mb-6">Create Unscheduled Timesheet</h1>
 
-  <div class="bg-white p-6 rounded-lg shadow-md">
+  <div class="bg-white p-6 rounded-lg shadow-md" data-controller="dynamic-select" data-areas="<%= @areas %>">
     <%# The form now correctly submits all fields nested under :timesheet %>
     <%= form_with(model: @timesheet, url: create_unscheduled_timesheets_path, method: :post, local: true) do |form| %>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -11,7 +11,11 @@
         </div>
         <div>
           <%= form.label :location_id, "Location", class: "block text-sm font-medium text-gray-700" %>
-          <%= form.collection_select :location_id, @locations, :id, :name, {}, { class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm" } %>
+          <%= form.collection_select :location_id, @locations, :id, :name, { prompt: "Select a location" }, { class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm", data: { action: "change->dynamic-select#updateTarget", 'dynamic-select-target': 'source' } } %>
+        </div>
+        <div>
+            <%= form.label :area_id, "Area", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.select :area_id, [], { prompt: "Select an Area" }, { class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm", data: { 'dynamic-select-target': 'target' } } %>
         </div>
         <div>
           <%= form.label :date, "Date", class: "block text-sm font-medium text-gray-700" %>
