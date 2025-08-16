@@ -51,12 +51,28 @@ class UsersController < ApplicationController
 
   # PATCH/PUT /users/1
   def update
-    if @user.update(user_params)
-      redirect_to @user, notice: "User was successfully updated."
-    else
-      render :edit, status: :unprocessable_entity
-    end
+  # Create a mutable copy of the parameters
+  updated_params = user_params.to_h
+
+  # Clean up the location_ids array to remove the blank value
+  if updated_params[:location_ids]
+    updated_params[:location_ids].reject!(&:blank?)
   end
+
+  # Remove password params if they are blank, so we don't validate them
+  if updated_params[:password].blank?
+    updated_params.delete(:password)
+    updated_params.delete(:password_confirmation)
+  end
+
+  if @user.update(updated_params)
+    redirect_to @user, notice: "User was successfully updated."
+  else
+    # This will print the validation errors to your terminal
+    p @user.errors.full_messages
+    render :edit, status: :unprocessable_entity
+  end
+end
 
   # DELETE /users/1
   def destroy
@@ -89,13 +105,13 @@ class UsersController < ApplicationController
     # Only allow a list of trusted parameters through.
     def user_params
       params.require(:user).permit(
-        :name, :email, :phone, :role, :location_id, :status, :gender,
+        :name, :email, :phone, :role, :status, :gender,
         :obtained_screening, :date_of_birth, :address, :suburb, :state,
         :postcode, :emergency_name, :emergency_phone, :disability_experience,
         :other_experience, :other_employment, :licence, :availability, :bio,
         :known_client, :resident, :education, :qualification, :bank_account,
         :bsb, :tfn, :training, :departure, :yellow_expiry, :blue_expiry,
-        :tfn_threshold, :debt, :super_name, :super_number
+        :tfn_threshold, :debt, :super_name, :super_number, :password, :password_confirmation, location_ids: []
       )
     end
 end

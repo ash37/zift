@@ -11,7 +11,7 @@ class User < ApplicationRecord
     [ record.to_key, record.authenticatable_salt ]
   end
 
-  belongs_to :location, optional: true
+  has_and_belongs_to_many :locations
   has_many :shifts, dependent: :destroy
   has_many :timesheets, dependent: :destroy
   has_many :unavailability_requests, dependent: :destroy
@@ -73,7 +73,7 @@ class User < ApplicationRecord
     # Don't require a password if an invitation is being sent.
     return false if invitation_token_changed? && invitation_token.present?
 
-    # Otherwise, require password if user has a role or is setting a password.
-    role.present? || password.present? || password_confirmation.present?
+    # Require password if it's a new record OR if password fields are filled in.
+    !persisted? || password.present? || password_confirmation.present?
   end
 end

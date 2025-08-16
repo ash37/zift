@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_15_203445) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_134701) do
   create_table "areas", force: :cascade do |t|
     t.string "name"
     t.string "export_code"
@@ -58,6 +58,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_203445) do
     t.integer "allowed_radius"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "locations_users", id: false, force: :cascade do |t|
+    t.integer "location_id"
+    t.integer "user_id"
+    t.index ["location_id"], name: "index_locations_users_on_location_id"
+    t.index ["user_id"], name: "index_locations_users_on_user_id"
   end
 
   create_table "recurrences", force: :cascade do |t|
@@ -166,7 +173,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_203445) do
     t.string "name"
     t.string "email"
     t.integer "role"
-    t.integer "location_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "encrypted_password"
@@ -211,7 +217,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_203445) do
     t.datetime "invitation_sent_at"
     t.string "phone"
     t.string "xero_employee_id"
-    t.index ["location_id"], name: "index_users_on_location_id"
   end
 
   create_table "xero_connections", force: :cascade do |t|
@@ -249,5 +254,4 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_203445) do
   add_foreign_key "timesheets", "shifts"
   add_foreign_key "timesheets", "users"
   add_foreign_key "unavailability_requests", "users"
-  add_foreign_key "users", "locations"
 end
