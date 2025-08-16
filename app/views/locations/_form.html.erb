@@ -1,42 +1,40 @@
-<%# app/views/locations/_form.html.erb %>
-<%# FIX: Adjusted classes to be full-width on mobile and a centered card on larger screens %>
-<section class="relative w-full sm:max-w-4xl p-6 sm:mx-auto bg-white rounded-md shadow-md dark:bg-gray-800">
-  <%# 'Back to locations' link, styled as an 'x' icon in the top-right corner. %>
-  <%= link_to locations_path, class: "absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  <% end %>
-
-  <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white"><%= location.persisted? ? 'Edit Location' : 'Add Location' %></h2>
-
-  <%= form_with(model: location, class: "mt-6") do |form| %>
-    <% if location.errors.any? %>
-      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mb-6">
-        <h2><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</h2>
-        <ul class="list-disc ml-6 mt-2">
-          <% location.errors.each do |error| %>
-            <li><%= error.full_message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      <div>
-        <%= form.label :name, class: "text-gray-700 dark:text-gray-200" %>
-        <%= form.text_field :name, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
-      </div>
-
-      <div>
-        <%= form.label :address, class: "text-gray-700 dark:text-gray-200" %>
-        <%= form.text_field :address, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
-      </div>
-    </div>
-
-    <%# This div uses 'flex justify-end' to push the button to the far right. %>
-    <div class="flex justify-end mt-6">
-      <%= form.submit "Save", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-3xl hover:bg-gray-600 focus:outline-none focus:bg-gray-600" %>
+<%= form_with(model: location) do |form| %>
+  <% if location.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</h2>
+      <ul>
+        <% location.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
     </div>
   <% end %>
-</section>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div>
+      <%= form.label :name, class: "text-gray-700 dark:text-gray-200" %>
+      <%= form.text_field :name, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+    </div>
+
+    <div>
+      <%= form.label :address, class: "text-gray-700 dark:text-gray-200" %>
+      <%= form.text_field :address, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+    </div>
+
+  
+  </div>
+
+  <div class="mt-8 border-t pt-6">
+    <h3 class="text-lg font-semibold text-gray-700 dark:text-white">Areas</h3>
+    <div id="areas" class="mt-4 space-y-6">
+      <%= form.fields_for :areas do |area_form| %>
+        <%= render 'locations/area_fields', form: area_form %>
+      <% end %>
+    </div>
+    <%# You will need JavaScript to dynamically add new area fields %>
+  </div>
+
+  <div class="flex justify-end mt-6">
+    <%= form.submit "Save Location", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-3xl hover:bg-gray-600 focus:outline-none focus:bg-gray-600" %>
+  </div>
+<% end %>

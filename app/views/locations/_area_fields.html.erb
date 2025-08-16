@@ -1,0 +1,30 @@
+<div class="nested-fields border p-4 rounded-md bg-gray-50 dark:bg-gray-700">
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-4 items-end">
+    <div>
+      <%= form.label :name, "Area Name", class: "text-gray-700 dark:text-gray-200 text-sm" %>
+      <%= form.text_field :name, class: "block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+    </div>
+
+    <div>
+      <%= form.label :export_code, class: "text-gray-700 dark:text-gray-200 text-sm" %>
+      <%= form.text_field :export_code, class: "block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+    </div>
+
+    <div data-controller="color-picker">
+      <%= form.label :color, class: "text-gray-700 dark:text-gray-200 text-sm" %>
+      <%= form.hidden_field :color, data: { 'color-picker-target': 'input' } %>
+      <div class="flex space-x-2 mt-2">
+        <% colors = ['#ffffff', '#00a2e8', '#c80080', '#ff5c00', '#ff9300', '#8059ff'] %>
+        <% colors.each do |color| %>
+          <div data-action="click->color-picker#select" data-color="<%= color %>" class="w-8 h-8 rounded-full cursor-pointer border-2 border-gray-200" style="background-color: <%= color %>;"></div>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="text-right">
+      <%= form.hidden_field :_destroy %>
+      <%# This link requires JavaScript to function correctly %>
+      <a href="#" data-action="click->nested-form#remove" class="text-red-500 hover:text-red-700 text-sm font-semibold">Remove Area</a>
+    </div>
+  </div>
+</div>

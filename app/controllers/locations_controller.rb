@@ -16,10 +16,12 @@ class LocationsController < ApplicationController
   # GET /locations/new
   def new
     @location = Location.new
+    @location.areas.build
   end
 
   # GET /locations/1/edit
   def edit
+    @location.areas.build if @location.areas.empty?
   end
 
   # POST /locations or /locations.json
@@ -69,6 +71,6 @@ class LocationsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def location_params
-      params.require(:location).permit(:name, :address, :phone_number)
+      params.require(:location).permit(:name, :address, :phone_number, areas_attributes: [ :id, :name, :_destroy ])
     end
 end
