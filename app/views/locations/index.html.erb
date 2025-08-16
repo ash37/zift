@@ -4,13 +4,25 @@
   <div class="flex justify-between items-center">
     <%# Left Side: Title and location count %>
     <div class="flex items-center gap-x-3">
-      <h2 class="text-lg font-medium text-gray-800 dark:text-white">Locations</h2>
+    <% if params[:archived] == "true" %>
+        <h2 class="text-lg font-medium text-gray-800 dark:text-white">Archived Locations</h2>
+      <% else %>
+        <h2 class="text-lg font-medium text-gray-800 dark:text-white">Locations</h2>
+      <% end %>
+      
       <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400"><%= pluralize(@locations.count, 'location') %></span>
     </div>
 
-    <%# Right Side: Add location button %>
-    <div>
-      <%= link_to "Add", new_location_path, class: "tracking-wide rounded-3xl px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white font-semibold" %>
+    <%# Right Side: Add location and filter buttons %>
+    <div class="flex items-center gap-x-3">
+      <% if params[:archived] == "true" %>
+        <%= link_to "View Active", locations_path, class: "px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400" %>
+      <% else %>
+        <%= link_to "View Archived", locations_path(archived: true), class: "px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400" %>
+      <% end %>
+      <% unless params[:archived] == "true" %>
+        <%= link_to "Add", new_location_path, class: "tracking-wide rounded-3xl px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white font-semibold" %>
+      <% end %>
     </div>
   </div>
 
@@ -31,7 +43,6 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
               <% @locations.each do |location| %>
-                <%# FIX: Add Stimulus controller and data attributes to make the row clickable %>
                 <tr data-controller="clickable-row"
                     data-action="click->clickable-row#visit"
                     data-clickable-row-url-value="<%= location_path(location) %>"

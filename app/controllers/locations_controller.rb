@@ -1,10 +1,14 @@
 class LocationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_location, only: %i[ show edit update destroy ]
+  before_action :set_location, only: %i[ show edit update destroy archive restore ]
 
   # GET /locations or /locations.json
   def index
-    @locations = Location.all
+    if params[:archived] == "true"
+      @locations = Location.archived
+    else
+      @locations = Location.all
+    end
   end
 
   # GET /locations/1 or /locations/1.json
@@ -63,10 +67,21 @@ class LocationsController < ApplicationController
     end
   end
 
+  def archive
+    @location.update(archived_at: Time.current)
+    redirect_to locations_url, notice: "Location was successfully archived."
+  end
+
+  def restore
+    @location.update(archived_at: nil)
+    redirect_to locations_url, notice: "Location was successfully restored."
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_location
-      @location = Location.find(params[:id])
+      # We need to use with_archived here so that we can find archived locations
+      @location = Location.with_archived.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

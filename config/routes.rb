@@ -29,6 +29,10 @@ Rails.application.routes.draw do
   resources :locations do
     # THE FIX IS HERE: Added edit and update to the areas resource
     resources :areas, only: [ :create, :edit, :update ]
+    member do
+      patch :archive
+      patch :restore
+    end
   end
   resources :shifts
   resources :recurrences

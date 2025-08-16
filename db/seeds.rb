@@ -20,7 +20,7 @@ User.create!(
   email: "ak@qcare.au",
   password: "password",
   password_confirmation: "password",
-  role: :admin,
+  role: User::ROLES[:admin],
   locations: [ location ]
 )
 
