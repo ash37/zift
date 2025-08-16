@@ -11,6 +11,9 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.0].define(version: 2025_08_16_134701) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
   create_table "areas", force: :cascade do |t|
     t.string "name"
     t.string "export_code"
@@ -61,8 +64,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_134701) do
   end
 
   create_table "locations_users", id: false, force: :cascade do |t|
-    t.integer "location_id"
-    t.integer "user_id"
+    t.bigint "location_id"
+    t.bigint "user_id"
     t.index ["location_id"], name: "index_locations_users_on_location_id"
     t.index ["user_id"], name: "index_locations_users_on_user_id"
   end

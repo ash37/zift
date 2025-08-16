@@ -16,12 +16,12 @@ location = Location.create!(
 )
 
 User.create!(
-  name: "Test Admin",
-  email: "admin@example.com",
+  name: "Ashley Knight",
+  email: "ak@qcare.au",
   password: "password",
   password_confirmation: "password",
   role: :admin,
-  location: location
+  locations: [ location ]
 )
 
 # Create Shift Types for Xero Mapping
