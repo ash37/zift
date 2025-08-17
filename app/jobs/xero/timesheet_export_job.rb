@@ -38,7 +38,7 @@ module Xero
               "Content-Type"   => "application/json",
               "Accept"         => "application/json",
               # **THE FIX IS HERE**: The idempotency key is now correctly sent as a header.
-              "Idempotency-Key" => timesheet_export.idempotency_key
+              "Idempotency-Key" => "#{timesheet_export.idempotency_key}-user-#{user.id}"
             },
             # **THE FIX IS HERE**: The body is now a JSON array, as required by the API.
             body: [ timesheet_payload ].to_json

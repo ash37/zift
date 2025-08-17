@@ -36,7 +36,7 @@ class Admin::XeroTimesheetExportsController < ApplicationController
       status: "pending"
     )
 
-    shift_types = ShiftType.all.index_by(&:name)
+    shift_types_by_name = ShiftType.all.index_by { |st| st.name.to_s.downcase }
     timesheets = Timesheet.includes(shift: [ :user, :roster ])
                           .where(status: Timesheet::STATUSES[:approved])
                           .where(clock_in_at: pay_period_start.beginning_of_day..pay_period_end.end_of_day)
@@ -50,7 +50,7 @@ class Admin::XeroTimesheetExportsController < ApplicationController
       current_time = ts.clock_in_at
       while current_time < ts.clock_out_at
         rate_name = ts.shift.determine_rate_name_for_time(current_time)
-        shift_type = shift_types[rate_name]
+        shift_type = shift_types_by_name[rate_name.to_s.downcase]
         earnings_rate_id = shift_type&.xero_earnings_rate_id
 
         if earnings_rate_id.present?
@@ -60,6 +60,23 @@ class Admin::XeroTimesheetExportsController < ApplicationController
           end
         end
         current_time += 1.minute
+      end
+
+      # Add travel units (captured at clock-off) into the daily aggregation as a separate earnings rate line
+      if ts.respond_to?(:travel)
+        travel_units = ts.travel.to_f
+        if travel_units.positive?
+          travel_shift_type = shift_types_by_name["travel"]
+          travel_rate_id = travel_shift_type&.xero_earnings_rate_id
+
+          if travel_rate_id.present?
+            # Attribute travel to the clock-out day (when the user enters it)
+            travel_day_index = (ts.clock_out_at.to_date - pay_period_start).to_i
+            if travel_day_index >= 0 && travel_day_index < number_of_days
+              aggregated_hours[user][travel_rate_id][travel_day_index] += travel_units
+            end
+          end
+        end
       end
     end
 
