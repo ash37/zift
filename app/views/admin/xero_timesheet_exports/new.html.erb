@@ -20,14 +20,14 @@
             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
         </div>
         <div>
-          <button type="submit" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-3 rounded">Update</button>
+          <button type="submit" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-3 rounded-3xl">Update</button>
         </div>
       </div>
     <% end %>
     <div class="text-xs text-gray-500 mb-4">Override the detected pay period to review a custom date range.</div>
 
     <% if @payroll_calendar.nil? %>
-      <p class="mb-4 text-amber-800 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+      <p class="text-xs text-gray-500 mb-4">
         We couldn’t fetch a Payroll Calendar from Xero right now. Using the current Wed–Tue week as a fallback. You can set custom dates above.
       </p>
     <% end %>
@@ -40,14 +40,15 @@
       <p class="mb-4 text-amber-800 bg-amber-50 border border-amber-200 rounded px-3 py-2"><%= flash.now[:warning] %></p>
     <% end %>
 
-    <p class="mb-6 text-gray-600">Review the hours below before sending to Xero. Only approved timesheets for users linked to a Xero employee will be included.</p>
+    <p class="text-xs text-gray-500 mb-6">Review the hours below before sending to Xero. Only approved timesheets for users linked to a Xero employee will be included.</p>
 
     <% if @user_hours.present? && @user_hours.any? %>
       <table class="min-w-full divide-y divide-gray-200 mb-6">
         <thead class="bg-gray-50">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Hours</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hours</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Travel</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -55,6 +56,7 @@
             <tr>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= data[:user].name %></td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_with_precision(data[:total_hours], precision: 2) %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_with_precision(data[:travel_hours] || 0, precision: 1) %>km</td>
             </tr>
           <% end %>
         </tbody>
@@ -65,8 +67,8 @@
         <%= hidden_field_tag :pay_period_start, @pay_period_start %>
         <%= hidden_field_tag :pay_period_end, @pay_period_end %>
         
-        <div class="flex items-center space-x-4">
-          <%= form.submit "Send to Xero", class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded" %>
+        <div class="flex items-center space-x-4 justify-end">
+          <%= form.submit "Send to Xero", class: "bg-violet-700 hover:bg-violet-800 text-white font-semibold py-2 px-4 rounded-3xl" %>
           <%= link_to "Cancel", admin_xero_connection_path, class: "text-gray-600 hover:text-gray-800" %>
         </div>
       <% end %>
