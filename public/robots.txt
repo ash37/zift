@@ -1,1 +1,58 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# ---------------------------------------------------------
+# ROBOTS.TXT — Enforced crawler rules for Qcare
+# ---------------------------------------------------------
+# Canonical site: http://www.qcare.au/
+# Public welcome/index: ALLOWED
+# Anything after login: DISALLOWED
+# ---------------------------------------------------------
+
+# OpenAI (ChatGPT / GPTBot)
+User-agent: GPTBot
+Allow: /
+Disallow: /login /logout /sign_in /sign_out /oauth/ /sessions/
+Disallow: /account/ /billing/ /settings/ /profile/ /users/ /teams/ /notifications/
+Disallow: /dashboard/ /rosters/ /timesheets/ /schedule/ /unavailability/ /shifts/
+Disallow: /payroll/ /xero/ /invoices/ /reports/
+Disallow: /admin/ /internal/ /beta/ /test/ /dev/
+Disallow: /exports/ /downloads/ /backups/
+Disallow: /*?session=* /*?token=*
+
+# Anthropic (Claude)
+User-agent: ClaudeBot
+Allow: /
+Disallow: same-as-above
+User-agent: Claude-User
+Allow: /
+Disallow: same-as-above
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: same-as-above
+
+# Google (Gemini)
+User-agent: Google-Extended
+Allow: /
+Disallow: same-as-above
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+Disallow: same-as-above
+
+# Common Crawl (feeds many AI models)
+User-agent: CCBot
+Allow: /
+Disallow: same-as-above
+
+# Fallback: all other crawlers
+User-agent: *
+Allow: /
+Disallow: /login /logout /sign_in /sign_out /oauth/ /sessions/
+Disallow: /account/ /billing/ /settings/ /profile/ /users/ /teams/ /notifications/
+Disallow: /dashboard/ /rosters/ /timesheets/ /schedule/ /unavailability/ /shifts/
+Disallow: /payroll/ /xero/ /invoices/ /reports/
+Disallow: /admin/ /internal/ /beta/ /test/ /dev/
+Disallow: /exports/ /downloads/ /backups/
+Disallow: /*?session=* /*?token=*
+
+# Advisory crawl rate
+Crawl-delay: 1

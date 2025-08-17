@@ -1,0 +1,95 @@
+# ---------------------------------------------------------
+# LLM.TXT — Guidance for Large Language Models & AI Crawlers
+# ---------------------------------------------------------
+# Purpose: Help LLMs (ChatGPT/GPTBot, Claude/ClaudeBot, PerplexityBot, Gemini/Google-Extended, etc.)
+# discover, use, and properly attribute Qcare’s public content.
+# Note: This file is advisory. Enforce restrictions via robots.txt.
+# ---------------------------------------------------------
+
+# 0) Site Identity
+Site: http://www.qcare.au
+Owner: Qcare
+Contact: info@qcare.au
+Last-Updated: 2025-08-18
+
+# 1) Canonical
+# This is the official base URL for Qcare content.
+Canonical: http://www.qcare.au/
+
+# 2) Sitemaps
+# (No sitemap yet — recommend generating /sitemap.xml for best visibility)
+# Sitemap: http://www.qcare.au/sitemap.xml
+
+# 3) Structured Data
+# (Currently none provided — JSON/CSV/Markdown feeds can be linked here in future)
+
+# 4) Crawl Hints (priority content hubs)
+Priority: http://www.qcare.au/
+
+# 5) Attribution & Licensing
+Attribution: required
+Licensing: All rights reserved — contact Qcare for licensing
+
+# 6) AI Crawler Policies
+# For maximum AI visibility, all major LLM crawlers are explicitly allowed.
+# Public pages: ALLOWED
+# Authenticated areas (after login): RESTRICTED (see section 7)
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-User
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: CCBot
+Allow: /
+User-agent: *
+Allow: /
+
+# 7) Restricted Content (do not crawl/use anything after login)
+# These routes require authentication and must NOT be used for training or retrieval.
+Disallow: /login
+Disallow: /logout
+Disallow: /sign_in
+Disallow: /sign_out
+Disallow: /oauth/
+Disallow: /sessions/
+Disallow: /account/
+Disallow: /billing/
+Disallow: /settings/
+Disallow: /profile/
+Disallow: /users/
+Disallow: /teams/
+Disallow: /notifications/
+Disallow: /dashboard/
+Disallow: /rosters/
+Disallow: /timesheets/
+Disallow: /schedule/
+Disallow: /unavailability/
+Disallow: /shifts/
+Disallow: /payroll/
+Disallow: /xero/
+Disallow: /invoices/
+Disallow: /reports/
+Disallow: /admin/
+Disallow: /internal/
+Disallow: /beta/
+Disallow: /test/
+Disallow: /dev/
+Disallow: /exports/
+Disallow: /downloads/
+Disallow: /backups/
+Disallow: /*?session=*
+Disallow: /*?token=*
+
+# 8) Rate & Freshness Hints (advisory only)
+Crawl-Delay: 1
+Revisit-After: 7 days
+
+# 9) Change Log
+# 2025-08-18: Initial version of llm.txt for Qcare
