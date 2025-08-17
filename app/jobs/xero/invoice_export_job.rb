@@ -1,4 +1,3 @@
-# app/jobs/xero/invoice_export_job.rb
 require "json"
 require "cgi"
 module Xero
@@ -58,32 +57,156 @@ module Xero
 
           Rails.logger.info("[Xero::InvoiceExportJob] Building payload for location='#{location&.name}' lines=#{lines.size}")
 
+          # === BEGIN travel supplement (create extra Travel line-items for timesheets with travel > 0) ===
+          begin
+            # Collect timesheets in this location batch
+            timesheets_in_batch = lines.map(&:timesheet).compact.uniq
+            travel_timesheets    = timesheets_in_batch.select { |ts| ts.travel.to_d > 0 }
+
+            # Skip building duplicates when a line is already a Travel-area line for that timesheet
+            travel_line_ts_ids_already_present =
+              lines.select { |l| l.area&.name&.casecmp?("travel") }.map { |l| l.timesheet&.id }.compact.uniq
+
+            travel_timesheets.reject! { |ts| travel_line_ts_ids_already_present.include?(ts.id) }
+
+            # Find the Travel area for this location (case-insensitive)
+            travel_area =
+              begin
+                Area.where(location_id: location&.id).find { |a| a.name.to_s.strip.casecmp?("travel") }
+              rescue => e
+                Rails.logger.warn("[Xero::InvoiceExportJob] Could not query Travel area for location='#{location&.name}': #{e.class}: #{e.message}")
+                nil
+              end
+
+            @travel_item_line_items_extra = []
+            @travel_account_line_items_extra = []
+
+            if travel_timesheets.any?
+              if travel_area.nil?
+                Rails.logger.warn("[Xero::InvoiceExportJob] Travel timesheets present but no 'Travel' area found for location='#{location&.name}'. Skipping extra travel lines.")
+              else
+                mapped_travel_code =
+                  if travel_area.respond_to?(:xero_item_code) && travel_area.xero_item_code.present?
+                    travel_area.xero_item_code
+                  else
+                    travel_area.export_code
+                  end
+
+                travel_timesheets.each do |ts|
+                  # Date string: "16 AUG 2025"
+                  date_str =
+                    begin
+                      (ts.clock_in_at || Time.current).in_time_zone("Australia/Brisbane").to_date.strftime("%-d %^b %Y")
+                    rescue
+                      Time.current.in_time_zone("Australia/Brisbane").to_date.strftime("%-d %^b %Y")
+                    end
+
+                  desc = "Activity based transport #{date_str}"
+
+                  qty = ts.travel.to_d
+                  if qty <= 0
+                    Rails.logger.debug("[Xero::InvoiceExportJob] Skipping zero/negative travel for timesheet_id=#{ts.id}")
+                    next
+                  end
+
+                  # ItemCode mode: DO NOT set unit_amount so Xero uses the Item's default price
+                  @travel_item_line_items_extra << {
+                    item_code: mapped_travel_code,
+                    description: desc,
+                    quantity: qty,
+                    tax_type: "NONE"
+                    # no :unit_amount on purpose
+                  }
+
+                  # Fallback account mode (only used when ItemCode fails). Keep amount 0.0 and log.
+                  @travel_account_line_items_extra << {
+                    description: desc,
+                    quantity: qty,
+                    unit_amount: 0.0,
+                    tax_type: "NONE",
+                    account_code: fallback_account_code.presence
+                  }
+
+                  Rails.logger.info("[Xero::InvoiceExportJob] Added extra Travel line for timesheet_id=#{ts.id} location='#{location&.name}' qty=#{qty}")
+                end
+              end
+            end
+          rescue => e
+            Rails.logger.error("[Xero::InvoiceExportJob] Travel supplement build error for location='#{location&.name}': #{e.class}: #{e.message}")
+          end
+          # === END travel supplement ===
+
           item_line_items = lines.map do |line|
-            # Prefer an explicit Xero item mapping if the Area has one; otherwise fall back to export_code
             mapped_code = if line.area.respond_to?(:xero_item_code) && line.area.xero_item_code.present?
               line.area.xero_item_code
             else
               line.area.export_code
             end
 
-            {
+            line_item = {
               item_code: mapped_code,
               description: line.description,
-              quantity: line.timesheet.duration_in_hours,
               tax_type: "NONE"
             }
+
+            if line.area&.name&.downcase == "travel"
+              # For Travel from a Travel-area line: quantity is travel hours, description fixed, no unit_amount.
+              ts = line.timesheet
+              date_str =
+                begin
+                  (ts.clock_in_at || Time.current).in_time_zone("Australia/Brisbane").to_date.strftime("%-d %^b %Y")
+                rescue
+                  Time.current.in_time_zone("Australia/Brisbane").to_date.strftime("%-d %^b %Y")
+                end
+              line_item[:description] = "Activity based transport #{date_str}"
+              line_item[:quantity]    = ts.travel.to_d
+              # IMPORTANT: do NOT set :unit_amount so Xero pulls price from Item Code
+            else
+              # Hours worked: keep existing behaviour (quantity = hours; no unit_amount here).
+              line_item[:quantity] = line.timesheet.duration_in_hours
+            end
+
+            line_item
+          end
+
+          # Append the extra Travel line-items built from timesheets that had travel > 0 but no Travel line yet:
+          if defined?(@travel_item_line_items_extra) && @travel_item_line_items_extra.present?
+            Rails.logger.info("[Xero::InvoiceExportJob] Appending #{@travel_item_line_items_extra.size} extra Travel item-code lines for location='#{location&.name}'")
+            item_line_items.concat(@travel_item_line_items_extra)
           end
 
           account_line_items = lines.map do |line|
-            h = {
+            line_item = {
               description: line.description,
-              quantity: line.timesheet.duration_in_hours,
-              unit_amount: 0.0, # replace with your rate if available
               tax_type: "NONE"
             }
-            h[:account_code] = fallback_account_code if fallback_account_code.present?
-            h
+
+            if line.area&.name&.downcase == "travel"
+              ts = line.timesheet
+              date_str =
+                begin
+                  (ts.clock_in_at || Time.current).in_time_zone("Australia/Brisbane").to_date.strftime("%-d %^b %Y")
+                rescue
+                  Time.current.in_time_zone("Australia/Brisbane").to_date.strftime("%-d %^b %Y")
+                end
+              line_item[:description] = "Activity based transport #{date_str}"
+              line_item[:quantity]    = ts.travel.to_d
+              line_item[:unit_amount] = 0.0  # In fallback account mode we cannot rely on Item pricing
+            else
+              line_item[:quantity]    = line.timesheet.duration_in_hours
+              line_item[:unit_amount] = 0.0  # keep your existing fallback behaviour
+            end
+
+            line_item[:account_code] = fallback_account_code if fallback_account_code.present?
+            line_item
           end
+
+          # Append the extra Travel fallback lines too (only used when we switch to account mode)
+          if defined?(@travel_account_line_items_extra) && @travel_account_line_items_extra.present?
+            Rails.logger.info("[Xero::InvoiceExportJob] Appending #{@travel_account_line_items_extra.size} extra Travel account-mode lines for location='#{location&.name}'")
+            account_line_items.concat(@travel_account_line_items_extra)
+          end
+
           Rails.logger.warn("[Xero::InvoiceExportJob] No fallback account code available after auto-detect; set #{FALLBACK_ACCOUNT_ENV} or add a revenue account in Xero if you want account-mode retry.") if fallback_account_code.blank?
 
           if item_line_items.any? { |li| li[:item_code].blank? || li[:quantity].nil? }
@@ -108,16 +231,13 @@ module Xero
 
           opts = { summarize_errors: false, unitdp: 4 }
 
-          # Preflight diagnostics (non-fatal): check whether all item codes exist and whether the contact exists
           item_codes = item_line_items.map { |li| li[:item_code] }.compact.uniq
           missing = item_codes.reject { |code| item_exists?(accounting_api, xero_tenant_id, code) }
           Rails.logger.info("[Xero::InvoiceExportJob] Preflight items: codes=#{item_codes.inspect} missing=#{missing.inspect}") unless item_codes.empty?
 
-          # If any items are missing, decide early how to proceed
           if missing.any?
             Rails.logger.warn("[Xero::InvoiceExportJob] Missing item codes detected preflight: #{missing.inspect}")
 
-            # Option A: try auto-create (guarded by env var)
             if ActiveModel::Type::Boolean.new.cast(ENV[AUTO_CREATE_ITEMS_ENV])
               Rails.logger.info("[Xero::InvoiceExportJob] #{AUTO_CREATE_ITEMS_ENV}=true — attempting to auto-create missing Items: #{missing.inspect}")
               begin
@@ -126,7 +246,6 @@ module Xero
                 Rails.logger.error("[Xero::InvoiceExportJob] auto_create_items failed: #{e_ac.class}: #{e_ac.message}")
               end
 
-              # Re-check existence after auto-create (use the same multi-strategy probe)
               still_missing = missing.reject { |code| item_exists?(accounting_api, xero_tenant_id, code) }
               Rails.logger.info("[Xero::InvoiceExportJob] After auto-create, still missing: #{still_missing.inspect}")
 
@@ -137,7 +256,6 @@ module Xero
               end
             end
 
-            # Option B: if still missing and we have a fallback account code, switch to account-based line items
             if missing.any? && fallback_account_code.present?
               attempt = :account
               invoice_payload = build_payload.call(account_line_items)
@@ -167,7 +285,6 @@ module Xero
               end
             end
 
-            # Option C: still missing and no fallback — fail fast with guidance
             if missing.any?
               msg = "Missing Xero Items #{missing.join(', ')} for location #{location&.name}; cannot create invoice with ItemCode. Either create these Items in Xero, set #{AUTO_CREATE_ITEMS_ENV}=true, or set #{FALLBACK_ACCOUNT_ENV} (or connection.sales_account_code) to use AccountCode."
               Rails.logger.error("[Xero::InvoiceExportJob] #{msg}")
@@ -204,7 +321,6 @@ module Xero
 
           Rails.logger.error("[Xero::InvoiceExportJob] ApiError create_invoices(#{attempt}) tenant=#{xero_tenant_id} location='#{location&.name}' status=#{status_code} corr=#{corr} short_corr=#{short(corr)} body=#{body.presence || '(empty)'}")
 
-          # Try raw HTTP create as a fallback for SDK 404/empty responses
           http_invoice_id = http_create_invoice(xero_tenant_id, contact_hash, item_line_items)
           if http_invoice_id.present?
             Rails.logger.info("[Xero::InvoiceExportJob] Created invoice_id=#{http_invoice_id} via HTTP fallback (items) for location='#{location&.name}'")
@@ -231,7 +347,6 @@ module Xero
                 corr2 = (e2.response_headers || {})["xero-correlation-id"] rescue nil
                 status_code2 = e2.respond_to?(:code) ? e2.code : nil
                 Rails.logger.error("[Xero::InvoiceExportJob] Fallback account-mode ApiError status=#{status_code2} corr=#{corr2} short_corr=#{short(corr2)} body=#{body2.presence || '(empty)'}")
-                # Try raw HTTP create as a fallback for SDK 404/empty responses in account mode
                 http_invoice_id = http_create_invoice(xero_tenant_id, contact_hash, account_line_items)
                 if http_invoice_id.present?
                   Rails.logger.info("[Xero::InvoiceExportJob] Created invoice_id=#{http_invoice_id} via HTTP fallback (account) for location='#{location&.name}'")
@@ -275,7 +390,6 @@ module Xero
     end
 
     def ensure_contact_hash(accounting_api, tenant_id, name)
-      # Prefer ContactID if we can find (or create) the contact; otherwise fall back to Name.
       contact = find_contact_by_name(accounting_api, tenant_id, name)
       if contact
         { contact_id: contact.contact_id }
@@ -305,7 +419,6 @@ module Xero
     private :ensure_contact_hash
 
     def find_contact_by_name(accounting_api, tenant_id, name)
-      # Build a proper `where` Hash for xero-ruby (12.x expects a Hash, not a String)
       escaped = name.to_s.gsub('"', '\\"')
       where_hash = { "Name" => %(=="#{escaped}") }
       Rails.logger.info("[Xero::InvoiceExportJob] Probe contacts where=#{where_hash.inspect}")
@@ -325,7 +438,6 @@ module Xero
     def item_exists?(accounting_api, tenant_id, code)
       return false if code.blank?
 
-      # 1) Trust our local cache first (populated by the Xero Items sync)
       begin
         if defined?(XeroItem) && XeroItem.where(code: code).exists?
           Rails.logger.info("[Xero::InvoiceExportJob] Local cache reports item exists code=#{code.inspect}")
@@ -335,7 +447,6 @@ module Xero
         Rails.logger.warn("[Xero::InvoiceExportJob] Local cache check failed for code=#{code.inspect}: #{e.class}: #{e.message}")
       end
 
-      # 2) Try SDK probe (xero-ruby)
       escaped = code.to_s.gsub('"', '\\"')
       where_hash = { "Code" => %(=="#{escaped}") }
       Rails.logger.info("[Xero::InvoiceExportJob] Probe items (SDK) where=#{where_hash.inspect}")
@@ -351,12 +462,10 @@ module Xero
         Rails.logger.warn("[Xero::InvoiceExportJob] SDK get_items ApiError code=#{code.inspect} status=#{status} corr=#{corr} short_corr=#{short(corr)} body=#{e.response_body.to_s.presence || '(empty)'}; will try HTTP fallback")
       end
 
-      # 3) Raw HTTP fallback (works around SDK 404s)
       begin
         token = XeroConnection.first&.access_token
         raise "missing access_token" if token.blank?
 
-        # Use a `where` to filter by exact Code, percent-encoding the value
         where_q = CGI.escape(%(Code=="#{code}"))
         url = "https://api.xero.com/api.xro/2.0/Items?where=#{where_q}"
         Rails.logger.info("[Xero::InvoiceExportJob] HTTP fallback GET #{url}")
@@ -382,18 +491,15 @@ module Xero
     end
     private :item_exists?
 
-    # Attempt to create the given item codes in Xero.
-    # Uses the SDK first, then falls back to raw HTTP if the SDK returns 404/empty.
     def auto_create_items(accounting_api, tenant_id, codes, fallback_account_code)
       codes = Array(codes).compact.uniq
       return if codes.empty?
 
-      # Build minimal valid payloads. If an account code is provided, include SalesDetails to satisfy org validation.
       items_payload = {
         items: codes.map do |code|
           item_hash = {
             code: code.to_s,
-            name: code.to_s,        # use Code as Name if we don't have a friendlier label
+            name: code.to_s,
             is_sold: true
           }
           if fallback_account_code.present?
@@ -411,7 +517,6 @@ module Xero
         resp = accounting_api.create_items(tenant_id, items_payload)
         created = Array(resp&.items).map { |it| it&.code }.compact
         Rails.logger.info("[Xero::InvoiceExportJob] SDK create_items created/echoed codes=#{created.inspect}")
-        # If SDK says nothing created and some codes still missing, try HTTP fallback
         leftover = codes - created
         if leftover.any?
           Rails.logger.warn("[Xero::InvoiceExportJob] SDK create_items did not confirm for #{leftover.inspect}; trying HTTP fallback")
@@ -422,21 +527,17 @@ module Xero
         corr = (e.response_headers || {})["xero-correlation-id"] rescue nil
         status = e.respond_to?(:code) ? e.code : nil
         Rails.logger.error("[Xero::InvoiceExportJob] SDK create_items ApiError status=#{status} corr=#{corr} short_corr=#{short(corr)} body=#{e.response_body.to_s.presence || '(empty)'} — will try HTTP fallback for all.")
-        # Fall back to HTTP for all
         codes.each { |code| create_item_http(tenant_id, code, fallback_account_code) }
       end
     end
     private :auto_create_items
 
-    # Raw HTTP POST to create an Invoice (works around SDK 404s on create_invoices).
-    # line_items_hashes should already be in SDK-style snake_case keys. We'll convert to Xero's expected casing.
     def http_create_invoice(tenant_id, contact_hash, line_items_hashes)
       token = XeroConnection.first&.access_token
       raise "missing access_token" if token.blank?
 
       url = "https://api.xero.com/api.xro/2.0/Invoices"
 
-      # Convert snake_case keys to the Xero payload keys (PascalCase) that we know work with raw HTTP.
       xero_line_items = line_items_hashes.map do |li|
         h = {}
         h["ItemCode"]    = li[:item_code].to_s if li.key?(:item_code) && li[:item_code].present?
@@ -468,8 +569,6 @@ module Xero
         ]
       }
 
-      # Optional idempotency-key: reuse the most recent invoice_export idempotency_key if present.
-      # If not available in this scope, it is safe to omit — Xero will still accept the POST.
       headers = {
         "Authorization"  => "Bearer #{token}",
         "Xero-Tenant-Id" => tenant_id,
@@ -495,7 +594,6 @@ module Xero
       nil
     end
 
-    # Raw HTTP POST to create a single Item, working around SDK quirks.
     def create_item_http(tenant_id, code, fallback_account_code)
       token = XeroConnection.first&.access_token
       raise "missing access_token" if token.blank?
@@ -577,20 +675,18 @@ module Xero
         false
       end
     end
+
     def resolve_fallback_account_code(accounting_api, tenant_id, connection)
-      # 1) Prefer DB column *if it exists* and is set (won't blow up if column is missing)
       if connection.respond_to?(:sales_account_code) && connection.sales_account_code.present?
         Rails.logger.info("[Xero::InvoiceExportJob] Using connection.sales_account_code=#{connection.sales_account_code}")
         return connection.sales_account_code.to_s
       end
 
-      # 2) Then ENV
       if ENV[FALLBACK_ACCOUNT_ENV].present?
         Rails.logger.info("[Xero::InvoiceExportJob] Using ENV #{FALLBACK_ACCOUNT_ENV}=#{ENV[FALLBACK_ACCOUNT_ENV]}")
         return ENV[FALLBACK_ACCOUNT_ENV].to_s
       end
 
-      # 3) Auto-detect by asking Xero for Accounts
       Rails.logger.info("[Xero::InvoiceExportJob] Auto-detecting fallback account code via Accounts API…")
       accounts = []
       begin
@@ -610,10 +706,8 @@ module Xero
         end
       end
 
-      # Choose a sensible revenue code
       chosen = nil
       if accounts.present?
-        # Normalise to simple Hash-like for scanning
         normalized = accounts.map do |a|
           if a.respond_to?(:code)
             { code: a.code.to_s, name: a.respond_to?(:name) ? a.name.to_s : (a["Name"] || a[:Name]).to_s, type: (a.respond_to?(:type) ? a.type.to_s : (a["Type"] || a[:Type]).to_s) }
@@ -653,7 +747,7 @@ module Xero
       Rails.logger.info("[Xero::InvoiceExportJob] HTTP Accounts status=#{resp.code} corr=#{corr} short_corr=#{short(corr)} bytes=#{resp.body.to_s.bytesize}")
       if resp.code.to_i == 200
         body = JSON.parse(resp.body) rescue {}
-        Array(body["Accounts"]) # return raw array of hashes
+        Array(body["Accounts"])
       else
         []
       end

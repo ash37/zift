@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_152101) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_152102) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -154,7 +154,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_152101) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "notes"
-    t.integer "travel"
+    t.decimal "travel", precision: 10, scale: 2, default: "0.0"
     t.boolean "auto_clock_off", default: false
     t.index ["shift_id"], name: "index_timesheets_on_shift_id"
     t.index ["user_id"], name: "index_timesheets_on_user_id"
