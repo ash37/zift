@@ -25,6 +25,6 @@ User.create!(
 )
 
 # Create Shift Types for Xero Mapping
-[ 'Weekday', 'Weeknight (first 2 hours)', 'Weeknight (after 2 hours)', 'Saturday', 'Sunday', 'Public Holiday' ].each do |name|
+[ 'Weekday', 'Weeknight (first 2 hours)', 'Weeknight (after 2 hours)', 'Saturday', 'Sunday', 'Public Holiday', 'Travel' ].each do |name|
   ShiftType.find_or_create_by!(name: name)
 end
