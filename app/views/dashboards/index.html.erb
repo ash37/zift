@@ -8,14 +8,12 @@
 %>
 
 <section class="container px-4 py-4 mx-auto bg-transparent">
-  <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hi, <%= current_user.first_name %></h2>
-  <p class="mt-2 text-gray-600 dark:text-gray-300">Here are your upcoming shifts.</p>
-
+  
   <div class="mt-6 space-y-8">
     <div>
       <div class="flex justify-between items-center">
-        <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200">Today</h3>
-        <%= link_to "Start Unscheduled Shift", new_timesheet_path, class: "bg-white text-gray-400 font-semibold py-1 px-4 rounded-3xl" %>
+        <h3 class="text-4xl font-bold text-gray-700 dark:text-gray-200">Today</h3>
+        <%= link_to "Start Unscheduled Shift", new_timesheet_path, class: "bg-white text-gray-400 py-1 px-4 rounded-3xl" %>
       </div>
       <div class="mt-4 space-y-4">
         <% if today_shifts.any? %>
@@ -36,7 +34,7 @@
                 missed_clock_on = true
               end
             %>
-            <div class="p-4 bg-white rounded-lg flex justify-between items-center"
+            <div class="p-4 bg-white rounded-3xl flex justify-between items-center"
               data-controller="clickable-row"
               data-action="click->clickable-row#visit"
               data-clickable-row-url-value="<%= shift_path(shift) %>"
@@ -48,11 +46,11 @@
                   </div>
                 <% end %>
                 <div>
-                  <p class="font-semibold"><%= shift.location.name %></p>
+                  <p class="text-2xl font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+                  <p class="text-sm text-gray-600"><%= shift.location.name %></p>
                   <% if shift.area.present? %>
                     <p class="text-sm text-violet-700"><%= shift.area.name %></p>
                   <% end %>
-                  <p class="text-sm text-gray-600"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
                   <% if shift.note.present? %>
                     <p class="text-sm text-gray-600"><em><%= shift.note %></em></p>
                   <% end %>
@@ -72,7 +70,7 @@
       <div class="mt-4 space-y-4">
         <% if upcoming_shifts.any? %>
           <% upcoming_shifts.each do |shift| %>
-            <div class="p-4 bg-white rounded-lg flex justify-between items-center">
+            <div class="p-4 bg-white rounded-3xl flex justify-between items-center">
               <div>
                 <p class="font-semibold"><%= shift.location.name %></p>
                 <p class="text-sm text-gray-600"><%= shift.start_time.strftime("%a, %d %b") %>: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
