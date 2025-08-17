@@ -1,7 +1,6 @@
 <div class="container mx-auto mt-10 px-4 py-10">
   <h1 class="text-3xl font-bold mb-6">Export Invoices to Xero</h1>
-
-  <div class="bg-white p-6 rounded-lg shadow-md">
+  <div class="bg-white p-6 rounded-3xl">
     <%= form_with url: new_admin_xero_invoice_export_path, method: :get, local: true do %>
       <div class="flex flex-wrap gap-4 items-end mb-4">
         <div>
@@ -17,7 +16,7 @@
             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
         </div>
         <div>
-          <button type="submit" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded">Update</button>
+          <button type="submit" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-3xl">Update</button>
         </div>
       </div>
     <% end %>
@@ -31,19 +30,17 @@
     <%= hidden_field_tag :end_date,   @end_date&.strftime('%Y-%m-%d') %>
 
     <div class="mt-6">
-      <div class="overflow-x-auto rounded border">
+      <div class="overflow-x-auto rounded">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input type="checkbox" id="select_all_ts" onclick="document.querySelectorAll('.ts-box').forEach(cb => cb.checked = this.checked)">
               </th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Area</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hours</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shift</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Travel</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hours</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -57,12 +54,16 @@
                 <td class="px-4 py-3">
                   <input class="ts-box" type="checkbox" name="timesheet_ids[]" value="<%= ts.id %>">
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-900"><%= user&.name %></td>
-                <td class="px-4 py-3 text-sm text-gray-900"><%= work_day.strftime('%d %b %Y') %></td>
-                <td class="px-4 py-3 text-sm text-gray-900"><%= location&.name %></td>
-                <td class="px-4 py-3 text-sm text-gray-900"><%= area&.name %></td>
-                <td class="px-4 py-3 text-sm text-gray-900"><%= (ts.duration.to_f / 3600.0).round(2) %></td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  <%= location&.name %><br>
+                  <span class="text-gray-500"><%= area&.name %></span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  <%= work_day.strftime('%d %b %Y') %>: <%= "#{ts.clock_in_at.strftime('%-l:%M%P')} - #{ts.clock_out_at&.strftime('%-l:%M%P')}" %><br>
+                  <span class="text-gray-500"><%= user&.name %></span>
+                </td>
                 <td class="px-4 py-3 text-sm text-gray-900"><%= ts.travel.to_f %></td>
+                <td class="px-4 py-3 text-sm text-gray-900"><%= (ts.duration.to_f / 3600.0).round(2) %></td>
               </tr>
             <% end %>
           </tbody>
@@ -70,8 +71,8 @@
       </div>
     </div>
 
-    <div class="mt-8 flex items-center space-x-4">
-      <%= form.submit "Send to Xero", class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded" %>
+<div class="mt-8 flex items-center space-x-4 justify-end">
+      <%= form.submit "Send to Xero", class: "bg-violet-700 hover:bg-violet-800 text-white font-semibold py-2 px-4 rounded-3xl" %>
       <%= link_to "Cancel", admin_xero_connection_path, class: "text-gray-600 hover:text-gray-800" %>
     </div>
   <% end %>
