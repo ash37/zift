@@ -95,10 +95,13 @@ class Admin::XeroTimesheetExportsController < ApplicationController
 
     timesheet_export.update!(total_count: total_lines)
 
+    users_count = aggregated_hours.keys.size
+
     # **THE FIX IS HERE**: The unnecessary calendar ID is removed from the job call.
     Xero::TimesheetExportJob.perform_later(timesheet_export)
 
-    redirect_to admin_xero_connection_path, notice: "Timesheet export ##{timesheet_export.id} has been queued with #{total_lines} lines."
+    redirect_to timesheets_path,
+                notice: "#{total_lines} payroll items for #{users_count} users have successfully exported to Xero Timesheets for approval."
   end
 
   private
