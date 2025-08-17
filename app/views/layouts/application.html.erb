@@ -20,6 +20,7 @@
   </head>
 
   <body class="bg-zinc-100">
+    <% unless controller_name == 'welcome' && action_name == 'index' %>
     <nav x-data="{ isOpen: false }" class="relative bg-white shadow dark:bg-gray-800">
       <div class="container px-6 py-4 mx-auto">
         <div class="lg:flex lg:items-center lg:justify-between">
@@ -123,6 +124,7 @@
         </div>
       </div>
     </nav>
+    <% end %>
     <main>
       <%= turbo_frame_tag "flash" do %>
         <%= render "layouts/flash" %>
