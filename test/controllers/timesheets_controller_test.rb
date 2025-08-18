@@ -3,6 +3,8 @@ require "test_helper"
 class TimesheetsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @timesheet = timesheets(:one)
+    @user = users(:one)
+    @shift = shifts(:one)
   end
 
   test "should get index" do
@@ -17,7 +19,16 @@ class TimesheetsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create timesheet" do
     assert_difference("Timesheet.count") do
-      post timesheets_url, params: { timesheet: { clock_in_at: @timesheet.clock_in_at, clock_out_at: @timesheet.clock_out_at, duration: @timesheet.duration, shift_id: @timesheet.shift_id, status: @timesheet.status, user_id: @timesheet.user_id } }
+      post timesheets_url, params: {
+        timesheet: {
+          clock_in_at:  @timesheet.clock_in_at,
+          clock_out_at: @timesheet.clock_out_at,
+          duration:     @timesheet.duration,
+          shift_id:     @shift.id,
+          status:       "approved",
+          user_id:      @user.id
+        }
+      }
     end
 
     assert_redirected_to timesheet_url(Timesheet.last)
@@ -34,7 +45,16 @@ class TimesheetsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update timesheet" do
-    patch timesheet_url(@timesheet), params: { timesheet: { clock_in_at: @timesheet.clock_in_at, clock_out_at: @timesheet.clock_out_at, duration: @timesheet.duration, shift_id: @timesheet.shift_id, status: @timesheet.status, user_id: @timesheet.user_id } }
+    patch timesheet_url(@timesheet), params: {
+      timesheet: {
+        clock_in_at:  @timesheet.clock_in_at,
+        clock_out_at: @timesheet.clock_out_at,
+        duration:     @timesheet.duration,
+        shift_id:     @shift.id,
+        status:       "approved",
+        user_id:      @user.id
+      }
+    }
     assert_redirected_to timesheet_url(@timesheet)
   end
 
