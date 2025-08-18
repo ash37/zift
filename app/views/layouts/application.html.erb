@@ -35,10 +35,10 @@
       <div class="container px-6 py-4 mx-auto">
         <div class="lg:flex lg:items-center lg:justify-between">
           <div class="flex items-center justify-between">
-<% if user_signed_in? %>
+
               <%= link_to dashboards_path do %>
               <%= image_tag "qcare_logo.png", alt: "Qcare Logo", class: "h-10 w-auto" %>
-              <% end %>
+             
 
 
 
@@ -126,7 +126,7 @@
               <%# FIX: Add condition to hide Log in link on the sessions#new page %>
               <% unless current_page?(new_user_session_path) %>
                 <div class="flex items-center mt-4 lg:mt-0">
-                  <%= link_to "Log in", new_user_session_path, class: "block text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white rounded-md p-2" %>
+                  <%= link_to "Log in", new_user_session_path, class: "block text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white rounded-3-xl p-2" %>
                 </div>
               <% end %>
             <% end %>

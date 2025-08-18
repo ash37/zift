@@ -211,17 +211,12 @@
           <%= link_to "My Schedule", dashboards_path, class: "btn" %>
         <% else %>
           <%= link_to "Log in".html_safe, new_user_session_path, class: "btn_log_in" %>
-        <% end %>
           <a href="#services">Services</a>
           <a href="#ndis">NDIS</a>
-          <a href="#careers">Careers</a>
           <a href="#feedback">Feedback</a>
-           <% if user_signed_in? %>
-          <%= link_to "My Schedule", dashboards_path, class: "btn" %>
-        <% else %>
+          <%= link_to "Careers", new_application_path %>
           <%= link_to "Get started", new_application_path, class: "btn" %>
-        <% end %>
-          
+        <% end %> 
         </div>
       </nav>
     </div>

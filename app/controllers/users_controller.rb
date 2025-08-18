@@ -49,8 +49,8 @@ class UsersController < ApplicationController
     end
   end
 
-  # PATCH/PUT /users/1
-  def update
+# PATCH/PUT /users/1
+def update
   # Create a mutable copy of the parameters
   updated_params = user_params.to_h
 

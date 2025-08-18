@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  before_action :authenticate_user!
+  skip_before_action :authenticate_user!, if: -> { controller_name == "welcome" && action_name == "index" }
   include Devise::Controllers::Helpers
   helper_method :current_user, :user_signed_in?
 
