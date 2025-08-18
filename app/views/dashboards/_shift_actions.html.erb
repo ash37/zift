@@ -10,13 +10,13 @@
               this.canClockOut = true;
               return;
           }
-          const fifteenMinutes = 15 * 60 * 1000;
+          const fiveMinutes = 5 * 60 * 1000;
           const clockInTime = new Date(this.clockedInAt).getTime();
           const now = new Date().getTime();
-          this.canClockOut = (now - clockInTime) > fifteenMinutes;
+          this.canClockOut = (now - clockInTime) > fiveMinutes;
 
           if (!this.canClockOut) {
-              const remainingTime = fifteenMinutes - (now - clockInTime);
+              const remainingTime = fiveMinutes - (now - clockInTime);
               setTimeout(() => { this.canClockOut = true; }, remainingTime);
           }
       }

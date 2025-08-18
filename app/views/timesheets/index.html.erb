@@ -29,7 +29,7 @@
     </div>
   </div>
 
-  <div class="sm:hidden flex flex-col w-full px-4 py-1 bg-zinc-200">
+  <div class="sm:hidden flex flex-col w-full px-4 py-1 bg-transparent">
     <% @shifts.group_by { |s| s.start_time.to_date }.each do |date, shifts_for_day| %>
       <div class="mt-1">
         <div class="text-lg font-bold text-gray-800 dark:text-white px-4 py-4"><%= date.strftime("%A, %d %B") %></div>
