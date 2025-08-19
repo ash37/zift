@@ -14,6 +14,7 @@ class User < ApplicationRecord
   has_and_belongs_to_many :locations
   has_many :shifts, dependent: :destroy
   has_many :timesheets, dependent: :destroy
+  has_many :shift_answers, dependent: :nullify
   has_many :unavailability_requests, dependent: :destroy
   has_many :timesheet_export_lines
 

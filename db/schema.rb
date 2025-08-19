@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_152102) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_19_093919) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_152102) do
     t.string "xero_item_code"
     t.index ["location_id"], name: "index_areas_on_location_id"
     t.index ["xero_item_code"], name: "index_areas_on_xero_item_code"
+  end
+
+  create_table "areas_shift_questions", force: :cascade do |t|
+    t.bigint "area_id", null: false
+    t.bigint "shift_question_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["area_id", "shift_question_id"], name: "idx_areas_shift_questions_uniqueness", unique: true
+    t.index ["area_id"], name: "index_areas_shift_questions_on_area_id"
+    t.index ["shift_question_id"], name: "index_areas_shift_questions_on_shift_question_id"
   end
 
   create_table "invoice_export_lines", force: :cascade do |t|
@@ -86,6 +96,35 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_152102) do
     t.datetime "updated_at", null: false
     t.datetime "emails_sent_at"
     t.text "public_holidays"
+  end
+
+  create_table "shift_answers", force: :cascade do |t|
+    t.text "answer_text", null: false
+    t.bigint "shift_id", null: false
+    t.bigint "timesheet_id", null: false
+    t.bigint "shift_question_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shift_id", "shift_question_id"], name: "idx_answers_shift_question"
+    t.index ["shift_id"], name: "index_shift_answers_on_shift_id"
+    t.index ["shift_question_id"], name: "index_shift_answers_on_shift_question_id"
+    t.index ["timesheet_id", "shift_question_id"], name: "idx_answers_timesheet_question"
+    t.index ["timesheet_id"], name: "index_shift_answers_on_timesheet_id"
+    t.index ["user_id"], name: "index_shift_answers_on_user_id"
+  end
+
+  create_table "shift_questions", force: :cascade do |t|
+    t.string "question_text", null: false
+    t.string "question_type", null: false
+    t.integer "display_order", default: 0, null: false
+    t.boolean "is_mandatory", default: false, null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["display_order"], name: "index_shift_questions_on_display_order"
+    t.index ["is_active"], name: "index_shift_questions_on_is_active"
+    t.index ["question_type"], name: "index_shift_questions_on_question_type"
   end
 
   create_table "shift_types", force: :cascade do |t|
@@ -245,10 +284,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_152102) do
   end
 
   add_foreign_key "areas", "locations"
+  add_foreign_key "areas_shift_questions", "areas"
+  add_foreign_key "areas_shift_questions", "shift_questions"
   add_foreign_key "invoice_export_lines", "areas"
   add_foreign_key "invoice_export_lines", "invoice_exports"
   add_foreign_key "invoice_export_lines", "locations"
   add_foreign_key "invoice_export_lines", "timesheets"
+  add_foreign_key "shift_answers", "shift_questions"
+  add_foreign_key "shift_answers", "shifts"
+  add_foreign_key "shift_answers", "timesheets"
+  add_foreign_key "shift_answers", "users"
   add_foreign_key "shifts", "areas"
   add_foreign_key "shifts", "locations"
   add_foreign_key "shifts", "rosters"

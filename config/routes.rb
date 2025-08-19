@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     end
   end
   resources :shifts
+  resources :shift_questions
   resources :recurrences
   resources :reports, only: [ :index ]
 

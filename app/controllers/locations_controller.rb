@@ -86,6 +86,26 @@ class LocationsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def location_params
-      params.require(:location).permit(:name, :address, :phone_number, areas_attributes: [ :id, :name, :_destroy ])
+      # Sanitize nested multi-selects to drop the blank string Rails sends
+      if params[:location] && params[:location][:areas_attributes].present?
+        params[:location][:areas_attributes].each_value do |attrs|
+          attrs[:shift_question_ids]&.reject!(&:blank?)
+        end
+      end
+
+      params.require(:location).permit(
+        :name,
+        :address,
+        :phone_number,
+        areas_attributes: [
+          :id,
+          :name,
+          :export_code,
+          :color,
+          :xero_item_code,
+          :_destroy,
+          { shift_question_ids: [] }
+        ]
+      )
     end
 end

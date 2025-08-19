@@ -1,10 +1,21 @@
 <% upcoming ||= false %>
 <% timesheet ||= nil %>
+<% pre_questions = shift.pre_shift_questions %>
+<% has_pre_questions = pre_questions.any? %>
 
 <% if !upcoming %>
   <div x-data="{
       clockedInAt: '<%= timesheet&.clock_in_at&.iso8601 %>',
       canClockOut: true,
+      showPreModal: false,
+      hasPreQuestions: <%= has_pre_questions ? 'true' : 'false' %>,
+      openClockOn() {
+        if (this.hasPreQuestions) {
+          this.showPreModal = true;
+        } else {
+          this.$refs.clockOnForm.submit();
+        }
+      },
       init() {
           if (!this.clockedInAt || this.clockedInAt === '') {
               this.canClockOut = true;
@@ -30,7 +41,53 @@
         Clock Off
       </a>
     <% else %>
-      <%= button_to "Clock On", clock_on_shift_path(shift), method: :post, class: "px-4 py-3 text-md font-semibold text-white bg-green-500 rounded-full hover:bg-green-600" %>
+      <!-- Clock On button triggers modal when there are pre-shift questions -->
+      <button type="button"
+              @click="openClockOn()"
+              class="px-4 py-3 text-md font-semibold text-white bg-green-500 rounded-full hover:bg-green-600">
+        Clock On
+      </button>
+
+      <!-- Submission form for clock on (used directly or via modal) -->
+      <%= form_with url: clock_on_shift_path(shift), method: :post, html: { "x-ref" => "clockOnForm" } do %>
+        <% if has_pre_questions %>
+          <% pre_questions.each_with_index do |q, idx| %>
+            <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][shift_question_id]", q.id %>
+            <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][user_id]", current_user.id %>
+            <!-- answer_text field rendered inside modal below via matching name attribute -->
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <!-- Pre-shift Questions Modal -->
+      <% if has_pre_questions %>
+        <div x-show="showPreModal" class="fixed inset-0 z-40 flex items-center justify-center" aria-modal="true" role="dialog">
+          <div class="fixed inset-0 bg-black/40" @click="showPreModal = false"></div>
+          <div class="relative z-50 w-full max-w-lg bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Pre‑shift Questions</h3>
+
+            <% pre_questions.each_with_index do |q, idx| %>
+              <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">
+                  <%= q.question_text %>
+                  <span class="ml-2 text-xs px-2 py-0.5 border rounded"><%= q.question_type %></span>
+                  <% if q.is_mandatory %><span class="ml-2 text-xs">• mandatory</span><% end %>
+                </label>
+                <textarea name="timesheet[shift_answers_attributes][<%= idx %>][answer_text]"
+                          class="block w-full px-3 py-2 border rounded focus:outline-none focus:ring"
+                          <%= 'required' if q.is_mandatory %>></textarea>
+              </div>
+            <% end %>
+
+            <div class="mt-6 flex justify-end gap-3">
+              <button type="button" @click="showPreModal = false" class="px-4 py-2 rounded border">Cancel</button>
+              <button type="button"
+                      @click="$refs.clockOnForm.submit()"
+                      class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700">Start Shift</button>
+            </div>
+          </div>
+        </div>
+      <% end %>
     <% end %>
   </div>
 <% end %>

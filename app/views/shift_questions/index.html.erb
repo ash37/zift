@@ -1,0 +1,31 @@
+
+
+<section class="container mx-auto p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-semibold">Shift Questions</h1>
+    <%= link_to "Add new question", new_shift_question_path, class: "px-3 py-2 bg-blue-600 text-white rounded" %>
+  </div>
+  <div class="bg-white rounded shadow divide-y">
+    <% @shift_questions.each do |q| %>
+      <div class="p-4 flex items-center justify-between">
+        <div>
+          <div class="font-medium"><%= q.question_text %></div>
+          <div class="text-xs text-gray-600 mt-1">
+            Type: <%= q.question_type %> • Order: <%= q.display_order %> •
+            <%= q.is_mandatory ? "Mandatory" : "Optional" %> •
+            <%= q.is_active ? "Active" : "Inactive" %>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <%= link_to "Edit", edit_shift_question_path(q), class: "px-2 py-1 border rounded" %>
+          <%= button_to "Delete", shift_question_path(q), method: :delete,
+                        data: { confirm: "Delete this question?" },
+                        class: "px-2 py-1 border rounded text-red-600" %>
+        </div>
+      </div>
+    <% end %>
+    <% if @shift_questions.empty? %>
+      <div class="p-6 text-sm text-gray-600">No questions yet.</div>
+    <% end %>
+  </div>
+</section>

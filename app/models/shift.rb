@@ -8,6 +8,7 @@ class Shift < ApplicationRecord
   belongs_to :location
   belongs_to :area, optional: true
   has_many :timesheets, dependent: :destroy
+  has_many :shift_answers, dependent: :destroy
 
   # Make the validation conditional
   validate :user_is_available, unless: :bypass_unavailability_validation
@@ -44,6 +45,21 @@ class Shift < ApplicationRecord
         "Weekday"
       end
     end
+  end
+
+
+  # Questions applicable to this shift (via its area)
+  def applicable_shift_questions
+    return ShiftQuestion.none unless area_id
+    ShiftQuestion.for_area(area)
+  end
+
+  def pre_shift_questions
+    applicable_shift_questions.pre_shift
+  end
+
+  def post_shift_questions
+    applicable_shift_questions.post_shift
   end
 
   private

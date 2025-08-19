@@ -84,11 +84,11 @@ class TimesheetsController < ApplicationController
     updated_params[:clock_out_at] = clock_out_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
   end
 
-  if @timesheet.update(updated_params)
-    redirect_to timesheets_path
-  else
-    render :edit, status: :unprocessable_entity
-  end
+      if @timesheet.update(updated_params)
+        redirect_to timesheets_path
+      else
+        render :edit, status: :unprocessable_entity
+      end
   end
 
   def destroy
@@ -202,11 +202,22 @@ class TimesheetsController < ApplicationController
     end
 
     def timesheet_params
-      params.require(:timesheet).permit(:clock_in_at, :clock_out_at, :notes, :travel, shift_attributes: [ :id, :area_id ])
+      params.require(:timesheet).permit(
+        :clock_in_at,
+        :clock_out_at,
+        :notes,
+        :travel,
+        shift_attributes: [ :id, :area_id ],
+        shift_answers_attributes: [ :answer_text, :shift_id, :timesheet_id, :shift_question_id, :user_id ]
+      )
     end
 
     def clock_off_params
-      params.require(:timesheet).permit(:notes, :travel)
+      params.require(:timesheet).permit(
+        :notes,
+        :travel,
+        shift_answers_attributes: [ :answer_text, :shift_id, :timesheet_id, :shift_question_id, :user_id ]
+      )
     end
 
     def shift_params

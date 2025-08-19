@@ -59,7 +59,18 @@
                 <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                   <% @areas.each do |area| %>
                     <tr>
-                      <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap dark:text-white"><%= area.name %></td>
+                      <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap dark:text-white">
+                        <div><%= area.name %></div>
+                        <% if area.respond_to?(:shift_questions) && area.shift_questions.present? %>
+                          <ul class="mt-1 space-y-0.5">
+                            <% area.shift_questions.each do |sq| %>
+                              <% txt = sq.try(:text) || sq.try(:question_text) || sq.try(:content) || sq.try(:title) %>
+                              <% next if txt.blank? %>
+                              <li class="text-xs font-normal text-gray-500 dark:text-gray-400"><%= txt %></li>
+                            <% end %>
+                          </ul>
+                        <% end %>
+                      </td>
                       <td class="px-12 py-4 text-sm font-medium text-gray-700 whitespace-nowrap dark:text-white"><%= area.export_code %></td>
                       <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
                         <div class="w-6 h-6 rounded" style="background-color: <%= area.color %>;"></div>

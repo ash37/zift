@@ -28,3 +28,26 @@
     </div>
   </div>
 </div>
+<div class="mt-4">
+  <div class="flex items-center justify-between">
+    <h3 class="text-sm font-medium">Shift Questions</h3>
+    <%= link_to "Add new question",
+                new_shift_question_path,
+                class: "text-sm underline hover:no-underline" %>
+  </div>
+
+  <div class="mt-2 space-y-2">
+    <%= form.collection_check_boxes :shift_question_ids, ShiftQuestion.active.ordered, :id, :question_text do |cb| %>
+      <div class="flex items-start gap-2">
+        <%= cb.check_box class: "mt-1" %>
+        <%= cb.label class: "text-sm" do %>
+          <span class="font-medium"><%= cb.text %></span>
+          <span class="ml-2 text-xs px-2 py-0.5 border rounded"><%= cb.object.question_type %></span>
+          <% if cb.object.is_mandatory %>
+            <span class="ml-2 text-xs">• mandatory</span>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

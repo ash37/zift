@@ -2,7 +2,7 @@
 class ShiftsController < ApplicationController
   before_action :authenticate_user!
   include ActionView::RecordIdentifier
-  before_action :set_shift, only: %i[show edit update destroy]
+  before_action :set_shift, only: %i[show edit update destroy clock_on]
 
   # GET /shifts
   def index
@@ -131,6 +131,56 @@ class ShiftsController < ApplicationController
       format.turbo_stream
       format.html { redirect_to roster_path(@roster), status: :see_other, notice: "Shift deleted." }
       format.json { head :no_content }
+    end
+  end
+
+  # POST /shifts/:id/clock_on
+  def clock_on
+    # Create or find an open timesheet for this shift
+    @timesheet = @shift.timesheets.where(user: current_user, clock_out_at: nil).first_or_initialize
+    if @timesheet.new_record?
+      @timesheet.user = current_user
+      @timesheet.area = @shift.area if @timesheet.respond_to?(:area=)
+      @timesheet.clock_in_at = Time.current
+    end
+
+    # Build any provided pre-shift answers
+    answers_attrs = params.dig(:timesheet, :shift_answers_attributes)
+    if answers_attrs.present?
+      answers_attrs.each_value do |qa|
+        next if qa[:answer_text].blank?
+        @timesheet.shift_answers.build(
+          answer_text: qa[:answer_text],
+          shift_id: @shift.id,
+          timesheet_id: @timesheet.id, # set after save too, but safe here
+          shift_question_id: qa[:shift_question_id],
+          user_id: current_user.id
+        )
+      end
+    end
+
+    # Validate mandatory pre-shift questions are answered when present
+    mandatory_ids = @shift.pre_shift_questions.where(is_mandatory: true).pluck(:id)
+    if mandatory_ids.any?
+      provided_ids = Array(answers_attrs).map { |_, v| v[:shift_question_id].to_i if v[:answer_text].present? }.compact
+      missing_ids = mandatory_ids - provided_ids
+      if missing_ids.any?
+        flash[:alert] = "Please answer all mandatory pre-shift questions."
+        return redirect_back(fallback_location: shifts_path)
+      end
+    end
+
+    if @timesheet.save
+      # Ensure answers have the timesheet id persisted
+      if @timesheet.shift_answers.any?
+        @timesheet.shift_answers.each { |a| a.timesheet_id ||= @timesheet.id }
+        @timesheet.shift_answers.each(&:save!)
+      end
+      flash[:notice] = "Clocked on. Have a great shift!"
+      redirect_back(fallback_location: shifts_path)
+    else
+      flash[:alert] = @timesheet.errors.full_messages.to_sentence
+      redirect_back(fallback_location: shifts_path)
     end
   end
 

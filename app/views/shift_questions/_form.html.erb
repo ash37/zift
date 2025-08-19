@@ -1,0 +1,45 @@
+
+
+<%= form_with(model: @shift_question) do |f| %>
+  <div class="space-y-4">
+    <% if @shift_question.errors.any? %>
+      <div class="p-3 rounded bg-red-50 text-red-700 text-sm">
+        <%= @shift_question.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :question_text, class: "block text-sm font-medium" %>
+      <%= f.text_field :question_text, required: true, class: "mt-1 block w-full border rounded px-3 py-2" %>
+    </div>
+
+    <div>
+      <%= f.label :question_type, class: "block text-sm font-medium" %>
+      <%= f.select :question_type,
+            [["Pre shift", ShiftQuestion::QUESTION_TYPES[:PRE_SHIFT]],
+             ["Post shift", ShiftQuestion::QUESTION_TYPES[:POST_SHIFT]]],
+            {},
+            class: "mt-1 block w-full border rounded px-3 py-2" %>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div>
+        <%= f.label :display_order, class: "block text-sm font-medium" %>
+        <%= f.number_field :display_order, step: 1, min: 0, class: "mt-1 block w-full border rounded px-3 py-2" %>
+      </div>
+      <div class="flex items-center gap-2 mt-6">
+        <%= f.check_box :is_mandatory %>
+        <%= f.label :is_mandatory, "Mandatory" %>
+      </div>
+      <div class="flex items-center gap-2 mt-6">
+        <%= f.check_box :is_active %>
+        <%= f.label :is_active, "Active" %>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <%= link_to "Cancel", shift_questions_path, class: "px-4 py-2 border rounded" %>
+      <%= f.submit class: "px-4 py-2 bg-blue-600 text-white rounded" %>
+    </div>
+  </div>
+<% end %>

@@ -38,6 +38,15 @@ class AreasController < ApplicationController
   end
 
   def area_params
-    params.require(:area).permit(:name, :export_code, :color)
+    # Remove blank values Rails sends for multi-selects/checkboxes
+    params[:area][:shift_question_ids]&.reject!(&:blank?)
+
+    params.require(:area).permit(
+      :name,
+      :export_code,
+      :color,
+      :xero_item_code,
+      shift_question_ids: []
+    )
   end
 end

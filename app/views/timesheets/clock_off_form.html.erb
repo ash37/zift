@@ -12,6 +12,35 @@
           <%= form.number_field :travel, value: nil, placeholder: "10", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
         </div>
       </div>
+      <% post_questions = @timesheet.unanswered_questions(
+           question_type: ShiftQuestion::QUESTION_TYPES[:POST_SHIFT]
+         ) %>
+
+      <% if post_questions.any? %>
+        <div class="mt-6 border-t pt-4">
+          <h3 class="text-base font-semibold mb-3">Shift Questions</h3>
+
+          <% post_questions.each_with_index do |q, idx| %>
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-1">
+                <%= q.question_text %>
+                <span class="ml-2 text-xs px-2 py-0.5 border rounded"><%= q.question_type %></span>
+                <% if q.is_mandatory %><span class="ml-2 text-xs">• mandatory</span><% end %>
+              </label>
+
+              <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][shift_question_id]", q.id %>
+              <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][shift_id]", @timesheet.shift_id %>
+              <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][timesheet_id]", @timesheet.id %>
+              <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][user_id]", current_user.id %>
+
+              <%= text_area_tag "timesheet[shift_answers_attributes][#{idx}][answer_text]",
+                                "",
+                                required: q.is_mandatory,
+                                class: "block w-full px-3 py-2 border rounded focus:outline-none focus:ring" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
       <div class="flex justify-end mt-6">
         <%= form.submit "Clock Off", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-violet-700 rounded-3xl hover:bg-violet-500 focus:outline-none focus:bg-violet-600" %>
       </div>

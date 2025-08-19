@@ -3,8 +3,10 @@ class Timesheet < ApplicationRecord
   belongs_to :shift, optional: true
   belongs_to :area, optional: true
   has_many :invoice_export_lines, dependent: :destroy
+  has_many :shift_answers, dependent: :destroy
 
   accepts_nested_attributes_for :shift
+  accepts_nested_attributes_for :shift_answers, allow_destroy: false
 
   STATUSES = {
     pending: 0,
@@ -59,6 +61,13 @@ class Timesheet < ApplicationRecord
 
   def rostered_hours
     shift.duration_in_hours
+  end
+
+  # Fetch unanswered questions of a given type for this timesheet/shift
+  def unanswered_questions(question_type:)
+    asked = shift_answers.includes(:shift_question).map(&:shift_question_id)
+    scope = shift.applicable_shift_questions.where(question_type: question_type)
+    asked.present? ? scope.where.not(id: asked) : scope
   end
 
   private
