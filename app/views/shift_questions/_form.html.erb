@@ -1,45 +1,45 @@
-
-
 <%= form_with(model: @shift_question) do |f| %>
-  <div class="space-y-4">
+  <div class="bg-white rounded-3xl p-6 shadow">
+    <div class="space-y-4">
     <% if @shift_question.errors.any? %>
-      <div class="p-3 rounded bg-red-50 text-red-700 text-sm">
+      <div class="p-3 rounded border border-red-200 bg-red-50 text-red-700 text-sm">
         <%= @shift_question.errors.full_messages.to_sentence %>
       </div>
     <% end %>
 
     <div>
-      <%= f.label :question_text, class: "block text-sm font-medium" %>
-      <%= f.text_field :question_text, required: true, class: "mt-1 block w-full border rounded px-3 py-2" %>
+      <%= f.label :question_text, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :question_text, required: true, class: "mt-1 block w-full rounded border-gray-300  focus:border-violet-500 focus:ring-violet-500 px-4 py-2 bg-gray-100" %>
     </div>
 
     <div>
-      <%= f.label :question_type, class: "block text-sm font-medium" %>
+      <%= f.label :question_type, class: "block text-sm font-medium text-gray-700" %>
       <%= f.select :question_type,
             [["Pre shift", ShiftQuestion::QUESTION_TYPES[:PRE_SHIFT]],
              ["Post shift", ShiftQuestion::QUESTION_TYPES[:POST_SHIFT]]],
             {},
-            class: "mt-1 block w-full border rounded px-3 py-2" %>
+            class: "mt-1 block w-full rounded border-gray-300  focus:border-violet-500 focus:ring-violet-500 px-4 py-2 bg-gray-100" %>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div>
-        <%= f.label :display_order, class: "block text-sm font-medium" %>
-        <%= f.number_field :display_order, step: 1, min: 0, class: "mt-1 block w-full border rounded px-3 py-2" %>
+        <%= f.label :display_order, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.number_field :display_order, step: 1, min: 0, class: "mt-1 block w-full rounded border-gray-300  focus:border-violet-500 focus:ring-violet-500 px-4 py-2 bg-gray-100" %>
       </div>
       <div class="flex items-center gap-2 mt-6">
-        <%= f.check_box :is_mandatory %>
-        <%= f.label :is_mandatory, "Mandatory" %>
+        <%= f.check_box :is_mandatory, class: "h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500" %>
+        <%= f.label :is_mandatory, "Mandatory", class: "text-sm text-gray-700" %>
       </div>
       <div class="flex items-center gap-2 mt-6">
-        <%= f.check_box :is_active %>
-        <%= f.label :is_active, "Active" %>
+        <%= f.check_box :is_active, class: "h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500" %>
+        <%= f.label :is_active, "Active", class: "text-sm text-gray-700" %>
       </div>
     </div>
 
     <div class="flex justify-end gap-3">
-      <%= link_to "Cancel", shift_questions_path, class: "px-4 py-2 border rounded" %>
-      <%= f.submit class: "px-4 py-2 bg-blue-600 text-white rounded" %>
+      <%= link_to "Cancel", shift_questions_path, class: "px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500" %>
+      <%= f.submit class: "px-4 py-2 text-sm font-semibold text-white bg-violet-600 rounded-3xl hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+    </div>
     </div>
   </div>
 <% end %>
