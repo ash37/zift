@@ -8,7 +8,7 @@
           <%= form.text_area :notes, rows: 4, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
         </div>
         <div>
-          <%= form.label :travel, "Travel (km)", class: "text-gray-700 dark:text-gray-200" %><span class="text-xs text-gray-500 dark:text-gray-400">km from here to there</span>
+          <%= form.label :travel, "Travel", class: "text-gray-700 dark:text-gray-200" %><span class="text-xs text-gray-500 dark:text-gray-400"> Any km in addition to home-work and back again.</span>
           <%= form.number_field :travel, value: nil, placeholder: "10", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
         </div>
       </div>
@@ -18,25 +18,70 @@
 
       <% if post_questions.any? %>
         <div class="mt-6 border-t pt-4">
-          <h3 class="text-base font-semibold mb-3">Shift Questions</h3>
+          <h3 class="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-6">Shift Questions</h3>
 
           <% post_questions.each_with_index do |q, idx| %>
             <div class="mb-4">
               <label class="block text-sm font-medium mb-1">
                 <%= q.question_text %>
-                <span class="ml-2 text-xs px-2 py-0.5 border rounded"><%= q.question_type %></span>
                 <% if q.is_mandatory %><span class="ml-2 text-xs">• mandatory</span><% end %>
               </label>
 
-              <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][shift_question_id]", q.id %>
-              <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][shift_id]", @timesheet.shift_id %>
-              <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][timesheet_id]", @timesheet.id %>
-              <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][user_id]", current_user.id %>
+              <% if q.question_text.to_s.strip.downcase == 'did an incident occur on this shift' %>
+                <div x-data="{ val: 'no', text: '' }">
+                  <!-- Submit nested attributes ONLY when toggled YES -->
+                  <input type="hidden"
+                         name="timesheet[shift_answers_attributes][<%= idx %>][shift_question_id]"
+                         value="<%= q.id %>"
+                         :disabled="val !== 'yes'">
+                  <input type="hidden"
+                         name="timesheet[shift_answers_attributes][<%= idx %>][shift_id]"
+                         value="<%= @timesheet.shift_id %>"
+                         :disabled="val !== 'yes'">
+                  <input type="hidden"
+                         name="timesheet[shift_answers_attributes][<%= idx %>][timesheet_id]"
+                         value="<%= @timesheet.id %>"
+                         :disabled="val !== 'yes'">
+                  <input type="hidden"
+                         name="timesheet[shift_answers_attributes][<%= idx %>][user_id]"
+                         value="<%= current_user.id %>"
+                         :disabled="val !== 'yes'">
+                  <input type="hidden"
+                         name="timesheet[shift_answers_attributes][<%= idx %>][answer_text]"
+                         x-bind:value="text"
+                         :disabled="val !== 'yes'">
 
-              <%= text_area_tag "timesheet[shift_answers_attributes][#{idx}][answer_text]",
-                                "",
-                                required: q.is_mandatory,
-                                class: "block w-full px-3 py-2 border rounded focus:outline-none focus:ring" %>
+                  <!-- YES/NO segmented toggle styled like your inspiration -->
+                  <div class="space-y-2">
+                    <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
+                      <button type="button" @click="val='yes'"
+                              class="flex-1 rounded-3xl px-4 py-2 text-sm font-bold transition"
+                              :class="val==='yes' ? 'border-2 border-violet-700 text-violet-500 bg-violet-100' : 'text-gray-400'">Yes</button>
+                      <button type="button" @click="val='no'"
+                              class="flex-1 rounded-3xl px-4 py-2 text-sm font-bold transition"
+                              :class="val==='no' ? 'border-2 border-green-700 text-green-500 bg-green-50' : 'text-gray-400'">No</button>
+                    </div>
+
+                    <!-- Conditionally show the textarea only when YES -->
+                    <template x-if="val==='yes'">
+                      <textarea x-model="text"
+                                class="block w-full px-3 py-2 rounded bg-gray-100 focus:outline-none focus:ring focus:ring-violet-300"
+                                placeholder="Describe the incident..."
+                                <%= 'required' if q.is_mandatory %>></textarea>
+                    </template>
+                  </div>
+                </div>
+              <% else %>
+                <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][shift_question_id]", q.id %>
+                <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][shift_id]", @timesheet.shift_id %>
+                <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][timesheet_id]", @timesheet.id %>
+                <%= hidden_field_tag "timesheet[shift_answers_attributes][#{idx}][user_id]", current_user.id %>
+
+                <%= text_area_tag "timesheet[shift_answers_attributes][#{idx}][answer_text]",
+                                  "",
+                                  required: q.is_mandatory,
+                                  class: "block w-full px-3 py-2 border rounded focus:outline-none focus:ring" %>
+              <% end %>
             </div>
           <% end %>
         </div>

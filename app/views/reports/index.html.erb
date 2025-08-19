@@ -29,6 +29,20 @@
               : <em><%= timesheet.shift.note %></em></p>
             <% end %>
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.notes %></p>
+            <% if timesheet.shift_answers.any? %>
+              <div class="mt-2 space-y-2">
+                <% timesheet.shift_answers.each do |answer| %>
+                  <div class="bg-gray-50 rounded-xl p-2">
+                    <p class="text-xs text-gray-500">
+                      <%= answer.shift_question&.question_text || 'Question' %>
+                    </p>
+                    <p class="text-sm text-gray-800">
+                      <%= answer.answer_text %>
+                    </p>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
             <% if timesheet.travel.present? && timesheet.travel > 0 %>
               <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><strong>Travel on this shift:</strong> <%= timesheet.travel %>km</p>
             <% end %>

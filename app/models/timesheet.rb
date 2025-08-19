@@ -6,7 +6,9 @@ class Timesheet < ApplicationRecord
   has_many :shift_answers, dependent: :destroy
 
   accepts_nested_attributes_for :shift
-  accepts_nested_attributes_for :shift_answers, allow_destroy: false
+  accepts_nested_attributes_for :shift_answers,
+    allow_destroy: false,
+    reject_if: proc { |attrs| attrs["answer_text"].blank? }
 
   STATUSES = {
     pending: 0,
