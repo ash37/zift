@@ -87,8 +87,62 @@ class ShiftsController < ApplicationController
     end
 
     if @shift.update(attrs_to_update)
+      @new_user = @shift.user
+      @new_date = @shift.start_time.to_date
+
+      streams = []
+
+      # Always update the destination cell
+      streams << turbo_stream.replace(
+        dom_id(@roster, "cell_content_#{@new_user.id}_#{@new_date}"),
+        partial: "rosters/cell_content",
+        locals: { roster: @roster, user: @new_user, date: @new_date, selected_location_id: @selected_location_id }
+      )
+
+      # Update the source cell if it changed (user and/or date)
+      if @old_user.id != @new_user.id || @old_date != @new_date
+        streams << turbo_stream.replace(
+          dom_id(@roster, "cell_content_#{@old_user.id}_#{@old_date}"),
+          partial: "rosters/cell_content",
+          locals: { roster: @roster, user: @old_user, date: @old_date, selected_location_id: @selected_location_id }
+        )
+      end
+
+      # Update per-user hours for new and (if different) old user
+      streams << turbo_stream.replace(
+        dom_id(@roster, "user_hours_#{@new_user.id}"),
+        partial: "rosters/user_hours",
+        locals: { roster: @roster, user: @new_user, selected_location_id: @selected_location_id }
+      )
+      if @old_user.id != @new_user.id
+        streams << turbo_stream.replace(
+          dom_id(@roster, "user_hours_#{@old_user.id}"),
+          partial: "rosters/user_hours",
+          locals: { roster: @roster, user: @old_user, selected_location_id: @selected_location_id }
+        )
+      end
+
+      # Update per-day totals for new and (if different) old date
+      streams << turbo_stream.replace(
+        dom_id(@roster, "daily_hours_#{@new_date}"),
+        partial: "rosters/daily_hours",
+        locals: { roster: @roster, date: @new_date, selected_location_id: @selected_location_id }
+      )
+      if @old_date != @new_date
+        streams << turbo_stream.replace(
+          dom_id(@roster, "daily_hours_#{@old_date}"),
+          partial: "rosters/daily_hours",
+          locals: { roster: @roster, date: @old_date, selected_location_id: @selected_location_id }
+        )
+      end
+
+      # If the update came from the modal, close it on success
+      unless is_drag_and_drop
+        streams << turbo_stream.replace("assign_shift_modal", "")
+      end
+
       respond_to do |format|
-        format.turbo_stream
+        format.turbo_stream { render turbo_stream: streams }
         format.html { redirect_to roster_path(@roster), notice: "Shift updated." }
       end
     else

@@ -3,7 +3,7 @@
   roster_is_draft = shift.roster.draft?
   show_location_name = selected_location_id.blank?
   # Base classes for the main container
-  main_div_classes = "p-2.5 rounded-lg relative shadow-lg flex flex-col justify-between h-full"
+  main_div_classes = "p-1 rounded-lg relative flex flex-col justify-between h-24"
   main_div_style = ""
 
   # Classes and styles for PUBLISHED shifts
@@ -15,48 +15,52 @@
 
   # Classes and styles for DRAFT shifts
   if roster_is_draft
-    main_div_classes += " border-2 border-dashed"
-    main_div_style = "border-color: #{area&.color || '#cccccc'};" # Fallback to gray border
+    main_div_classes += " border-2 border-dashed bg-white"
+    main_div_style = "border-color: #{area&.color || '#bc15cbff'};" # Fallback to gray border
     main_div_classes += " text-zinc-800" # Text is always dark for drafts
   end
 
   # Determine background for child elements based on roster status
-  child_bg_class = roster_is_draft ? 'bg-black/10' : 'bg-black/30'
+  child_bg_class = roster_is_draft ? 'bg-black/10' : 'bg-black/10'
   edit_icon_bg_class = roster_is_draft ? 'bg-black/10 hover:bg-black/20' : 'bg-black/20 hover:bg-black/40'
   default_child_bg_class = roster_is_draft ? 'bg-gray-200' : 'bg-violet-700'
   default_edit_icon_bg_class = roster_is_draft ? 'bg-gray-200 hover:bg-gray-300' : 'bg-violet-600/50 hover:bg-violet-600/90'
 %>
 
-<%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: "cursor-grab relative group h-full p-1" do %>
+<%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: "#{roster_is_draft ? 'drag-enabled' : 'drag-disabled'} relative group h-full" do %>
   <div style="<%= main_div_style %>" class="<%= main_div_classes %>">
     
     <div class="flex justify-between items-start">
       <div>
         <p class="text-sm font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
       </div>
-      <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-         <%= link_to edit_shift_path(shift, location_id: selected_location_id) do %>
-          <span class="inline-block p-1 rounded-full <%= area&.color.present? ? edit_icon_bg_class : default_edit_icon_bg_class %>">
-            <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-          </span>
-        <% end %>
-      </div>
+      <div class="flex items-center justify-between">
+      <% duration_in_hours = (shift.end_time - shift.start_time) / 3600.0 %>
+      <span class="<%= area&.color.present? ? child_bg_class : default_child_bg_class %> px-2 py-0.5 rounded-3xl text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
+    </div>
+      
     </div>
     
     
-    <div class="space-y-1">
-      <h3 class="text-xs font-light opacity-80"><%= area&.name %></h3>
+    <div class="leading-none space-y-0">
+      <p class="m-0 text-xs font-light "><%= area&.name %></p>
       <% if shift.note.present? %>
-        <p class="text-xs font-light opacity-80 italic"><%= shift.note %></p>
+        <p class="m-0 text-xs font-light italic"><%= shift.note %></p>
+      <% else %>
+        <p class="m-0 text-xs font-light italic invisible">&nbsp;</p>
       <% end %>
       <% if show_location_name %>
-        <span class="text-xs font-light opacity-80"><%= shift.location&.name %></span>
+        <div class="flex items-center justify-between">
+          <p class="m-0 text-xs font-light "><%= shift.location&.name %></p>
+          <div class="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+            <%= link_to edit_shift_path(shift, location_id: selected_location_id), data: { turbo_frame: "assign_shift_modal" } do %>
+              <span class="inline-block p-1 rounded-full <%= area&.color.present? ? edit_icon_bg_class : default_edit_icon_bg_class %>">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </span>
+            <% end %>
+          </div>
+        </div>
       <% end %>
-    </div>
-
-    <div class="flex items-center justify-between">
-      <% duration_in_hours = (shift.end_time - shift.start_time) / 3600.0 %>
-      <span class="<%= area&.color.present? ? child_bg_class : default_child_bg_class %> px-2 py-0.5 rounded-md text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
     </div>
   </div>
 <% end %>

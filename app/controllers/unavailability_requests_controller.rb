@@ -62,18 +62,30 @@ class UnavailabilityRequestsController < ApplicationController
 
   def processed_unavailability_params
     attrs = unavailability_request_params.to_h
+
     start_date_str = attrs[:starts_at]
-    end_date_str = attrs[:ends_at]
+    end_date_str   = attrs[:ends_at].presence || start_date_str
     start_time_str = attrs[:starts_at_time]
-    end_time_str = attrs[:ends_at_time]
+    end_time_str   = attrs[:ends_at_time].presence || start_time_str
 
     if attrs[:all_day] == "true"
-      attrs[:starts_at] = Time.zone.parse(start_date_str)&.beginning_of_day if start_date_str.present?
-      attrs[:ends_at] = Time.zone.parse(end_date_str)&.end_of_day if end_date_str.present?
+      # All day: use full-day bounds. Require a start date; end date defaults to start date.
+      if start_date_str.present?
+        attrs[:starts_at] = Time.zone.parse(start_date_str).beginning_of_day
+        if end_date_str.present?
+          attrs[:ends_at] = Time.zone.parse(end_date_str).end_of_day
+        end
+      end
     else
-      attrs[:starts_at] = Time.zone.parse("#{start_date_str} #{start_time_str}") if start_date_str.present? && start_time_str.present?
-      attrs[:ends_at] = Time.zone.parse("#{end_date_str} #{end_time_str}") if end_date_str.present? && end_time_str.present?
+      # Timed: compose from date + time. End date defaults to start date; end time defaults to start time.
+      if start_date_str.present? && start_time_str.present?
+        attrs[:starts_at] = Time.zone.parse("#{start_date_str} #{start_time_str}")
+      end
+      if end_date_str.present? && end_time_str.present?
+        attrs[:ends_at] = Time.zone.parse("#{end_date_str} #{end_time_str}")
+      end
     end
+
     attrs.except(:starts_at_time, :ends_at_time, :all_day)
   end
 end

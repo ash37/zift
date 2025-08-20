@@ -6,10 +6,12 @@ export default class extends Controller {
   static values = {
     url: String,
     userId: String,
-    date: String
+    date: String,
+    enabled: Boolean
   }
 
   connect() {
+    if (!this.enabledValue) return;
     this.sortable = Sortable.create(this.element, {
       group: 'shared',
       animation: 150,
@@ -21,7 +23,8 @@ export default class extends Controller {
       
       // These functions are called when a drag starts and ends.
       onStart: this.onDragStart.bind(this),
-      onEnd: this.onDragEnd.bind(this)
+      onEnd: this.onDragEnd.bind(this),
+      onMove: this.onMove.bind(this)
     });
   }
 
@@ -32,10 +35,24 @@ export default class extends Controller {
     });
   }
 
+  onMove(evt) {
+    // Remove hover state from any previously hovered containers
+    document.querySelectorAll('.shifts-container.drop-hover').forEach(el => {
+      el.classList.remove('drop-hover');
+    });
+
+    // Add hover state to the current `to` container, if it is a valid drop target
+    if (evt.to && evt.to.classList && evt.to.classList.contains('shifts-container')) {
+      evt.to.classList.add('drop-hover');
+    }
+
+    return true; // allow move
+  }
+
   onDragEnd(event) {
     // When a drag ends, remove the highlight from all drop zones.
     document.querySelectorAll('.shifts-container').forEach(container => {
-      container.classList.remove('drop-target-active');
+      container.classList.remove('drop-target-active', 'drop-hover');
     });
 
     // --- The rest of the onEnd logic to update the server ---

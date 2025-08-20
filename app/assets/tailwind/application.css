@@ -1,2 +1,19 @@
 @import "tailwindcss";
 @config "../../../config/tailwind.config.js";
+
+@layer utilities {
+  /* Dragging visuals */
+  .sortable-drag-custom { @apply opacity-80; }
+  .sortable-ghost-custom { @apply opacity-40; }
+
+  /* All drop zones active during a drag */
+  .drop-target-active { @apply outline-dashed outline-2 outline-violet-500/60 bg-violet-500/5; }
+
+  /* The zone currently hovered by the dragged shift */
+  .shifts-container.drop-hover { @apply bg-violet-500/20; }
+
+  /* Optional UX: cursors to signal draggable vs locked */
+  .drag-enabled { @apply cursor-grab; }
+  .drag-enabled:active { @apply cursor-grabbing; }
+  .drag-disabled { @apply cursor-not-allowed opacity-60; }
+}

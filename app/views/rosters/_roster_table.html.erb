@@ -1,10 +1,10 @@
 <table class="w-full border-separate table-fixed" style="border-spacing: 0;">
   <thead>
     <tr>
-      <th class="w-48 text-left font-semibold p-2">EMPLOYEE</th>
+      <th class="w-25 text-left font-semibold py-1 px-2">EMPLOYEE</th>
       <% 7.times do |i| %>
         <% date = @roster.starts_on + i.days %>
-        <th class="text-center font-normal p-2">
+        <th class="text-center font-normal py-1 px-2">
           <p class="text-xs text-zinc-500"><%= date.strftime("%a").upcase %></p>
           <p class="text-lg font-bold <%= date == Date.today ? 'text-violet-600' : 'text-zinc-800' %>">
             <%= date.strftime("%d") %>
@@ -16,15 +16,15 @@
   <tbody>
     <% User.where.not(role: nil).each do |user| %>
       <tr class="align-top">
-        <td class="p-2 border-t border-zinc-200">
+        <td class="px-2 py-1 border border-zinc-200">
           <div class="font-semibold text-zinc-800"><%= user.first_name %><br><%= user.last_name %></div>
-          <div id="<%= dom_id(user, 'hours_total') %>">
+          <div id="<%= dom_id(@roster, "user_hours_#{user.id}") %>">
             <%= render 'rosters/user_hours', roster: @roster, user: user, selected_location_id: @selected_location_id %>
           </div>
         </td>
         <% 7.times do |i| %>
           <% date = @roster.starts_on + i.days %>
-          <td class="p-1 border-t border-zinc-200">
+          <td class="p-2 border border-zinc-200">
             <%= render 'rosters/cell_content', roster: @roster, user: user, date: date, selected_location_id: @selected_location_id %>
           </td>
         <% end %>
@@ -33,11 +33,13 @@
   </tbody>
   <tfoot>
     <tr class="text-center">
-      <td class="p-2 border-t-2 border-zinc-300 text-left text-sm font-semibold text-zinc-800">TOTALS</td>
+      <td class="px-2 py-1 border-t-2 border-zinc-300 text-left text-sm font-semibold text-zinc-800">TOTALS</td>
       <% 7.times do |i| %>
         <% date = @roster.starts_on + i.days %>
-        <td class="p-2 border-t-2 border-zinc-300">
-          <%= render 'rosters/daily_hours', roster: @roster, date: date, selected_location_id: @selected_location_id %>
+        <td class="px-2 py-1 border-t-2 border-zinc-300">
+          <div id="<%= dom_id(@roster, "daily_hours_#{date}") %>">
+            <%= render 'rosters/daily_hours', roster: @roster, date: date, selected_location_id: @selected_location_id %>
+          </div>
         </td>
       <% end %>
     </tr>

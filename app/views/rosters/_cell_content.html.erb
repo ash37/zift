@@ -12,24 +12,25 @@
                                 .where("starts_at <= ? AND ends_at >= ?", date.end_of_day, date.beginning_of_day)
                                 .first
 %>
-<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[100px] space-y-2"
+<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[100px]"
       data-controller="drag"
+      data-drag-enabled-value="<%= roster.draft? %>"
       data-drag-url-value="/shifts/:id"
       data-drag-user-id-value="<%= user.id %>"
       data-drag-date-value="<%= date.to_s %>">
 
   <%# FIX: Add conditional rendering based on the unavailability check %>
   <% if approved_unavailability %>
-    <div class="h-full p-2.5 rounded-lg bg-orange-200 text-orange-800 text-xs flex flex-col justify-center">
-      <p class="font-bold">
-        <%# Display time only if it's not an all-day request %>
+    <div class="relative w-full p-2 h-27 px-2 py-4 rounded-lg bg-orange-100 text-orange-500 opacity-50 text-xs flex flex-col justify-center text-center space-y-2">
+      <p class="font-semibold">UNAVAILABLE</p>
+      <p>
         <% unless approved_unavailability.starts_at == approved_unavailability.starts_at.beginning_of_day %>
           <%= format_shift_time(approved_unavailability.starts_at) %> - <%= format_shift_time(approved_unavailability.ends_at) %>
         <% else %>
           All Day
         <% end %>
       </p>
-      <p class="italic"><%= approved_unavailability.reason %></p>
+      <p><%= approved_unavailability.reason %></p>
     </div>
   <% else %>
     <%# --- This is the original logic for when the user IS available --- %>

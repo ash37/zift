@@ -1,8 +1,5 @@
 <% content_for :title, "Roster for #{@roster.starts_on.strftime('%B %d, %Y')}" %>
 
-
-<% content_for :title, "Roster for #{@roster.starts_on.strftime('%B %d, %Y')}" %>
-
 <div class="hidden sm:block">
   <%= render "sub_nav", selected_location_id: @selected_location_id %>
 </div>
@@ -11,26 +8,8 @@
   <%= render "mobile_sub_nav", selected_location_id: @selected_location_id %>
 </div>
 
-<%# We add a style block here to define the custom styles for drag-and-drop. %>
-<style>
-  /* Style for the placeholder that appears in the new list */
-  .sortable-ghost-custom {
-    @apply bg-violet-100/50 border-2 border-dashed border-violet-400 rounded-lg;
-  }
-  .sortable-ghost-custom > * {
-    @apply opacity-0;
-  }
 
-  /* Style for the item being dragged to give it a "lifted" effect */
-  .sortable-drag-custom {
-    @apply opacity-90 shadow-2xl scale-105;
-  }
-
-  /* Style for all potential drop zones when a drag is active */
-  .drop-target-active {
-    @apply bg-zinc-100 rounded-lg;
-  }
-</style>
+<%# Drag-and-drop styles are defined in Tailwind at app/assets/tailwind/application.css (@layer utilities). %>
 
 
 
