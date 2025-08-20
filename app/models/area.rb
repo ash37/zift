@@ -1,4 +1,6 @@
 class Area < ApplicationRecord
+  attribute :show_timesheet_notes, :boolean, default: true
+  attribute :show_timesheet_travel, :boolean, default: true
   belongs_to :location
   has_many :shifts
   has_many :area_shift_questions, dependent: :destroy

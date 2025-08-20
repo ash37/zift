@@ -103,6 +103,8 @@ class LocationsController < ApplicationController
           :export_code,
           :color,
           :xero_item_code,
+          :show_timesheet_notes,
+          :show_timesheet_travel,
           :_destroy,
           { shift_question_ids: [] }
         ]

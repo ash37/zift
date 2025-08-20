@@ -51,3 +51,21 @@
     <% end %>
   </div>
 </div>
+
+<div class="mt-4">
+  <h3 class="text-sm font-medium">Timesheet fields</h3>
+  <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <label class="inline-flex items-center gap-2">
+      <%= form.check_box :show_timesheet_notes,
+                         { checked: form.object.show_timesheet_notes.nil? ? true : form.object.show_timesheet_notes,
+                           class: "rounded" } %>
+      <span class="text-sm">Timesheet notes</span>
+    </label>
+    <label class="inline-flex items-center gap-2">
+      <%= form.check_box :show_timesheet_travel,
+                         { checked: form.object.show_timesheet_travel.nil? ? true : form.object.show_timesheet_travel,
+                           class: "rounded" } %>
+      <span class="text-sm">Timesheet travel</span>
+    </label>
+  </div>
+</div>

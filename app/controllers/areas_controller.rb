@@ -46,6 +46,8 @@ class AreasController < ApplicationController
       :export_code,
       :color,
       :xero_item_code,
+      :show_timesheet_notes,
+      :show_timesheet_travel,
       shift_question_ids: []
     )
   end

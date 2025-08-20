@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_19_093919) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_20_064202) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_19_093919) do
     t.datetime "updated_at", null: false
     t.datetime "archived_at"
     t.string "xero_item_code"
+    t.boolean "show_timesheet_notes", default: true, null: false
+    t.boolean "show_timesheet_travel", default: true, null: false
     t.index ["location_id"], name: "index_areas_on_location_id"
     t.index ["xero_item_code"], name: "index_areas_on_xero_item_code"
   end
