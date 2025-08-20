@@ -7,46 +7,55 @@
 
     <div class="grid w-full grid-cols-1 gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <% @timesheets.each do |timesheet| %>
-        <div class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl dark:bg-gray-800">
-          <div class="flex items-center justify-between">
-            <h1 class="text-lg font-semibold text-gray-800 dark:text-white"><%= timesheet.shift.location.name %></h1>
-            <span class="px-3 py-1 text-xs text-violet-800 uppercase bg-violet-200 rounded-full dark:bg-violet-300 dark:text-violet-900"><%= timesheet.shift.start_time.strftime("%a, %d %b") %></span>
-          </div>
-
-          <div>
-            
-            <div class="flex items-center mt-2 bg-violet-100 rounded-3xl p-1">
-              <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-violet-100 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h2 class="ml-2 text-gray-600 text-sm"><%= timesheet.user.name %></h2>
+        <% if timesheet.notes.present? || timesheet.shift_answers.any? %>
+          <div class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl dark:bg-gray-800">
+            <div class="flex items-center justify-between">
+              <h1 class="text-lg font-semibold text-gray-800 dark:text-white"><%= timesheet.shift.location.name %></h1>
+              <span class="px-3 py-1 text-xs text-violet-800 uppercase bg-violet-200 rounded-full dark:bg-violet-300 dark:text-violet-900"><%= timesheet.shift.start_time.strftime("%a, %d %b") %></span>
             </div>
-            <p class="ml-4 mt-2 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.shift.area&.name %>
-            <% if timesheet.shift.note.present? %>
-              : <em><%= timesheet.shift.note %></em></p>
-            <% end %>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.notes %></p>
-            <% if timesheet.shift_answers.any? %>
-              <div class="mt-2 space-y-2">
-                <% timesheet.shift_answers.each do |answer| %>
-                  <div class="bg-gray-50 rounded-xl p-2">
-                    <p class="text-xs text-gray-500">
-                      <%= answer.shift_question&.question_text || 'Question' %>
-                    </p>
-                    <p class="text-sm text-gray-800">
-                      <%= answer.answer_text %>
-                    </p>
-                  </div>
-                <% end %>
+
+            <div>
+              <div class="flex items-center mt-2 bg-violet-100 rounded-3xl p-1">
+                <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-violet-100 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h2 class="ml-2 text-gray-600 text-sm"><%= timesheet.user.name %></h2>
               </div>
-            <% end %>
-            <% if timesheet.travel.present? && timesheet.travel > 0 %>
-              <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><strong>Travel on this shift:</strong> <%= timesheet.travel %>km</p>
-            <% end %>
+
+              <p class="ml-4 mt-2 text-sm text-gray-600 dark:text-gray-300">
+                <%= timesheet.shift.area&.name %>
+                <% if timesheet.shift.note.present? %>
+                  : <em><%= timesheet.shift.note %></em>
+                <% end %>
+              </p>
+
+              <% if timesheet.notes.present? %>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.notes %></p>
+              <% end %>
+
+              <% if timesheet.shift_answers.any? %>
+                <div class="mt-2 space-y-2">
+                  <% timesheet.shift_answers.each do |answer| %>
+                    <div class="bg-gray-50 rounded-xl p-2">
+                      <p class="text-xs text-gray-500">
+                        <%= answer.shift_question&.question_text || 'Question' %>
+                      </p>
+                      <p class="text-sm text-gray-800">
+                        <%= answer.answer_text %>
+                      </p>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <% if timesheet.travel.present? && timesheet.travel > 0 %>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><strong>Travel on this shift:</strong> <%= timesheet.travel %>km</p>
+              <% end %>
+            </div>
           </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>

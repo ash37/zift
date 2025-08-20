@@ -213,6 +213,7 @@ class TimesheetsController < ApplicationController
     end
 
     def clock_off_params
+      params[:timesheet]&.delete(:_present)
       params.require(:timesheet).permit(
         :notes,
         :travel,
