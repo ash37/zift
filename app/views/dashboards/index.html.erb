@@ -47,12 +47,12 @@
                 <% end %>
                 <div>
                   <p class="text-2xl font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
-                  <p class="text-sm text-gray-600"><%= shift.location.name %></p>
+                  <p class="text-sm text-violet-700"><%= shift.location.name %></p>
                   <% if shift.area.present? %>
-                    <p class="text-sm text-violet-700"><%= shift.area.name %></p>
+                    <p class="text-sm text-gray-500"><%= shift.area.name %></p>
                   <% end %>
                   <% if shift.note.present? %>
-                    <p class="text-sm text-gray-600"><em><%= shift.note %></em></p>
+                    <p class="text-sm text-violet-700"><em><%= shift.note %></em></p>
                   <% end %>
                 </div>
               </div>

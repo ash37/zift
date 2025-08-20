@@ -15,8 +15,11 @@
     <div>
       <%= f.label :question_type, class: "block text-sm font-medium text-gray-700" %>
       <%= f.select :question_type,
-            [["Pre shift", ShiftQuestion::QUESTION_TYPES[:PRE_SHIFT]],
-             ["Post shift", ShiftQuestion::QUESTION_TYPES[:POST_SHIFT]]],
+            [
+              ["Pre shift", ShiftQuestion::QUESTION_TYPES[:PRE_SHIFT]],
+              ["Post shift", ShiftQuestion::QUESTION_TYPES[:POST_SHIFT]],
+              ["Post shift (Yes/No)", ShiftQuestion::QUESTION_TYPES[:POST_SHIFT_YN]]
+            ],
             {},
             class: "mt-1 block w-full rounded border-gray-300  focus:border-violet-500 focus:ring-violet-500 px-4 py-2 bg-gray-100" %>
     </div>

@@ -12,9 +12,12 @@
           <%= form.number_field :travel, value: nil, placeholder: "10", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
         </div>
       </div>
-      <% post_questions = @timesheet.unanswered_questions(
-           question_type: ShiftQuestion::QUESTION_TYPES[:POST_SHIFT]
-         ) %>
+      <%
+post_questions = [
+  *@timesheet.unanswered_questions(question_type: ShiftQuestion::QUESTION_TYPES[:POST_SHIFT]),
+  *@timesheet.unanswered_questions(question_type: ShiftQuestion::QUESTION_TYPES[:POST_SHIFT_YN])
+].uniq { |q| q.id }
+%>
 
       <% if post_questions.any? %>
         <div class="mt-6 border-t pt-4">
@@ -27,7 +30,7 @@
                 <% if q.is_mandatory %><span class="ml-2 text-xs">• mandatory</span><% end %>
               </label>
 
-              <% if q.question_text.to_s.strip.downcase == 'did an incident occur on this shift' %>
+              <% if q.question_type == ShiftQuestion::QUESTION_TYPES[:POST_SHIFT_YN] %>
                 <div x-data="{ val: 'no', text: '' }">
                   <!-- Submit nested attributes ONLY when toggled YES -->
                   <input type="hidden"
@@ -66,7 +69,7 @@
                     <template x-if="val==='yes'">
                       <textarea x-model="text"
                                 class="block w-full px-3 py-2 rounded bg-gray-100 focus:outline-none focus:ring focus:ring-violet-300"
-                                placeholder="Describe the incident..."
+                                placeholder="Add additional information..."
                                 <%= 'required' if q.is_mandatory %>></textarea>
                     </template>
                   </div>

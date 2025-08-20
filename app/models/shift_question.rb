@@ -1,8 +1,9 @@
 class ShiftQuestion < ApplicationRecord
   # Constants (no enums)
   QUESTION_TYPES = {
-    PRE_SHIFT:  "pre_shift",
-    POST_SHIFT: "post_shift"
+    PRE_SHIFT:     "pre_shift",
+    POST_SHIFT:    "post_shift",
+    POST_SHIFT_YN: "post_shift_yn"
   }.freeze
 
   # Associations
@@ -21,6 +22,7 @@ class ShiftQuestion < ApplicationRecord
   scope :ordered,   -> { order(:display_order, :id) }
   scope :pre_shift, -> { where(question_type: QUESTION_TYPES[:PRE_SHIFT]) }
   scope :post_shift, -> { where(question_type: QUESTION_TYPES[:POST_SHIFT]) }
+  scope :post_shift_yn, -> { where(question_type: QUESTION_TYPES[:POST_SHIFT_YN]) }
 
   # Helper to fetch questions for a given area
   def self.for_area(area)
