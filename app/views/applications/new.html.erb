@@ -15,8 +15,17 @@
       </p>
     </div>
 
-    <%= form_with(model: @user, url: applications_path, method: :post, html: { class: "space-y-6" }) do |form| %>
-      <%= render "devise/shared/error_messages", resource: @user %>
+    <%= form_with(model: @application, scope: :user, url: applications_path, method: :post, html: { class: "space-y-6" }) do |form| %>
+      <% if @application.errors.any? %>
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
+          <p class="font-semibold"><%= pluralize(@application.errors.count, "error") %> prevented this application from being submitted:</p>
+          <ul class="mt-2 list-disc pl-5">
+            <% @application.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
 
       <!-- Name -->
       <div>
@@ -39,7 +48,7 @@
       <!-- Date of Birth (type into visible field; hidden native input posts ISO yyyy-mm-dd) -->
 <div
   x-data="{
-    iso: '<%= @user.date_of_birth.present? ? @user.date_of_birth.strftime('%Y-%m-%d') : '' %>',
+    iso: '<%= @application.date_of_birth.present? ? @application.date_of_birth.strftime('%Y-%m-%d') : '' %>',
     display: '',
     err: '',
     pad(n){ return String(n).padStart(2,'0') },
@@ -86,7 +95,7 @@
 
   <!-- Native date input: truly hidden; value kept in ISO via x-model -->
   <%= form.date_field :date_of_birth,
-        value: (@user.date_of_birth&.strftime('%Y-%m-%d')),
+        value: (@application.date_of_birth&.strftime('%Y-%m-%d')),
         class: "hidden",
         "x-model" => "iso" %>
 </div>
@@ -105,7 +114,7 @@
       </div>
 
       <!-- Obtained Screening (YES/NO segmented) -->
-      <div x-data="{ val: '<%= @user.obtained_screening.to_s %>' }" class="space-y-2">
+      <div x-data="{ val: '<%= @application.obtained_screening.to_s %>' }" class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">Obtained screening</label>
         <input type="hidden" name="user[obtained_screening]" :value="val">
         <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
@@ -121,7 +130,7 @@
       </div>
 
       <!-- Disability Experience (YES/NO segmented) -->
-      <div x-data="{ val: '<%= @user.disability_experience.to_s %>' }" class="space-y-2">
+      <div x-data="{ val: '<%= @application.disability_experience.to_s %>' }" class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">Disability experience</label>
         <input type="hidden" name="user[disability_experience]" :value="val">
         <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
@@ -135,7 +144,7 @@
       </div>
 
       <!-- Other Employment (YES/NO segmented) -->
-      <div x-data="{ val: '<%= @user.other_employment.to_s %>' }" class="space-y-2">
+      <div x-data="{ val: '<%= @application.other_employment.to_s %>' }" class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">Other employment</label>
         <input type="hidden" name="user[other_employment]" :value="val">
         <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
@@ -149,7 +158,7 @@
       </div>
 
       <!-- Licence (YES/NO segmented) -->
-      <div x-data="{ val: '<%= @user.licence.to_s %>' }" class="space-y-2">
+      <div x-data="{ val: '<%= @application.licence.to_s %>' }" class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">Licence</label>
         <input type="hidden" name="user[licence]" :value="val">
         <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">

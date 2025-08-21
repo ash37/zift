@@ -95,5 +95,6 @@ Rails.application.routes.draw do
   end
 
   # Health check
+  get "notifications", to: "notifications#index", as: :notifications
   get "up" => "rails/health#show", as: :rails_health_check
 end

@@ -2,17 +2,24 @@ class ApplicationsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :new, :create, :success ]
 
   def new
-    @user = User.new
+    @application = User.new
   end
 
   def create
-    @user = User.new(application_params)
-    @user.status = User::STATUSES[:applicant]
+    @application = User.new(application_params)
+    if @application.password.blank?
+      generated_password = Devise.friendly_token.first(20)
+      @application.password = generated_password
+      @application.password_confirmation = generated_password
+    end
+    if defined?(User::STATUSES) && User::STATUSES.respond_to?(:[]) && User::STATUSES[:applicant]
+      @application.status = User::STATUSES[:applicant]
+    end
 
-    if @user.save
+    if @application.save
       redirect_to success_applications_path
     else
-      render :new, status: :unprocessable_content
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -22,6 +29,9 @@ class ApplicationsController < ApplicationController
 
   private
 
+  # NOTE: The public form currently posts under params[:user]. We accept that here
+  # to avoid changing the view right now. If you later switch the form builder to
+  # `model: @application`, also update this to `params.require(:application)`.
   def application_params
     params.require(:user).permit(
       :name, :email, :phone, :obtained_screening, :date_of_birth,

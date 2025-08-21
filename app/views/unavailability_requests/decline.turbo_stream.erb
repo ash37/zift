@@ -1,0 +1,2 @@
+<%= turbo_stream.remove view_context.dom_id(@unavailability_request) %>
+<%= turbo_stream.replace "pending_unavailability_count", partial: "notifications/badge" %>

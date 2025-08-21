@@ -1,0 +1,7 @@
+<%# Renders the red badge with the current pending count. Empty when zero. %>
+<% if pending_unavailability_count > 0 %>
+  <span class="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-semibold text-white shadow">
+    <%= pending_unavailability_count %>
+    <span class="sr-only">pending notifications</span>
+  </span>
+<% end %>

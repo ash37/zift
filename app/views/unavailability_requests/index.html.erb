@@ -27,7 +27,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <% @unavailability_requests.each do |unavailability_request| %>
-                <tr data-controller="clickable-row" data-action="click->clickable-row#visit" data-clickable-row-url-value="<%= unavailability_request_path(unavailability_request) %>">
+                <tr data-controller="clickable-row" data-action="click->clickable-row#visit" data-clickable-row-url-value="<%= edit_unavailability_request_path(unavailability_request) %>">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= unavailability_request.user.name %></td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <% if unavailability_request.starts_at.to_date == unavailability_request.ends_at.to_date %>

@@ -47,12 +47,32 @@ class UnavailabilityRequestsController < ApplicationController
 
   def approve
     @unavailability_request.update(status: UnavailabilityRequest::STATUSES[:approved])
-    redirect_to unavailability_requests_path, notice: "Request approved."
+    respond_to do |format|
+      format.html do
+        redirect_to(params[:from] == "notifications" ? notifications_path : unavailability_requests_path, notice: "Request approved.")
+      end
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.remove(view_context.dom_id(@unavailability_request, :row)),
+          turbo_stream.replace("pending_unavailability_count", partial: "notifications/badge")
+        ]
+      end
+    end
   end
 
   def decline
     @unavailability_request.update(status: UnavailabilityRequest::STATUSES[:declined])
-    redirect_to unavailability_requests_path, notice: "Request declined."
+    respond_to do |format|
+      format.html do
+        redirect_to(params[:from] == "notifications" ? notifications_path : unavailability_requests_path, notice: "Request declined.")
+      end
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.remove(view_context.dom_id(@unavailability_request, :row)),
+          turbo_stream.replace("pending_unavailability_count", partial: "notifications/badge")
+        ]
+      end
+    end
   end
 
   private
