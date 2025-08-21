@@ -1,7 +1,7 @@
 # app/controllers/unavailability_requests_controller.rb
 class UnavailabilityRequestsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_unavailability_request, only: %i[ show edit update approve decline ]
+  before_action :set_unavailability_request, only: %i[ show edit update approve decline destroy ]
 
   def index
     if current_user.admin? || current_user.manager?
@@ -40,6 +40,11 @@ class UnavailabilityRequestsController < ApplicationController
     end
   end
 
+  def destroy
+    @unavailability_request.destroy
+    redirect_to unavailability_requests_path, notice: "Unavailability request was successfully deleted."
+  end
+
   def approve
     @unavailability_request.update(status: UnavailabilityRequest::STATUSES[:approved])
     redirect_to unavailability_requests_path, notice: "Request approved."
@@ -57,7 +62,7 @@ class UnavailabilityRequestsController < ApplicationController
   end
 
   def unavailability_request_params
-    params.require(:unavailability_request).permit(:reason, :starts_at, :ends_at, :starts_at_time, :ends_at_time, :all_day)
+    params.require(:unavailability_request).permit(:reason, :starts_at, :ends_at, :starts_at_time, :ends_at_time, :all_day, :repeats_weekly)
   end
 
   def processed_unavailability_params

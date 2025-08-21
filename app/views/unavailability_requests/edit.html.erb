@@ -1,3 +1,10 @@
 <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg mt-10">
   <%= render "form", unavailability_request: @unavailability_request %>
 </div>
+<div class="mt-6">
+  <%= button_to "Delete Unavailability Request",
+                @unavailability_request,
+                method: :delete,
+                data: { confirm: "Are you sure you want to delete this unavailability request?" },
+                class: "bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
+</div>

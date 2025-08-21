@@ -1,4 +1,3 @@
-<%# app/views/rosters/_cell_content.html.erb %>
 <%
   # Find any shifts for this user on this date
   shifts = roster.shifts.where(user: user, start_time: date.all_day)
@@ -6,11 +5,26 @@
     shifts = shifts.where(location_id: selected_location_id)
   end
 
-  # FIX: Check for an approved unavailability request that overlaps with this day
+  repeating_weekday_match = false
+
+  # FIX: Check for an approved unavailability request that overlaps with this day,
+  # and if none, look for a weekly repeating request for the same weekday
   approved_unavailability = user.unavailability_requests
                                 .where(status: UnavailabilityRequest::STATUSES[:approved])
                                 .where("starts_at <= ? AND ends_at >= ?", date.end_of_day, date.beginning_of_day)
                                 .first
+
+  if approved_unavailability.nil?
+    repeating_candidates = user.unavailability_requests
+                               .where(status: UnavailabilityRequest::STATUSES[:approved])
+                               .where(repeats_weekly: true)
+
+    match = repeating_candidates.detect { |req| req.starts_at.wday == date.wday }
+    if match
+      approved_unavailability = match
+      repeating_weekday_match = true
+    end
+  end
 %>
 <div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[80px]"
       data-controller="drag"
@@ -22,6 +36,13 @@
   <%# FIX: Add conditional rendering based on the unavailability check %>
   <% if approved_unavailability %>
     <div class="relative w-full border-2 p-3 rounded-2xl bg-orange-100 text-orange-500 opacity-50 text-xs flex flex-col justify-center text-center space-y-1">
+      <% if repeating_weekday_match %>
+        <span class="absolute top-1 right-1 text-orange-400" title="Repeats weekly">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+          </svg>
+        </span>
+      <% end %>
       <p class="font-semibold">UNAVAILABLE</p>
       <p>
         <% unless approved_unavailability.starts_at == approved_unavailability.starts_at.beginning_of_day %>

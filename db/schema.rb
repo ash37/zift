@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_20_064202) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_21_052812) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -211,6 +211,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_20_064202) do
     t.datetime "updated_at", null: false
     t.string "frequency"
     t.integer "repeat_day"
+    t.boolean "repeats_weekly", default: false, null: false
+    t.index ["repeats_weekly"], name: "index_unavailability_requests_on_repeats_weekly"
     t.index ["user_id"], name: "index_unavailability_requests_on_user_id"
   end
 
