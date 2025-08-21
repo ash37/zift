@@ -12,7 +12,7 @@
                                 .where("starts_at <= ? AND ends_at >= ?", date.end_of_day, date.beginning_of_day)
                                 .first
 %>
-<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[100px]"
+<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[80px]"
       data-controller="drag"
       data-drag-enabled-value="<%= roster.draft? %>"
       data-drag-url-value="/shifts/:id"
@@ -21,7 +21,7 @@
 
   <%# FIX: Add conditional rendering based on the unavailability check %>
   <% if approved_unavailability %>
-    <div class="relative w-full p-2 h-27 px-2 py-4 rounded-lg bg-orange-100 text-orange-500 opacity-50 text-xs flex flex-col justify-center text-center space-y-2">
+    <div class="relative w-full border-2 p-3 rounded-2xl bg-orange-100 text-orange-500 opacity-50 text-xs flex flex-col justify-center text-center space-y-1">
       <p class="font-semibold">UNAVAILABLE</p>
       <p>
         <% unless approved_unavailability.starts_at == approved_unavailability.starts_at.beginning_of_day %>
@@ -45,7 +45,7 @@
                     class: "block w-full h-full text-center group",
                     aria_label: "Add shift for #{user.name} on #{date.strftime('%A, %B %d')}" do %>
           <div class="flex items-center justify-center h-full">
-            <span class="inline-block text-zinc-300 transition-transform duration-200 group-hover:text-violet-500 group-hover:scale-125">
+            <span class="mt-8 inline-block text-zinc-300 transition-transform duration-200 group-hover:text-violet-500 group-hover:scale-125">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
               </svg>

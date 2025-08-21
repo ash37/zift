@@ -33,6 +33,10 @@ export default class extends Controller {
     document.querySelectorAll('.shifts-container').forEach(container => {
       container.classList.add('drop-target-active');
     });
+    // Add a subtle background to the item being dragged for visibility
+    if (event.item) {
+      event.item.classList.add('bg-violet-100');
+    }
   }
 
   onMove(evt) {
@@ -54,6 +58,10 @@ export default class extends Controller {
     document.querySelectorAll('.shifts-container').forEach(container => {
       container.classList.remove('drop-target-active', 'drop-hover');
     });
+    // Remove the temporary drag background class
+    if (event.item) {
+      event.item.classList.remove('bg-violet-100');
+    }
 
     // --- The rest of the onEnd logic to update the server ---
     const shiftId = event.item.dataset.id;

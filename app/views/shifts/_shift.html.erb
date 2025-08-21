@@ -3,7 +3,7 @@
   roster_is_draft = shift.roster.draft?
   show_location_name = selected_location_id.blank?
   # Base classes for the main container
-  main_div_classes = "p-1 rounded-lg relative flex flex-col justify-between h-24"
+  main_div_classes = "p-1 rounded-2xl relative flex flex-col justify-between"
   main_div_style = ""
 
   # Classes and styles for PUBLISHED shifts
@@ -11,11 +11,12 @@
     main_div_style = "background-color: #{area.color};" if area&.color.present?
     main_div_classes += " #{area&.color.blank? ? 'bg-violet-500' : ''}"
     main_div_classes += (area&.color == '#ffffff') ? ' text-zinc-800' : ' text-white'
+    
   end
 
   # Classes and styles for DRAFT shifts
   if roster_is_draft
-    main_div_classes += " border-2 border-dashed bg-white"
+    main_div_classes += "border-2 border-dashed bg-white"
     main_div_style = "border-color: #{area&.color || '#bc15cbff'};" # Fallback to gray border
     main_div_classes += " text-zinc-800" # Text is always dark for drafts
   end
@@ -32,26 +33,27 @@
     
     <div class="flex justify-between items-start">
       <div>
-        <p class="text-sm font-bold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+        <p class="text-sm font-bold ml-2"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
       </div>
       <div class="flex items-center justify-between">
       <% duration_in_hours = (shift.end_time - shift.start_time) / 3600.0 %>
-      <span class="<%= area&.color.present? ? child_bg_class : default_child_bg_class %> px-2 py-0.5 rounded-3xl text-xs font-semibold"><%= number_with_precision(duration_in_hours, precision: 1) %>h</span>
+      <span class="<%= area&.color.present? ? child_bg_class : default_child_bg_class %> px-2 py-0.5 rounded-3xl text-xs font-semibold">
+        <%= number_with_precision(duration_in_hours, precision: (duration_in_hours % 1 == 0 ? 0 : 1)) %>h
+      </span>
     </div>
       
     </div>
     
     
     <div class="leading-none space-y-0">
-      <p class="m-0 text-xs font-light "><%= area&.name %></p>
-      <% if shift.note.present? %>
-        <p class="m-0 text-xs font-light italic"><%= shift.note %></p>
-      <% else %>
-        <p class="m-0 text-xs font-light italic invisible">&nbsp;</p>
-      <% end %>
-      <% if show_location_name %>
-        <div class="flex items-center justify-between">
-          <p class="m-0 text-xs font-light "><%= shift.location&.name %></p>
+      <p class="ml-2 text-xs font-light "><%= area&.name %></p>
+      <div class="flex items-center justify-between ml-2">
+        <% if shift.note.present? %>
+          <p class="m-2 text-xs font-light italic"><%= shift.note %></p>
+        <% else %>
+          <p class="m-2 text-xs font-light italic invisible">&nbsp;</p>
+        <% end %>
+        <% if roster_is_draft %>
           <div class="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
             <%= link_to edit_shift_path(shift, location_id: selected_location_id), data: { turbo_frame: "assign_shift_modal" } do %>
               <span class="inline-block p-1 rounded-full <%= area&.color.present? ? edit_icon_bg_class : default_edit_icon_bg_class %>">
@@ -59,7 +61,19 @@
               </span>
             <% end %>
           </div>
-        </div>
+        <% else %>
+          <div class="ml-2 invisible">
+            <span class="inline-block p-1 rounded-full <%= default_edit_icon_bg_class %>">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </span>
+          </div>
+        <% end %>
+      </div>
+
+      <% if show_location_name %>
+        <p class="m-0 text-xs font-light ml-2"><%= shift.location&.name %></p>
+      <% else %>
+        <p class="m-0 text-xs font-light ml-2 invisible">&nbsp;</p>
       <% end %>
     </div>
   </div>
