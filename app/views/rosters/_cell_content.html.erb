@@ -26,53 +26,73 @@
     end
   end
 %>
-<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container h-full min-h-[80px]"
+<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>" class="shifts-container relative h-full min-h-[80px] <%= 'bg-white rounded-2xl' if approved_unavailability && shifts.blank? %>"
       data-controller="drag"
       data-drag-enabled-value="<%= roster.draft? %>"
       data-drag-url-value="/shifts/:id"
       data-drag-user-id-value="<%= user.id %>"
       data-drag-date-value="<%= date.to_s %>">
 
-  <%# FIX: Add conditional rendering based on the unavailability check %>
-  <% if approved_unavailability %>
-    <div class="relative w-full border-2 p-3 rounded-2xl bg-orange-100 text-orange-500 opacity-50 text-xs flex flex-col justify-center text-center space-y-1">
-      <% if repeating_weekday_match %>
-        <span class="absolute top-1 right-1 text-orange-400" title="Repeats weekly">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
-          </svg>
-        </span>
-      <% end %>
-      <p class="font-semibold">UNAVAILABLE</p>
-      <p>
-        <% unless approved_unavailability.starts_at == approved_unavailability.starts_at.beginning_of_day %>
-          <%= format_shift_time(approved_unavailability.starts_at) %> - <%= format_shift_time(approved_unavailability.ends_at) %>
-        <% else %>
-          All Day
-        <% end %>
-      </p>
-      <p><%= approved_unavailability.reason %></p>
-    </div>
-  <% else %>
-    <%# --- This is the original logic for when the user IS available --- %>
-    <% if shifts.any? %>
-      <% shifts.each do |shift| %>
-        <%= render "shifts/shift", shift: shift, selected_location_id: selected_location_id %>
-      <% end %>
-    <% else %>
-      <% if roster.draft? %>
-        <%= link_to new_shift_path(user_id: user.id, roster_id: roster.id, date: date, location_id: selected_location_id),
-                    data: { turbo_frame: "assign_shift_modal" },
-                    class: "block w-full h-full text-center group",
-                    aria_label: "Add shift for #{user.name} on #{date.strftime('%A, %B %d')}" do %>
-          <div class="flex items-center justify-center h-full">
-            <span class="mt-8 inline-block text-zinc-300 transition-transform duration-200 group-hover:text-violet-500 group-hover:scale-125">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+  <% if approved_unavailability && shifts.blank? && roster.draft? %>
+    <% ua_day_start = approved_unavailability.starts_at %>
+    <% ua_day_end   = approved_unavailability.ends_at %>
+    <% if repeating_weekday_match %>
+      <% ua_day_start = ua_day_start.in_time_zone.change(year: date.year, month: date.month, day: date.day) %>
+      <% ua_day_end   = ua_day_end.in_time_zone.change(year: date.year, month: date.month, day: date.day) %>
+    <% end %>
+    <% ua_text = display_range_or_allday(ua_day_start, ua_day_end) %>
+    <div class="absolute inset-0 flex items-center justify-center z-10 text-center">
+      <span class="text-xs text-orange-500 flex flex-col items-center">
+        <p class="">UNAVAILABLE</p>
+        <p class=""><%= ua_text %></p>
+        
+          <% if repeating_weekday_match %>
+            <span class="ml-1 text-orange-500">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
               </svg>
             </span>
-          </div>
+          <% else %>
+            <p class=""><%= approved_unavailability.reason.presence || '—' %></p>
+          <% end %>
+        
+      </span>
+    </div>
+  <% end %>
+
+  <% if shifts.any? %>
+    <% shifts.each do |shift| %>
+      <% overlap_payload = nil %>
+      <% if approved_unavailability %>
+        <% ua_start = approved_unavailability.starts_at %>
+        <% ua_end   = approved_unavailability.ends_at %>
+        <% if repeating_weekday_match %>
+          <% ua_start = ua_start.in_time_zone.change(year: date.year, month: date.month, day: date.day) %>
+          <% ua_end   = ua_end.in_time_zone.change(year: date.year, month: date.month, day: date.day) %>
         <% end %>
+        <% if ua_start < shift.end_time && ua_end > shift.start_time %>
+          <% overlap_payload = { starts_at: ua_start, ends_at: ua_end, repeating: repeating_weekday_match } %>
+        <% end %>
+      <% end %>
+
+      <%= render "shifts/shift",
+                 shift: shift,
+                 selected_location_id: selected_location_id,
+                 unavailability_overlap: overlap_payload %>
+    <% end %>
+  <% else %>
+    <% if roster.draft? %>
+      <%= link_to new_shift_path(user_id: user.id, roster_id: roster.id, date: date, location_id: selected_location_id),
+                  data: { turbo_frame: "assign_shift_modal" },
+                  class: "block w-full h-full text-center group",
+                  aria_label: "Add shift for #{user.name} on #{date.strftime('%A, %B %d')}" do %>
+        <div class="flex items-center justify-center h-full">
+          <span class="mt-8 inline-block transition-transform duration-200 group-hover:text-violet-500 group-hover:scale-125 <%= approved_unavailability.present? ? 'text-white' : 'text-zinc-300' %>">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </span>
+        </div>
       <% end %>
     <% end %>
   <% end %>

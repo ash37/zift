@@ -30,6 +30,16 @@
 
 <%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: "#{roster_is_draft ? 'drag-enabled' : 'drag-disabled'} relative group h-full" do %>
   <div style="<%= main_div_style %>" class="<%= main_div_classes %>">
+    <% if local_assigns[:unavailability_overlap].present? %>
+      <% range_text = display_range_or_allday(unavailability_overlap[:starts_at], unavailability_overlap[:ends_at]) %>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-500" title="<%= range_text %>">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </span>
+      </div>
+    <% end %>
     
     <div class="flex justify-between items-start">
       <div>

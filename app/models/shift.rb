@@ -83,20 +83,22 @@ class Shift < ApplicationRecord
     end
   end
 
-  # This is the key validation method you requested. It is correct.
+  # Previously, this validation added an error and prevented saving when the user
+  # had overlapping approved unavailability. We now allow saving and surface
+  # the conflict in the UI (red badge on the shift) instead.
   def user_is_available
     return if user.blank? || start_time.blank? || end_time.blank?
 
-    # 1. Finds unavailability requests for the correct user that are 'approved'
-    unavailable = user.unavailability_requests.where(status: UnavailabilityRequest::STATUSES[:approved])
-                      # 2. Checks if the request period overlaps with the new shift's time
-                      .where("starts_at < ? AND ends_at > ?", end_time, start_time)
-                      .exists?
+    conflict = user.unavailability_requests
+                   .where(status: UnavailabilityRequest::STATUSES[:approved])
+                   .where("starts_at < ? AND ends_at > ?", end_time, start_time)
+                   .exists?
 
-    # 3. If an overlapping approved request exists, it adds an error and prevents saving
-    if unavailable
-      errors.add(:base, "User has an approved unavailability request during this time.")
-    end
+    # Expose a non-persistent flag for callers if needed (does not block save)
+    @unavailability_conflict = true if conflict
+
+    # Do NOT add errors; allow the record to save. UI indicates conflict.
+    true
   end
 
   def duration_within_limits
