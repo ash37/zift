@@ -82,15 +82,25 @@ test:
 # Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
 # for a full overview on how database connection configuration can be specified.
 #
+
 production:
-  primary:
+  primary: &primary_production
+    adapter: postgresql
     url: <%= ENV["DATABASE_URL"] %>
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+  # Optional separate DBs; fall back to DATABASE_URL if not provided
   cache:
-    url: <%= ENV["CACHE_DATABASE_URL"] %>
+    <<: *primary_production
+    url: <%= ENV.fetch("CACHE_DATABASE_URL", ENV["DATABASE_URL"]) %>
     migrations_paths: db/cache_migrate
+
   queue:
-    url: <%= ENV["QUEUE_DATABASE_URL"] %>
+    <<: *primary_production
+    url: <%= ENV.fetch("QUEUE_DATABASE_URL", ENV["DATABASE_URL"]) %>
     migrations_paths: db/queue_migrate
+
   cable:
-    url: <%= ENV["CABLE_DATABASE_URL"] %>
+    <<: *primary_production
+    url: <%= ENV.fetch("CABLE_DATABASE_URL", ENV["DATABASE_URL"]) %>
     migrations_paths: db/cable_migrate
