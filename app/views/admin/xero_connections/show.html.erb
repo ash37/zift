@@ -1,8 +1,8 @@
 <div class="container mx-auto mt-10 px-4 py-10">
-  <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
+  <div class="bg-white p-4 rounded-3xl mb-6">
     <div class="flex flex-col sm:flex-row justify-between sm:items-center">
       <div>
-        <%= link_to "Shift Questions", shift_questions_path, class: "px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+        <%= link_to "Shift Questions", shift_questions_path, class: "px-4 py-2 bg-gray-100 rounded-3xl text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
       </div>
     </div>
   </div>
@@ -40,7 +40,7 @@
 
   <% if @connection %>
     <div class="bg-white p-6 rounded-3xl">
-      <p class="text-lg font-semibold text-green-600">Payroll Set up</p>
+      <p class="text-lg font-semibold">Payroll Set up</p>
       <p class="mt-2 text-gray-700">Get employees from Xero then link them. Get pay rate items from Xero then link them.</p>
       <div class="mt-4 flex flex-wrap gap-4">
         <%= button_to "Sync Employees", admin_xero_connection_path, params: { sync: 'employees' }, method: :patch, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-3xl" %>
@@ -50,7 +50,7 @@
       </div>
     </div>
     <div class="bg-white p-6 rounded-3xl mt-6">
-      <p class="text-lg font-semibold text-green-600">Invoice Set up</p>
+      <p class="text-lg font-semibold">Invoice Set up</p>
       <p class="mt-2 text-gray-700">Get invoice line items from Xero then link them with each clients shift area.</p>
       <div class="mt-4 flex flex-wrap gap-4">
         <%= button_to "Sync Invoice Items", sync_admin_xero_items_path, method: :post, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-3xl" %>
@@ -58,7 +58,7 @@
       </div>
     </div>
     <div class="bg-white p-6 rounded-3xl mt-6">
-      <p class="text-lg font-semibold text-green-600">Connected to Xero</p>
+      <p class="text-lg font-semibold">Connected to Xero</p>
       <p class="mt-2 text-gray-700">Tenant ID: <%= @connection.tenant_id %></p>
       <div class="mt-4 flex flex-wrap gap-4">
         <%= button_to "Disconnect from Xero", admin_xero_connection_path, method: :delete, data: { confirm: "Are you sure?" }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-3xl" %>
