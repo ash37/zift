@@ -1,3 +1,141 @@
-<h1>Welcome to Qcare!</h1>
-<p>You have been invited to join the team. Please click the link below to set up your account and create a password:</p>
-<%= link_to 'Set Up My Account', @onboarding_url %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Employment Offer & Next Steps</title>
+  <style type="text/css">
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f4f4f4; }
+
+    @media screen and (max-width: 600px) {
+      .email-container { width: 100% !important; margin: auto !important; }
+      .fluid { max-width: 100% !important; height: auto !important; margin-left: auto !important; margin-right: auto !important; }
+      .stack-column, .stack-column-center { display: block !important; width: 100% !important; max-width: 100% !important; direction: ltr !important; }
+      .stack-column-center { text-align: center !important; }
+    }
+  </style>
+</head>
+<body style="margin:0 !important; padding:0 !important; background-color:#f4f4f4;">
+  <div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all; font-family:sans-serif;">
+    Your employment offer and pre-employment steps from Qcare.
+  </div>
+
+  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+      <td align="center" style="background-color:#f4f4f4;">
+        <table border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="background-color:#ffffff;">
+          <tr>
+            <td align="center" style="padding:20px 0; border-bottom:1px solid #dddddd;">
+              <%= image_tag "qcare_logo.png", width: 150, alt: "Qcare Logo" %>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:40px 30px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td style="font-family:sans-serif; font-size:24px; font-weight:bold; color:#333333;">
+                    Your Employment Offer & Next Steps
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px 0 10px; font-family:sans-serif; font-size:16px; line-height:24px; color:#555555;">
+                    Hi <%= (@user.try(:first_name) || @user.try(:name) || @name || "there") %>,
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-family:sans-serif; font-size:16px; line-height:24px; color:#555555;">
+                    I would like to take this opportunity to inform you that your application for employment has been successful pending successful completion of the pre‑employment checks.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:20px 0 0; font-family:sans-serif; font-size:16px; line-height:24px; color:#555555;">
+                    You will need to create an online employee file. To create your new employee file please launch your web browser and go here:
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" style="padding:16px 0 8px;">
+                    <table border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td align="center" style="border-radius:25px; background-color:#9963f1ff;">
+                            <%= link_to 'Create employee file', @onboarding_url %>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:24px 0 8px; font-family:sans-serif; font-size:18px; font-weight:bold; color:#333333;">
+                    Documents Attached
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-family:sans-serif; font-size:15px; line-height:24px; color:#555555;">
+                    <ul style="margin:0; padding-left:18px;">
+                      <li><strong>Letter of Offer</strong>: Contains pay rate info and an acceptance of employment page that needs to be printed and returned. <em>Print and sign page 4</em> and return by replying to this email with a photo, or message <a href="tel:0448129224" style="color:#6366f1; text-decoration:none;">0448&nbsp;129&nbsp;224</a>.</li>
+                      <li><strong>Position Description and Code of Conduct</strong>: Details the requirements of your position.</li>
+                      <li><strong>Fair Work Information Statement</strong>: Outlines employee entitlements in Australia, including casual employment info.</li>
+                      <li><strong>ID Information Sheet</strong>: Lists the two forms of ID to add to your employee file.</li>
+                    </ul>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:24px 0 8px; font-family:sans-serif; font-size:18px; font-weight:bold; color:#333333;">
+                    Pre‑Employment Checks (please complete)
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-family:sans-serif; font-size:15px; line-height:24px; color:#555555;">
+                    <ol style="margin:0; padding-left:18px;">
+                      <li>NDIS worker orientation module: <a href="https://training.ndiscommission.gov.au" target="_blank" style="color:#6366f1;">training.ndiscommission.gov.au</a>. Email completion certificate to <a href="mailto:ak@qcare.life" style="color:#6366f1;">ak@qcare.life</a>.</li>
+                      <li>Two forms of ID emailed to <a href="mailto:ak@qcare.life" style="color:#6366f1;">ak@qcare.life</a>.</li>
+                      <li>Create your employee file: <a href="https://podio.com/webforms/23975107/1738200" target="_blank" style="color:#6366f1;">Podio form</a>.</li>
+                      <li>Acceptance of Letter of Offer: sign and email to <a href="mailto:ak@qcare.life" style="color:#6366f1;">ak@qcare.life</a>.</li>
+                      <li>Create account & complete Qcare Support Worker Induction: <a href="https://link.edapp.com/V7Nj9aqVYlb" target="_blank" style="color:#6366f1;">EdApp link</a>.</li>
+                      <li>Create roster profile for Deputy scheduling app: <a href="https://dpty.me/u/1lSVWSpbA6j8m0cQfAUHPLOFNVZ" target="_blank" style="color:#6366f1;">Deputy profile</a>.</li>
+                      <li>Apply for NDIS screening check: <a href="https://workerscreening.dsdsatsip.qld.gov.au/workers/you-start" target="_blank" style="color:#6366f1;">Queensland worker screening</a>. Qcare company ID: <strong>4-G24F75I</strong>. If already obtained, please email a photo of your card to <a href="mailto:ak@qcare.life" style="color:#6366f1;">ak@qcare.life</a>.</li>
+                    </ol>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding-top:24px; font-family:sans-serif; font-size:16px; line-height:24px; color:#555555;">
+                    If you have any questions at all, please do not hesitate to contact me.
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:20px 30px; background-color:#f4f4f4;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" style="font-family:sans-serif; font-size:12px; line-height:18px; color:#888888;">
+                    <p style="margin:0;">Qcare QLD Pty Ltd</p>
+                    <p style="margin:0;">PO Box 5553, Red Hill, QLD 4701, Australia</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-top:10px; font-family:sans-serif; font-size:12px; line-height:18px; color:#888888;">
+                    You are receiving this email because you have an employment application with Qcare.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
