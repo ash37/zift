@@ -17,6 +17,6 @@ test:
   <<: *default
 
 production:
-  url: <%= ENV["DATABASE_URL"] %>
+  url: <%= ENV.fetch("QUEUE_DATABASE_URL", ENV["DATABASE_URL"]) %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
   <<: *default
