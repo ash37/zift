@@ -25,8 +25,12 @@ default: &default
 
 
 development:
-  <<: *default
-  database: zift_development
+  primary: &primary_development
+    <<: *default
+    database: zift_development
+
+  queue:
+    <<: *primary_development
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
