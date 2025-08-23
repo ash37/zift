@@ -9,10 +9,14 @@ default: &default
       polling_interval: 0.1
 
 development:
+  url: <%= ENV.fetch("QUEUE_DATABASE_URL", "postgres://localhost/yourapp_development") %>
   <<: *default
 
 test:
+  url: <%= ENV.fetch("QUEUE_DATABASE_URL", "postgres://localhost/yourapp_test") %>
   <<: *default
 
 production:
+  url: <%= ENV["DATABASE_URL"] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
   <<: *default
