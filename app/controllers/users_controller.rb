@@ -90,7 +90,7 @@ end
       @user.save!
 
       UserMailer.with(user: @user).invitation_email.deliver_later
-      redirect_to @user, notice: "Invitation sent to #{@user.name}."
+      redirect_to @user, notice: "Employment email sent to #{@user.name}."
     else
       redirect_to @user, alert: "This user has already been processed."
     end
