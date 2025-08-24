@@ -1,4 +1,4 @@
-<div class="nested-fields border p-4 rounded-md bg-gray-50 dark:bg-gray-700">
+<div class="nested-fields p-8 rounded-3xl bg-white">
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-4 items-end">
     <div>
       <%= form.label :name, "Area Name", class: "text-gray-700 dark:text-gray-200 text-sm" %>
@@ -24,16 +24,16 @@
     <div class="text-right">
       <%= form.hidden_field :_destroy %>
       <%# This link requires JavaScript to function correctly %>
-      <a href="#" data-action="click->nested-form#remove" class="text-red-500 hover:text-red-700 text-sm font-semibold">Remove Area</a>
+      <a href="#" data-action="click->nested-form#remove" class="text-red-500 hover:text-red-700 text-sm">Remove Area</a>
     </div>
   </div>
-</div>
+
 <div class="mt-4">
   <div class="flex items-center justify-between">
     <h3 class="text-sm font-medium">Shift Questions</h3>
     <%= link_to "Add new question",
                 new_shift_question_path,
-                class: "text-sm underline hover:no-underline" %>
+                class: "text-sm underline hover:no-underline text-violet-600 hover:text-violet-800" %>
   </div>
 
   <div class="mt-2 space-y-2">
@@ -53,19 +53,19 @@
 </div>
 
 <div class="mt-4">
-  <h3 class="text-sm font-medium">Timesheet fields</h3>
   <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
     <label class="inline-flex items-center gap-2">
       <%= form.check_box :show_timesheet_notes,
                          { checked: form.object.show_timesheet_notes.nil? ? true : form.object.show_timesheet_notes,
                            class: "rounded" } %>
-      <span class="text-sm">Timesheet notes</span>
+      <span class="text-sm">Shift summary notes</span>
     </label>
     <label class="inline-flex items-center gap-2">
       <%= form.check_box :show_timesheet_travel,
                          { checked: form.object.show_timesheet_travel.nil? ? true : form.object.show_timesheet_travel,
                            class: "rounded" } %>
-      <span class="text-sm">Timesheet travel</span>
+      <span class="text-sm">Log travel</span>
     </label>
   </div>
+</div>
 </div>
