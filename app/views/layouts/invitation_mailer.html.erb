@@ -30,7 +30,11 @@
         <table border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="background-color:#ffffff;">
           <tr>
             <td align="center" style="padding:20px 0; border-bottom:1px solid #dddddd;">
-              <%= image_tag "qcare_logo.png", width: 150, alt: "Qcare Logo" %>
+              <% if attachments['qcare_logo.png'] %>
+                <%= image_tag attachments['qcare_logo.png'].url, width: 150, alt: "Qcare Logo" %>
+              <% else %>
+                <%= image_tag (respond_to?(:image_url) ? image_url('qcare_logo.png') : 'qcare_logo.png'), width: 150, alt: "Qcare Logo" %>
+              <% end %>
             </td>
           </tr>
 
@@ -65,11 +69,11 @@
                       <tr>
                         <td align="center" style="border-radius: 25px; background-color: #9963f1ff;">
                           <% if @onboarding_url.present? %>
-                            <%= link_to @onboarding_url, target: "_blank", style: "font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #6366f1; display: inline-block;" do %>
+                            <%= link_to @onboarding_url, target: "_blank", style: "font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #9963f1ff; display: inline-block;" do %>
                               Create employee file
                             <% end %>
                           <% else %>
-                            <span style="display:inline-block; font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #6366f1;">
+                            <span style="display:inline-block; font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #9963f1ff;">
                               Create employee file (link unavailable)
                             </span>
                           <% end %>
