@@ -1,4 +1,5 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  skip_before_action :authenticate_user!, only: [ :edit, :update ]
   # This action is triggered by the link in the invitation email.
   # It finds the user by the token and shows the form to set a password.
   def edit
