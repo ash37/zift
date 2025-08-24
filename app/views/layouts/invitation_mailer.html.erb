@@ -64,8 +64,15 @@
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr>
                         <td align="center" style="border-radius: 25px; background-color: #9963f1ff;">
-                            <%= link_to 'Create employee file', @onboarding_url %>
-                            <a href="<%= onboarding_url %>" target="_blank" style="font-size: 16px; font-family: sans-serif; font-weight: semibold; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #6366f1; display: inline-block;">Create employee file</a>
+                          <% if @onboarding_url.present? %>
+                            <%= link_to @onboarding_url, target: "_blank", style: "font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #6366f1; display: inline-block;" do %>
+                              Create employee file
+                            <% end %>
+                          <% else %>
+                            <span style="display:inline-block; font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #6366f1;">
+                              Create employee file (link unavailable)
+                            </span>
+                          <% end %>
                         </td>
                       </tr>
                     </table>
