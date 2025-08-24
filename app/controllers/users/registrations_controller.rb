@@ -1,16 +1,20 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   skip_before_action :authenticate_user!, only: [ :edit, :update ]
+  skip_before_action :authenticate_scope!, only: [ :edit, :update ]
   # This action is triggered by the link in the invitation email.
   # It finds the user by the token and shows the form to set a password.
   def edit
     @token = params[:invitation_token]
-    @user = User.find_by(invitation_token: @token)
+    @user  = User.find_by(invitation_token: @token)
 
-    if @user.nil? || @user.invitation_sent_at < 72.hours.ago
+    if @user.blank? || @user.invitation_sent_at.blank? || @user.invitation_sent_at < 72.hours.ago
       redirect_to new_user_session_path, alert: "Your invitation token is invalid or has expired."
-    else
-      super
+      return
     end
+
+    # Don't call super; this path is for users who aren't signed in yet.
+    self.resource = @user
+    render :edit
   end
 
   # This action is triggered when the new employee submits the form.
@@ -27,6 +31,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       sign_in(@user)
       redirect_to dashboards_path, notice: "Your account has been successfully set up!"
     else
+      self.resource = @user
       render :edit, status: :unprocessable_entity
     end
   end

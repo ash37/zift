@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { registrations: "users/registrations" }
 
   devise_scope :user do
-    get "users/invitation/accept", to: "devise/invitations#edit", as: "accept_user_invitation"
+    get "users/invitation/accept", to: "users/registrations#edit", as: "accept_user_invitation"
   end
 
   # Admin-managed user creation
