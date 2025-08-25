@@ -43,12 +43,33 @@
       <% if user.new_record? %>
         <div>
           <%= form.label :password, class: "text-gray-700 dark:text-gray-200" %>
-          <%= form.password_field :password, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+          <%= form.password_field :password, autocomplete: "new-password", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
         </div>
 
         <div>
           <%= form.label :password_confirmation, "Password Confirmation", class: "text-gray-700 dark:text-gray-200" %>
-          <%= form.password_field :password_confirmation, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+          <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+        </div>
+      <% else %>
+        <div class="sm:col-span-2">
+          <details class="mt-2 rounded-md border border-gray-200 dark:border-gray-600 p-4">
+            <summary class="cursor-pointer text-gray-700 dark:text-gray-200 font-medium">
+              Change password (optional)
+            </summary>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              Leave both fields blank to keep the current password.
+            </p>
+            <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <%= form.label :password, "New password", class: "text-gray-700 dark:text-gray-200" %>
+                <%= form.password_field :password, autocomplete: "new-password", placeholder: "Leave blank to keep current", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+              </div>
+              <div>
+                <%= form.label :password_confirmation, "Confirm new password", class: "text-gray-700 dark:text-gray-200" %>
+                <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Repeat new password", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+              </div>
+            </div>
+          </details>
         </div>
       <% end %>
 
