@@ -1,5 +1,5 @@
 class RostersController < ApplicationController
-  before_action :set_roster, only: [ :show, :copy_previous_week ]
+  before_action :set_roster, only: [ :show, :copy_previous_week, :revert_to_draft ]
 
   # GET /rosters
   def index
@@ -69,6 +69,16 @@ class RostersController < ApplicationController
 
     msg = "#{copied} shift#{'s' if copied != 1} copied from #{weeks_ago} week#{'s' if weeks_ago > 1} ago."
     redirect_to roster_path(@roster, location_id: only_location_id), notice: msg
+  end
+
+  # POST /rosters/:id/revert_to_draft
+  def revert_to_draft
+    # @roster is set by set_roster
+    unless @roster
+      redirect_to rosters_path, alert: "Roster not found." and return
+    end
+    @roster.draft!
+    redirect_to roster_path(@roster), notice: "Roster reverted to draft."
   end
 
   private
