@@ -1,11 +1,16 @@
-<%# This partial calculates and displays the total hours for a given day on a roster. %>
 <%
-  # Find all shifts for the given date within this roster.
-  shifts_for_day = roster.shifts.where(start_time: date.all_day)
-  # Calculate the total duration in seconds.
-  total_seconds = shifts_for_day.sum { |shift| shift.end_time - shift.start_time }
-  # Convert seconds to hours.
-  total_hours = total_seconds / 3600.0
+  # Prefer precomputed totals when available (set in controller)
+  if defined?(@hours_by_date) && @hours_by_date
+    total_hours = @hours_by_date[date] || 0
+  else
+    # Fallback: compute from DB (respect selected_location_id if provided)
+    shifts_for_day = roster.shifts.where(start_time: date.all_day)
+    if defined?(selected_location_id) && selected_location_id.present?
+      shifts_for_day = shifts_for_day.where(location_id: selected_location_id)
+    end
+    total_seconds = shifts_for_day.sum { |shift| shift.end_time - shift.start_time }
+    total_hours = total_seconds / 3600.0
+  end
 %>
 
 <%# This div has a unique ID so we can target it with a Turbo Stream. %>

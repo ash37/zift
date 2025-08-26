@@ -1,28 +1,54 @@
 <%
-  # Find any shifts for this user on this date
-  shifts = roster.shifts.where(user: user, start_time: date.all_day)
+  # Prefer precomputed collections to avoid per-cell queries
+  if defined?(@shifts_by_user_and_date) && @shifts_by_user_and_date
+    shifts = (@shifts_by_user_and_date[[user.id, date]] || [])
+  else
+    # Fallback to original query if controller didn’t precompute
+    shifts = roster.shifts.where(user: user, start_time: date.all_day)
+  end
+
+  # Respect selected location if present
   if selected_location_id.present?
-    shifts = shifts.where(location_id: selected_location_id)
+    shifts = shifts.select { |s| s.location_id.to_s == selected_location_id.to_s }
   end
 
   repeating_weekday_match = false
 
-  # FIX: Check for an approved unavailability request that overlaps with this day,
-  # and if none, look for a weekly repeating request for the same weekday
-  approved_unavailability = user.unavailability_requests
-                                .where(status: UnavailabilityRequest::STATUSES[:approved])
-                                .where("starts_at <= ? AND ends_at >= ?", date.end_of_day, date.beginning_of_day)
-                                .first
+  # Find approved unavailability efficiently
+  approved_unavailability = nil
+  if defined?(@unavailability_by_user) && @unavailability_by_user
+    user_uas = (@unavailability_by_user[user.id] || [])
+    # Filter in-memory for overlap on the day
+    approved_unavailability = user_uas.find do |ua|
+      (ua.starts_at <= date.end_of_day) && (ua.ends_at >= date.beginning_of_day)
+    end
 
-  if approved_unavailability.nil?
-    repeating_candidates = user.unavailability_requests
-                               .where(status: UnavailabilityRequest::STATUSES[:approved])
-                               .where(repeats_weekly: true)
+    # If none overlapped that day, try repeating weekly on same weekday
+    if approved_unavailability.nil?
+      repeating_candidates = user_uas.select { |ua| ua.respond_to?(:repeats_weekly) && ua.repeats_weekly }
+      match = repeating_candidates.detect { |req| req.starts_at.wday == date.wday }
+      if match
+        approved_unavailability = match
+        repeating_weekday_match = true
+      end
+    end
+  else
+    # Fallback to original queries if controller didn’t preload
+    approved_unavailability = user.unavailability_requests
+                                  .where(status: UnavailabilityRequest::STATUSES[:approved])
+                                  .where("starts_at <= ? AND ends_at >= ?", date.end_of_day, date.beginning_of_day)
+                                  .first
 
-    match = repeating_candidates.detect { |req| req.starts_at.wday == date.wday }
-    if match
-      approved_unavailability = match
-      repeating_weekday_match = true
+    if approved_unavailability.nil?
+      repeating_candidates = user.unavailability_requests
+                                 .where(status: UnavailabilityRequest::STATUSES[:approved])
+                                 .where(repeats_weekly: true)
+
+      match = repeating_candidates.detect { |req| req.starts_at.wday == date.wday }
+      if match
+        approved_unavailability = match
+        repeating_weekday_match = true
+      end
     end
   end
 %>

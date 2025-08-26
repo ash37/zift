@@ -2,13 +2,16 @@
 class Shift < ApplicationRecord
   # Add an attribute to control the validation
   attr_accessor :bypass_unavailability_validation
+  attr_reader :unavailability_conflict
 
-  belongs_to :roster
-  belongs_to :user
-  belongs_to :location
-  belongs_to :area, optional: true
+  belongs_to :roster,   inverse_of: :shifts
+  belongs_to :user,     inverse_of: :shifts
+  belongs_to :location, inverse_of: :shifts
+  belongs_to :area,     optional: true, inverse_of: :shifts
   has_many :timesheets, dependent: :destroy
   has_many :shift_answers, dependent: :destroy
+
+  before_validation :ensure_area_matches_location
 
   # Make the validation conditional
   validate :user_is_available, unless: :bypass_unavailability_validation
@@ -64,6 +67,16 @@ class Shift < ApplicationRecord
 
   private
 
+  def ensure_area_matches_location
+    return if area_id.blank? || location_id.blank?
+    return unless area && area.respond_to?(:location_id)
+
+    if area.location_id != location_id
+      Rails.logger.warn("[Shift] Clearing area_id=#{area_id} because it does not belong to location_id=#{location_id}")
+      self.area_id = nil
+    end
+  end
+
   def end_time_after_start_time
     return if end_time.blank? || start_time.blank?
     if end_time <= start_time
@@ -115,6 +128,18 @@ class Shift < ApplicationRecord
 
     if roster.published? && start_time < Time.current
       errors.add(:base, "Cannot schedule a shift in the past for a published roster.")
+    end
+  end
+
+  before_save :log_area_and_note_changes, if: -> { ENV["SHIFT_DEBUG"] == "1" }
+
+  private
+
+  def log_area_and_note_changes
+    if will_save_change_to_area_id? || will_save_change_to_note?
+      Rails.logger.info("[ShiftDebug] Shift##{id || 'new'} user=#{user_id} " \
+                        "loc=#{location_id} area: #{area_id_before_last_save.inspect}→#{area_id.inspect} " \
+                        "note: #{note_before_last_save.inspect}→#{note.inspect}")
     end
   end
 end

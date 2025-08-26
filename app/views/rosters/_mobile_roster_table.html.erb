@@ -38,7 +38,8 @@
     </tr>
   </thead>
   <tbody>
-    <% User.where.not(role: nil).each do |user| %>
+    <% users = (defined?(@users_for_roster) && @users_for_roster.present?) ? @users_for_roster : User.where.not(role: nil) %>
+    <% users.each do |user| %>
       <tr class="align-top">
         <td class="p-2 border-t border-zinc-200 bg-white">
           <div class="font-semibold text-zinc-800 ml-4"><%= user.first_name %><br><%= user.last_name %></div>
