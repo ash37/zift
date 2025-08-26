@@ -1,5 +1,5 @@
 class RostersController < ApplicationController
-  before_action :set_roster, only: [ :show, :copy_previous_week, :revert_to_draft ]
+  before_action :set_roster, only: [ :show, :copy_previous_week, :revert_to_draft, :publish, :publish_with_email ]
 
   # GET /rosters
   def index
@@ -79,6 +79,35 @@ class RostersController < ApplicationController
     end
     @roster.update!(status: Roster::STATUSES[:draft])
     redirect_to roster_path(@roster), notice: "Roster reverted to draft."
+  end
+
+  # POST /rosters/:id/publish
+  def publish
+    # @roster is set by set_roster
+    unless @roster
+      redirect_to rosters_path, alert: "Roster not found." and return
+    end
+
+    @roster.update!(status: Roster::STATUSES[:published])
+    redirect_to roster_path(@roster), notice: "Roster published."
+  end
+
+  # POST /rosters/:id/publish_with_email
+  def publish_with_email
+    # @roster is set by set_roster
+    unless @roster
+      redirect_to rosters_path, alert: "Roster not found." and return
+    end
+
+    @roster.update!(status: Roster::STATUSES[:published])
+
+    # Send emails to all users who have shifts in this roster
+    users_to_notify = User.joins(:shifts).where(shifts: { roster_id: @roster.id }).distinct
+    users_to_notify.find_each do |u|
+      RosterMailer.with(user: u, roster: @roster).roster_published.deliver_later
+    end
+
+    redirect_to roster_path(@roster), notice: "Roster published and notifications sent."
   end
 
   private
