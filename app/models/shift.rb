@@ -1,5 +1,6 @@
 # app/models/shift.rb
 class Shift < ApplicationRecord
+  default_scope { order(:start_time, :end_time, :id) }
   # Add an attribute to control the validation
   attr_accessor :bypass_unavailability_validation
   attr_reader :unavailability_conflict
