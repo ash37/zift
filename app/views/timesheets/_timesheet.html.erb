@@ -21,6 +21,6 @@
   </div>
   <div>
     <strong class="block font-medium mb-1">Status:</strong>
-    <%= timesheet.status %>
+    <%= Timesheet::STATUSES.key(timesheet.status).to_s.titleize %>
   </div>
 </div>

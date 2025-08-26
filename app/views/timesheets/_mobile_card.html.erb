@@ -1,10 +1,9 @@
 <% timesheet = shift.timesheets.first %>
+<% click_url = timesheet ? edit_timesheet_path(timesheet) : new_timesheet_path(shift_id: shift.id) %>
 <div id="<%= dom_id(shift, :mobile) %>"
-  <% if timesheet %>
-    data-controller="clickable-row"
-    data-action="click->clickable-row#visit"
-    data-clickable-row-url-value="<%= edit_timesheet_path(timesheet) %>"
-  <% end %>
+  data-controller="clickable-row"
+  data-action="click->clickable-row#visit"
+  data-clickable-row-url-value="<%= click_url %>"
   class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl dark:bg-gray-800"
 >
   <div class="flex items-center justify-between">

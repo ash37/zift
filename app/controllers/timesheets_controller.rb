@@ -17,14 +17,14 @@ class TimesheetsController < ApplicationController
     published_shifts = Shift.joins(:roster)
                             .where(rosters: { status: Roster::STATUSES[:published] })
                             .where(start_time: week_range)
-                            .reorder(nil)
+                            .unscope(:order)
                             .select("shifts.*")
 
     unscheduled_shifts = Shift.joins(:roster)
                               .joins(:timesheets)
                               .where(rosters: { status: Roster::STATUSES[:draft] })
                               .where(start_time: week_range)
-                              .reorder(nil)
+                              .unscope(:order)
                               .select("shifts.*")
 
     @shifts = Shift.from("(#{published_shifts.to_sql} UNION #{unscheduled_shifts.to_sql}) AS shifts")
@@ -74,25 +74,25 @@ class TimesheetsController < ApplicationController
     end
   end
 
- def update
-  updated_params = timesheet_params.merge(status: Timesheet::STATUSES[:approved])
-  shift_date = @timesheet.shift.start_time.to_date
+  def update
+    updated_params = timesheet_params
+    shift_date = @timesheet.shift.start_time.to_date
 
-  if params[:timesheet][:clock_in_at].present?
-    clock_in_time = Time.zone.parse(params[:timesheet][:clock_in_at])
-    updated_params[:clock_in_at] = clock_in_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
-  end
+    if params[:timesheet][:clock_in_at].present?
+      clock_in_time = Time.zone.parse(params[:timesheet][:clock_in_at])
+      updated_params[:clock_in_at] = clock_in_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
+    end
 
-  if params[:timesheet][:clock_out_at].present?
-    clock_out_time = Time.zone.parse(params[:timesheet][:clock_out_at])
-    updated_params[:clock_out_at] = clock_out_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
-  end
+    if params[:timesheet][:clock_out_at].present?
+      clock_out_time = Time.zone.parse(params[:timesheet][:clock_out_at])
+      updated_params[:clock_out_at] = clock_out_time.change(year: shift_date.year, month: shift_date.month, day: shift_date.day)
+    end
 
-      if @timesheet.update(updated_params)
-        redirect_to timesheets_path
-      else
-        render :edit, status: :unprocessable_entity
-      end
+    if @timesheet.update(updated_params)
+      redirect_to timesheets_path
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def destroy
@@ -211,6 +211,7 @@ class TimesheetsController < ApplicationController
         :clock_out_at,
         :notes,
         :travel,
+        :status,
         shift_attributes: [ :id, :area_id ],
         shift_answers_attributes: [ :answer_text, :shift_id, :timesheet_id, :shift_question_id, :user_id ]
       )
