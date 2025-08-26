@@ -119,8 +119,8 @@ class Shift < ApplicationRecord
     return if start_time.blank? || end_time.blank?
 
     duration = (end_time - start_time) / 1.hour
-    if duration < 0.5 || duration > 11
-      errors.add(:base, "Shift duration must be between 0.5 and 11 hours.")
+    if duration < 0.25 || duration > 9
+      errors.add(:base, "Shift duration must be between 15 minutes and 9 hours.")
     end
   end
 
