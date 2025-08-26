@@ -69,7 +69,7 @@
                 <%= link_to "People", users_path, class: "px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 hover:bg-gray-100" %>
                 <%= link_to "Locations", locations_path, class: "px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 hover:bg-gray-100" %>
                 <%= link_to "Unavailability", unavailability_requests_path, class: "px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 hover:bg-gray-100" %>
-                <%= link_to "Schedule", url_for(controller: "rosters", action: "show_by_date", date: Date.current.beginning_of_week(:wednesday)), class: "px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 hover:bg-gray-100" %>
+                <%= link_to "Schedule", main_app.url_for(controller: "/rosters", action: "show_by_date", date: Date.current.beginning_of_week(:wednesday).to_s), class: "px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 hover:bg-gray-100" %>
                 <%= link_to "Reports", reports_path, class: "px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 hover:bg-gray-100" %>
                 
               </div>
