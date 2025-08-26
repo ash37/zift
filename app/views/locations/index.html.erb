@@ -5,20 +5,20 @@
     <%# Left Side: Title and location count %>
     <div class="flex items-center gap-x-3">
     <% if params[:archived] == "true" %>
-        <h2 class="text-lg font-medium text-gray-800 dark:text-white">Archived Locations</h2>
+        <h2 class="text-lg font-medium text-gray-800">Archived Locations</h2>
       <% else %>
-        <h2 class="text-lg font-medium text-gray-800 dark:text-white">Locations</h2>
+        <h2 class="text-lg font-medium text-gray-800">Locations</h2>
       <% end %>
       
-      <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400"><%= pluralize(@locations.count, 'location') %></span>
+      <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full"><%= pluralize(@locations.count, 'location') %></span>
     </div>
 
     <%# Right Side: Add location and filter buttons %>
     <div class="flex items-center gap-x-3">
       <% if params[:archived] == "true" %>
-        <%= link_to "View Active", locations_path, class: "px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400" %>
+        <%= link_to "View Active", locations_path, class: "px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full" %>
       <% else %>
-        <%= link_to "View Archived", locations_path(archived: true), class: "px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-400" %>
+        <%= link_to "View Archived", locations_path(archived: true), class: "px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full" %>
       <% end %>
       <% unless params[:archived] == "true" %>
         <%= link_to "Add", new_location_path, class: "tracking-wide rounded-3xl px-3 py-1 bg-zinc-800 hover:bg-zinc-900 text-white" %>
@@ -29,29 +29,29 @@
   <div class="flex flex-col mt-6">
     <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
       <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-        <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-800">
+        <div class="overflow-hidden border border-gray-200 md:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Name
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Address
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+            <tbody class="bg-white divide-y divide-gray-200">
               <% @locations.each do |location| %>
                 <tr data-controller="clickable-row"
                     data-action="click->clickable-row#visit"
                     data-clickable-row-url-value="<%= location_path(location) %>"
-                    class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+                    class="cursor-pointer hover:bg-gray-50">
 
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     <%= location.name %>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <%= location.address %>
                   </td>
                 </tr>

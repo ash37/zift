@@ -12,7 +12,7 @@
   <div class="mt-6 space-y-8">
     <div>
       <div class="flex justify-between items-center">
-        <h3 class="text-4xl font-bold text-gray-700 dark:text-gray-200">Today</h3>
+        <h3 class="text-4xl font-bold text-gray-700">Today</h3>
         <%= link_to "Start Unscheduled Shift", new_timesheet_path, class: "bg-white text-gray-400 py-1 px-4 rounded-3xl" %>
       </div>
       <div class="mt-4 space-y-4">
@@ -66,7 +66,7 @@
     </div>
 
     <div>
-      <h3 class="text-md font-medium text-gray-700 dark:text-gray-200">Upcoming</h3>
+      <h3 class="text-md font-medium text-gray-700">Upcoming</h3>
       <div class="mt-4 space-y-4">
         <% if upcoming_shifts.any? %>
           <% upcoming_shifts.each do |shift| %>
