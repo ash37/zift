@@ -77,7 +77,7 @@ class RostersController < ApplicationController
     unless @roster
       redirect_to rosters_path, alert: "Roster not found." and return
     end
-    @roster.draft!
+    @roster.update!(status: Roster::STATUSES[:draft])
     redirect_to roster_path(@roster), notice: "Roster reverted to draft."
   end
 
