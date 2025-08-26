@@ -4,12 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
   <title>Employment Offer & Next Steps</title>
   <style type="text/css">
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
     img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
     body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f4f4f4; }
+
+    :root { color-scheme: light; supported-color-schemes: light; }
+    .brand-bg { background-color: #60006A !important; }
+    .btn-bg { background-color: #60006A !important; border-color: #60006A !important; }
+    @media (prefers-color-scheme: dark) {
+      .brand-bg { background-color: #60006A !important; }
+      .btn-bg { background-color: #60006A !important; border-color: #60006A !important; }
+    }
 
     @media screen and (max-width: 600px) {
       .email-container { width: 100% !important; margin: auto !important; }
@@ -29,12 +39,96 @@
       <td align="center" style="background-color:#f4f4f4;">
         <table border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="background-color:#ffffff;">
           <tr>
-            <td align="center" style="padding:20px 0; border-bottom:1px solid #dddddd;">
-              <% if attachments['qcare_logo.png'] %>
-                <%= image_tag attachments['qcare_logo.png'].url, width: 150, alt: "Qcare Logo" %>
-              <% else %>
-                <%= image_tag (respond_to?(:image_url) ? image_url('qcare_logo.png') : 'qcare_logo.png'), width: 150, alt: "Qcare Logo" %>
-              <% end %>
+            <td align="center" style="padding:20px 0; border-bottom:1px solid #dddddd; background-color: rgb(96,0,106);">
+              <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="150" viewBox="0 0 1000 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1.14414,0,0,0.729885,-1864.86,-534.483)">
+        <rect x="1629.92" y="732.283" width="874.016" height="685.039" style="fill:rgb(96,0,106);"/>
+    </g>
+    <g transform="matrix(1,0,0,1,-160.802,-544.882)">
+        <g transform="matrix(1.64286,0,0,1.64286,-2740.02,412.024)">
+            <g transform="matrix(176.77,0,0,176.77,1958.65,307.087)">
+                <path d="M0.312,-0C0.372,-0 0.428,-0.022 0.471,-0.053C0.494,-0.073 0.498,-0.105 0.482,-0.127C0.462,-0.151 0.429,-0.155 0.407,-0.138C0.381,-0.119 0.348,-0.106 0.312,-0.106C0.231,-0.106 0.164,-0.172 0.164,-0.249C0.164,-0.326 0.231,-0.393 0.312,-0.393C0.349,-0.393 0.381,-0.38 0.407,-0.361C0.43,-0.343 0.462,-0.347 0.482,-0.371C0.498,-0.393 0.494,-0.427 0.471,-0.445C0.428,-0.478 0.372,-0.5 0.312,-0.5C0.174,-0.499 0.058,-0.388 0.058,-0.249C0.058,-0.112 0.174,-0 0.312,-0Z" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(176.77,0,0,176.77,2044.81,307.087)">
+                <path d="M0.516,-0.446C0.516,-0.476 0.492,-0.5 0.463,-0.5C0.437,-0.5 0.417,-0.481 0.411,-0.456C0.373,-0.483 0.328,-0.5 0.278,-0.5C0.21,-0.5 0.151,-0.471 0.108,-0.425C0.065,-0.38 0.04,-0.318 0.04,-0.249C0.04,-0.181 0.065,-0.119 0.108,-0.073C0.151,-0.028 0.21,-0 0.278,-0C0.328,-0 0.373,-0.016 0.411,-0.043C0.417,-0.019 0.437,-0 0.463,-0C0.492,-0 0.516,-0.024 0.516,-0.053L0.516,-0.446ZM0.371,-0.146C0.347,-0.121 0.313,-0.107 0.278,-0.107C0.242,-0.107 0.208,-0.121 0.185,-0.146C0.161,-0.172 0.147,-0.208 0.147,-0.249C0.147,-0.291 0.161,-0.327 0.185,-0.352C0.208,-0.379 0.242,-0.393 0.278,-0.393C0.313,-0.393 0.347,-0.379 0.371,-0.352C0.395,-0.327 0.41,-0.291 0.41,-0.249C0.41,-0.208 0.395,-0.172 0.371,-0.146Z" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(176.77,0,0,176.77,2133.71,307.087)">
+                <path d="M0.348,-0.499C0.298,-0.5 0.255,-0.482 0.222,-0.46C0.215,-0.455 0.207,-0.447 0.201,-0.44L0.201,-0.447C0.201,-0.476 0.176,-0.499 0.146,-0.499C0.117,-0.499 0.093,-0.476 0.093,-0.447L0.093,-0.053C0.093,-0.024 0.117,-0 0.146,-0C0.176,-0 0.201,-0.024 0.201,-0.053L0.201,-0.243C0.206,-0.257 0.218,-0.295 0.242,-0.327C0.254,-0.346 0.269,-0.363 0.288,-0.375C0.305,-0.388 0.325,-0.394 0.348,-0.394C0.378,-0.394 0.401,-0.419 0.401,-0.447C0.401,-0.476 0.378,-0.499 0.348,-0.499Z" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(176.77,0,0,176.77,2190.88,307.087)">
+                <path d="M0.302,-0C0.373,-0 0.432,-0.021 0.481,-0.066C0.504,-0.087 0.494,-0.117 0.481,-0.131C0.468,-0.147 0.427,-0.15 0.406,-0.128C0.381,-0.109 0.338,-0.1 0.302,-0.103C0.267,-0.106 0.227,-0.124 0.206,-0.148C0.188,-0.165 0.177,-0.191 0.172,-0.214L0.49,-0.214C0.518,-0.214 0.539,-0.23 0.542,-0.254C0.543,-0.256 0.543,-0.261 0.543,-0.263L0.543,-0.268C0.535,-0.403 0.432,-0.5 0.302,-0.5C0.165,-0.5 0.059,-0.386 0.058,-0.25C0.059,-0.114 0.165,-0.001 0.302,-0ZM0.302,-0.405C0.389,-0.398 0.44,-0.339 0.45,-0.299L0.167,-0.299C0.175,-0.34 0.217,-0.401 0.302,-0.405Z" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(0.214259,0,0,0.214259,1357.28,-14.7364)">
+                <path d="M2488.01,834.989C2672.09,834.989 2821.53,984.434 2821.53,1168.51C2821.53,1352.58 2672.09,1502.03 2488.01,1502.03C2303.94,1502.03 2154.49,1352.58 2154.49,1168.51C2154.49,984.434 2303.94,834.989 2488.01,834.989ZM2488.01,969.058C2598.09,969.058 2687.46,1058.43 2687.46,1168.51C2687.46,1278.59 2598.09,1367.96 2488.01,1367.96C2377.93,1367.96 2288.56,1278.59 2288.56,1168.51C2288.56,1058.43 2377.93,969.058 2488.01,969.058Z" style="fill:white;"/>
+            </g>
+            <g transform="matrix(-0.770319,0,0,-0.770319,3868.73,2140.53)">
+                <path d="M2504.86,2380.12C2509.4,2379.94 2514,2381.43 2517.65,2384.58L2518.28,2385.13L2550.51,2417.36L2504.7,2417.31L2504.11,2417.31C2500.07,2417.01 2496.43,2415.43 2493.56,2412.96L2491.99,2411.41L2491.44,2410.81C2491.41,2410.78 2491.38,2410.75 2491.35,2410.72C2488.68,2407.48 2487.08,2403.3 2487.08,2398.74C2487.08,2388.92 2494.69,2380.87 2504.32,2380.16L2504.86,2380.12Z" style="fill:white;"/>
+            </g>
+        </g>
+        <g transform="matrix(1.64286,0,0,1.64286,-2740.02,412.024)">
+            <g transform="matrix(1.61353,0,0,1.61353,-1487.42,-2365.22)">
+                <circle cx="2349.74" cy="1649.37" r="6.817" style="fill:rgb(255,109,0);"/>
+            </g>
+            <g transform="matrix(0.770319,0,0,0.770319,-25.9067,-1584.48)">
+                <path d="M2504.86,2380.12C2509.4,2379.94 2514,2381.43 2517.65,2384.58L2518.28,2385.13L2550.51,2417.36L2504.7,2417.31L2504.11,2417.31C2500.07,2417.01 2496.43,2415.43 2493.56,2412.96L2491.99,2411.41L2491.44,2410.81C2491.41,2410.78 2491.38,2410.75 2491.35,2410.72C2488.68,2407.48 2487.08,2403.3 2487.08,2398.74C2487.08,2388.92 2494.69,2380.87 2504.32,2380.16L2504.86,2380.12Z" style="fill:rgb(255,109,0);"/>
+            </g>
+        </g>
+        <g transform="matrix(1.64286,0,0,1.64286,-2740.02,412.024)">
+            <g transform="matrix(1.61353,0,0,1.61353,-1487.42,-2365.22)">
+                <circle cx="2349.74" cy="1649.37" r="6.817" style="fill:rgb(255,109,0);"/>
+            </g>
+            <g transform="matrix(0.770319,0,0,0.770319,-25.9067,-1584.48)">
+                <path d="M2504.86,2380.12C2509.4,2379.94 2514,2381.43 2517.65,2384.58L2518.28,2385.13L2550.51,2417.36L2504.7,2417.31L2504.11,2417.31C2500.07,2417.01 2496.43,2415.43 2493.56,2412.96L2491.99,2411.41L2491.44,2410.81C2491.41,2410.78 2491.38,2410.75 2491.35,2410.72C2488.68,2407.48 2487.08,2403.3 2487.08,2398.74C2487.08,2388.92 2494.69,2380.87 2504.32,2380.16L2504.86,2380.12Z" style="fill:rgb(255,109,0);"/>
+            </g>
+        </g>
+        <g transform="matrix(1.26552,1.54982e-16,-1.54982e-16,1.26552,-2793.4,-2142.7)">
+            <path d="M2504.86,2380.12C2509.4,2379.94 2514,2381.43 2517.65,2384.58L2518.28,2385.13L2556.3,2417.36L2504.7,2417.31L2504.11,2417.31C2500.07,2417.01 2496.43,2415.43 2493.56,2412.96L2491.99,2411.41L2491.44,2410.81C2491.41,2410.78 2491.38,2410.75 2491.35,2410.72C2488.68,2407.48 2487.08,2403.3 2487.08,2398.74C2487.08,2388.92 2494.69,2380.87 2504.32,2380.16L2504.86,2380.12Z" style="fill:rgb(68,177,201);"/>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,-155.646,-544.882)">
+        <g transform="matrix(1.64286,0,0,1.64286,-2740.02,412.024)">
+            <g transform="matrix(176.77,0,0,176.77,1958.65,307.087)">
+                <path d="M0.312,-0C0.372,-0 0.428,-0.022 0.471,-0.053C0.494,-0.073 0.498,-0.105 0.482,-0.127C0.462,-0.151 0.429,-0.155 0.407,-0.138C0.381,-0.119 0.348,-0.106 0.312,-0.106C0.231,-0.106 0.164,-0.172 0.164,-0.249C0.164,-0.326 0.231,-0.393 0.312,-0.393C0.349,-0.393 0.381,-0.38 0.407,-0.361C0.43,-0.343 0.462,-0.347 0.482,-0.371C0.498,-0.393 0.494,-0.427 0.471,-0.445C0.428,-0.478 0.372,-0.5 0.312,-0.5C0.174,-0.499 0.058,-0.388 0.058,-0.249C0.058,-0.112 0.174,-0 0.312,-0Z" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(176.77,0,0,176.77,2044.81,307.087)">
+                <path d="M0.516,-0.446C0.516,-0.476 0.492,-0.5 0.463,-0.5C0.437,-0.5 0.417,-0.481 0.411,-0.456C0.373,-0.483 0.328,-0.5 0.278,-0.5C0.21,-0.5 0.151,-0.471 0.108,-0.425C0.065,-0.38 0.04,-0.318 0.04,-0.249C0.04,-0.181 0.065,-0.119 0.108,-0.073C0.151,-0.028 0.21,-0 0.278,-0C0.328,-0 0.373,-0.016 0.411,-0.043C0.417,-0.019 0.437,-0 0.463,-0C0.492,-0 0.516,-0.024 0.516,-0.053L0.516,-0.446ZM0.371,-0.146C0.347,-0.121 0.313,-0.107 0.278,-0.107C0.242,-0.107 0.208,-0.121 0.185,-0.146C0.161,-0.172 0.147,-0.208 0.147,-0.249C0.147,-0.291 0.161,-0.327 0.185,-0.352C0.208,-0.379 0.242,-0.393 0.278,-0.393C0.313,-0.393 0.347,-0.379 0.371,-0.352C0.395,-0.327 0.41,-0.291 0.41,-0.249C0.41,-0.208 0.395,-0.172 0.371,-0.146Z" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(176.77,0,0,176.77,2133.71,307.087)">
+                <path d="M0.348,-0.499C0.298,-0.5 0.255,-0.482 0.222,-0.46C0.215,-0.455 0.207,-0.447 0.201,-0.44L0.201,-0.447C0.201,-0.476 0.176,-0.499 0.146,-0.499C0.117,-0.499 0.093,-0.476 0.093,-0.447L0.093,-0.053C0.093,-0.024 0.117,-0 0.146,-0C0.176,-0 0.201,-0.024 0.201,-0.053L0.201,-0.243C0.206,-0.257 0.218,-0.295 0.242,-0.327C0.254,-0.346 0.269,-0.363 0.288,-0.375C0.305,-0.388 0.325,-0.394 0.348,-0.394C0.378,-0.394 0.401,-0.419 0.401,-0.447C0.401,-0.476 0.378,-0.499 0.348,-0.499Z" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(176.77,0,0,176.77,2190.88,307.087)">
+                <path d="M0.302,-0C0.373,-0 0.432,-0.021 0.481,-0.066C0.504,-0.087 0.494,-0.117 0.481,-0.131C0.468,-0.147 0.427,-0.15 0.406,-0.128C0.381,-0.109 0.338,-0.1 0.302,-0.103C0.267,-0.106 0.227,-0.124 0.206,-0.148C0.188,-0.165 0.177,-0.191 0.172,-0.214L0.49,-0.214C0.518,-0.214 0.539,-0.23 0.542,-0.254C0.543,-0.256 0.543,-0.261 0.543,-0.263L0.543,-0.268C0.535,-0.403 0.432,-0.5 0.302,-0.5C0.165,-0.5 0.059,-0.386 0.058,-0.25C0.059,-0.114 0.165,-0.001 0.302,-0ZM0.302,-0.405C0.389,-0.398 0.44,-0.339 0.45,-0.299L0.167,-0.299C0.175,-0.34 0.217,-0.401 0.302,-0.405Z" style="fill:white;fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(0.214259,0,0,0.214259,1357.28,-14.7364)">
+                <path d="M2488.01,834.989C2672.09,834.989 2821.53,984.434 2821.53,1168.51C2821.53,1352.58 2672.09,1502.03 2488.01,1502.03C2303.94,1502.03 2154.49,1352.58 2154.49,1168.51C2154.49,984.434 2303.94,834.989 2488.01,834.989ZM2488.01,969.058C2598.09,969.058 2687.46,1058.43 2687.46,1168.51C2687.46,1278.59 2598.09,1367.96 2488.01,1367.96C2377.93,1367.96 2288.56,1278.59 2288.56,1168.51C2288.56,1058.43 2377.93,969.058 2488.01,969.058Z" style="fill:white;"/>
+            </g>
+            <g transform="matrix(-0.770319,0,0,-0.770319,3868.73,2140.53)">
+                <path d="M2504.86,2380.12C2509.4,2379.94 2514,2381.43 2517.65,2384.58L2518.28,2385.13L2550.51,2417.36L2504.7,2417.31L2504.11,2417.31C2500.07,2417.01 2496.43,2415.43 2493.56,2412.96L2491.99,2411.41L2491.44,2410.81C2491.41,2410.78 2491.38,2410.75 2491.35,2410.72C2488.68,2407.48 2487.08,2403.3 2487.08,2398.74C2487.08,2388.92 2494.69,2380.87 2504.32,2380.16L2504.86,2380.12Z" style="fill:white;"/>
+            </g>
+        </g>
+        <g transform="matrix(1.64286,0,0,1.64286,-2740.02,412.024)">
+            <g transform="matrix(1.61353,0,0,1.61353,-1487.42,-2365.22)">
+                <circle cx="2349.74" cy="1649.37" r="6.817" style="fill:rgb(255,109,0);"/>
+            </g>
+            <g transform="matrix(0.770319,0,0,0.770319,-25.9067,-1584.48)">
+                <path d="M2504.86,2380.12C2509.4,2379.94 2514,2381.43 2517.65,2384.58L2518.28,2385.13L2550.51,2417.36L2504.7,2417.31L2504.11,2417.31C2500.07,2417.01 2496.43,2415.43 2493.56,2412.96L2491.99,2411.41L2491.44,2410.81C2491.41,2410.78 2491.38,2410.75 2491.35,2410.72C2488.68,2407.48 2487.08,2403.3 2487.08,2398.74C2487.08,2388.92 2494.69,2380.87 2504.32,2380.16L2504.86,2380.12Z" style="fill:rgb(255,109,0);"/>
+            </g>
+        </g>
+        <g transform="matrix(1.64286,0,0,1.64286,-2740.02,412.024)">
+            <g transform="matrix(1.61353,0,0,1.61353,-1487.42,-2365.22)">
+                <circle cx="2349.74" cy="1649.37" r="6.817" style="fill:rgb(255,109,0);"/>
+            </g>
+            <g transform="matrix(0.770319,0,0,0.770319,-25.9067,-1584.48)">
+                <path d="M2504.86,2380.12C2509.4,2379.94 2514,2381.43 2517.65,2384.58L2518.28,2385.13L2550.51,2417.36L2504.7,2417.31L2504.11,2417.31C2500.07,2417.01 2496.43,2415.43 2493.56,2412.96L2491.99,2411.41L2491.44,2410.81C2491.41,2410.78 2491.38,2410.75 2491.35,2410.72C2488.68,2407.48 2487.08,2403.3 2487.08,2398.74C2487.08,2388.92 2494.69,2380.87 2504.32,2380.16L2504.86,2380.12Z" style="fill:rgb(255,109,0);"/>
+            </g>
+        </g>
+        <g transform="matrix(1.26552,1.54982e-16,-1.54982e-16,1.26552,-2793.4,-2142.7)">
+            <path d="M2504.86,2380.12C2509.4,2379.94 2514,2381.43 2517.65,2384.58L2518.28,2385.13L2556.3,2417.36L2504.7,2417.31L2504.11,2417.31C2500.07,2417.01 2496.43,2415.43 2493.56,2412.96L2491.99,2411.41L2491.44,2410.81C2491.41,2410.78 2491.38,2410.75 2491.35,2410.72C2488.68,2407.48 2487.08,2403.3 2487.08,2398.74C2487.08,2388.92 2494.69,2380.87 2504.32,2380.16L2504.86,2380.12Z" style="fill:rgb(68,177,201);"/>
+        </g>
+    </g>
+</svg>
             </td>
           </tr>
 
@@ -59,7 +153,7 @@
 
                 <tr>
                   <td style="padding:20px 0 0; font-family:sans-serif; font-size:16px; line-height:24px; color:#555555;">
-                    You will need to create an online employee file. To create your new employee file please launch your web browser and go here:
+                    You will need to create an employee file. To create your new employee file you can click below:
                   </td>
                 </tr>
 
@@ -67,13 +161,13 @@
                   <td align="center" style="padding:16px 0 8px;">
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr>
-                        <td align="center" style="border-radius: 25px; background-color: #9963f1ff;">
+                        <td align="center" class="btn-bg" style="border-radius: 25px; background-color: #60006A; border: 1px solid #60006A;">
                           <% if @onboarding_url.present? %>
-                            <%= link_to @onboarding_url, target: "_blank", style: "font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #9963f1ff; display: inline-block;" do %>
-                              Create employee file
+                            <%= link_to @onboarding_url, target: "_blank", style: "font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #60006A; display: inline-block;" do %>
+                              Create Employee File
                             <% end %>
                           <% else %>
-                            <span style="display:inline-block; font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #9963f1ff;">
+                            <span style="display:inline-block; font-size: 16px; font-family: sans-serif; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 25px; padding: 14px 25px; border: 1px solid #60006A;">
                               Create employee file (link unavailable)
                             </span>
                           <% end %>
@@ -107,13 +201,13 @@
                 <tr>
                   <td style="font-family:sans-serif; font-size:15px; line-height:24px; color:#555555;">
                     <ol style="margin:0; padding-left:18px;">
-                      <li>NDIS worker orientation module: <a href="https://training.ndiscommission.gov.au" target="_blank" style="color:#6366f1;">training.ndiscommission.gov.au</a>. Email completion certificate to <a href="mailto:ak@qcare.life" style="color:#6366f1;">ak@qcare.life</a>.</li>
-                      <li>Two forms of ID emailed to <a href="mailto:ak@qcare.life" style="color:#6366f1;">ak@qcare.life</a>.</li>
+                      <li>NDIS worker orientation module: <a href="https://training.ndiscommission.gov.au" target="_blank" style="color:#6366f1;">training.ndiscommission.gov.au</a>. Email completion certificate to <a href="mailto:ak@qcare.au" style="color:#6366f1;">ak@qcare.au</a>.</li>
+                      <li>Two forms of ID emailed to <a href="mailto:ak@qcare.au" style="color:#6366f1;">ak@qcare.au</a>.</li>
                       <li>Create your employee file: <a href="https://podio.com/webforms/23975107/1738200" target="_blank" style="color:#6366f1;">Podio form</a>.</li>
-                      <li>Acceptance of Letter of Offer: sign and email to <a href="mailto:ak@qcare.life" style="color:#6366f1;">ak@qcare.life</a>.</li>
+                      <li>Acceptance of Letter of Offer: sign and email to <a href="mailto:ak@qcare.au" style="color:#6366f1;">ak@qcare.au</a>.</li>
                       <li>Create account & complete Qcare Support Worker Induction: <a href="https://link.edapp.com/V7Nj9aqVYlb" target="_blank" style="color:#6366f1;">EdApp link</a>.</li>
                       
-                      <li>Apply for NDIS screening check: <a href="https://workerscreening.dsdsatsip.qld.gov.au/workers/you-start" target="_blank" style="color:#6366f1;">Queensland worker screening</a>. Qcare company ID: <strong>4-G24F75I</strong>. If already obtained, please email a photo of your card to <a href="mailto:ak@qcare.life" style="color:#6366f1;">ak@qcare.life</a>.</li>
+                      <li>Apply for NDIS screening check: <a href="https://workerscreening.dsdsatsip.qld.gov.au/workers/you-start" target="_blank" style="color:#6366f1;">Queensland worker screening</a>. Qcare company ID: <strong>4-G24F75I</strong>. If already obtained, please email a photo of your card to <a href="mailto:ak@qcare.au" style="color:#6366f1;">ak@qcare.au</a>.</li>
                     </ol>
                   </td>
                 </tr>
@@ -121,6 +215,12 @@
                 <tr>
                   <td style="padding-top:24px; font-family:sans-serif; font-size:16px; line-height:24px; color:#555555;">
                     If you have any questions at all, please do not hesitate to contact me.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px 0 0; font-family:sans-serif; font-size:16px; line-height:24px; color:#555555;">
+                    Ashley Knight<br/>
+                    Ph. 0448 129 224<br/>
                   </td>
                 </tr>
 
