@@ -1,9 +1,11 @@
+<%# Ensure we always have a date to show/use %>
+<% current_date = @date || (@roster&.starts_on) || Date.current %>
 <table class="w-full table-fixed mb-1 bg-white">
   <tbody>
     <tr>
       <% 7.times do |i| %>
         <% date_for_button = @roster.starts_on + i.days %>
-        <% is_selected = date_for_button == @date %>
+        <% is_selected = date_for_button == current_date %>
         <% is_today = date_for_button == Date.current %>
 
         <td class="p-1 text-center align-middle">
@@ -34,7 +36,7 @@
   <thead>
     <tr>
       <th class="w-1/2 text-left font-semibold p-2 ml-8 bg-white">EMPLOYEE</th>
-      <th class="w-1/2 text-center font-semibold p-2 bg-white"><%= @date.strftime("%A, %d %B") %></th>
+      <th class="w-1/2 text-center font-semibold p-2 bg-white"><%= current_date.strftime("%A, %d %B") %></th>
     </tr>
   </thead>
   <tbody>
@@ -48,7 +50,7 @@
           </div>
         </td>
         <td class="p-1 border-t border-zinc-200 bg-white">
-          <%= render 'rosters/cell_content', roster: @roster, user: user, date: @date, selected_location_id: @selected_location_id %>
+          <%= render 'rosters/cell_content', roster: @roster, user: user, date: current_date, selected_location_id: @selected_location_id %>
         </td>
       </tr>
     <% end %>
@@ -57,7 +59,7 @@
     <tr class="text-center">
       <td class="p-2 border-t-2 border-zinc-300 text-left text-sm font-semibold text-zinc-800">TOTALS</td>
       <td class="p-2 border-t-2 border-zinc-300">
-        <%= render 'rosters/daily_hours', roster: @roster, date: @date, selected_location_id: @selected_location_id %>
+        <%= render 'rosters/daily_hours', roster: @roster, date: current_date, selected_location_id: @selected_location_id %>
       </td>
     </tr>
   </tfoot>

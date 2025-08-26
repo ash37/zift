@@ -73,6 +73,35 @@
           <span class="hidden sm:inline">Revert to Draft</span>
         <% end %>
       <% end %>
+
+      <!-- Copy: dropdown to copy from previous N weeks (1-4) -->
+      <div x-data="{ openCopy: false }" class="relative">
+        <button @click="openCopy = !openCopy"
+                class="p-3 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 sm:px-4 sm:py-2 sm:rounded-3xl flex items-center justify-center gap-2">
+          <!-- Clipboard icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-5 h-5 text-violet-500">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75A1.5 1.5 0 0 1 10.5 2.25h3A1.5 1.5 0 0 1 15 3.75M9 3.75A2.25 2.25 0 0 0 6.75 6v11.25A2.25 2.25 0 0 0 9 19.5h6a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 15 3.75M9 3.75h6" />
+          </svg>
+          <span class="hidden sm:inline">Copy</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="hidden sm:block h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div x-show="openCopy" @click.away="openCopy = false" x-transition
+             class="absolute right-0 z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+             style="display: none;">
+          <div class="py-1">
+            <% (1..4).each do |w| %>
+              <%= button_to copy_previous_week_roster_path(@roster, weeks_ago: w, location_id: selected_location_id),
+                    method: :post,
+                    form: { data: { turbo: true } },
+                    class: "w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" do %>
+                Copy from <%= w %> week<%= 's' if w > 1 %> ago
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
