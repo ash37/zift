@@ -17,14 +17,18 @@ class TimesheetsController < ApplicationController
     published_shifts = Shift.joins(:roster)
                             .where(rosters: { status: Roster::STATUSES[:published] })
                             .where(start_time: week_range)
+                            .reorder(nil)
+                            .select("shifts.*")
 
     unscheduled_shifts = Shift.joins(:roster)
                               .joins(:timesheets)
                               .where(rosters: { status: Roster::STATUSES[:draft] })
                               .where(start_time: week_range)
+                              .reorder(nil)
+                              .select("shifts.*")
 
     @shifts = Shift.from("(#{published_shifts.to_sql} UNION #{unscheduled_shifts.to_sql}) AS shifts")
-                   .order("shifts.start_time ASC")
+                   .order("shifts.start_time ASC, shifts.end_time ASC, shifts.id ASC")
 
     if @selected_location_id.present?
       @shifts = @shifts.where(location_id: @selected_location_id)
