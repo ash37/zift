@@ -1,13 +1,24 @@
 <% if current_user.respond_to?(:client?) && current_user.client? %>
-  <%= render partial: "client_dashboard", locals: { date: params[:date].present? ? Date.parse(params[:date]) : Date.current } %>
+  <%= render partial: "client_dashboard", locals: { date: params[:date].present? ? Time.zone.parse(params[:date]).to_date : Time.zone.today } %>
 <% else %>
 <%
-  today_shifts = current_user.shifts.includes(:timesheets)
-                                  .where("shifts.start_time >= ? AND shifts.start_time < ?", Date.today.beginning_of_day, Date.today.end_of_day)
-                                  .left_joins(:timesheets)
-                                  .where("timesheets.id IS NULL OR timesheets.clock_out_at IS NULL")
-                                  .order('shifts.start_time ASC')
-  upcoming_shifts = current_user.shifts.joins(:roster).where(rosters: { status: Roster::STATUSES[:published] }).where("shifts.start_time >= ?", Date.tomorrow.beginning_of_day).order(:start_time).limit(5)
+  today_range = Time.zone.today.beginning_of_day..Time.zone.today.end_of_day
+
+  today_shifts = current_user.shifts
+                             .includes(:timesheets)
+                             .where(start_time: today_range)
+                             .joins(:roster)
+                             .where(rosters: { status: Roster::STATUSES[:published] })
+                             .left_joins(:timesheets)
+                             .where("timesheets.id IS NULL OR timesheets.clock_out_at IS NULL")
+                             .order('shifts.start_time ASC')
+
+  upcoming_shifts = current_user.shifts
+                                .joins(:roster)
+                                .where(rosters: { status: Roster::STATUSES[:published] })
+                                .where("shifts.start_time >= ?", Time.zone.tomorrow.beginning_of_day)
+                                .order(:start_time)
+                                .limit(5)
 %>
 
 <section class="container px-4 py-4 mx-auto bg-transparent">
