@@ -41,7 +41,7 @@
           <div id="<%= dom_id(shift, :client_card) %>"
                class="w-full max-w-md px-4 py-3 bg-white rounded-3xl mb-4">
             <div class="flex items-center justify-between">
-              <h3 class="text-base font-semibold text-gray-900">
+              <h3 class="text-base text-lg font-semibold text-gray-900 ml-2">
                 <%= (shift.user.try(:full_name) || shift.user&.name || "—") %>
               </h3>
               <% if timesheet %>
@@ -62,15 +62,13 @@
                 %>
                 <span class="px-3 py-1 text-xs uppercase rounded-full <%= status_classes %>"><%= status_name.titleize %></span>
               <% else %>
-                <span class="px-3 py-1 text-xs uppercase bg-gray-100/60 rounded-full text-gray-700">Not Started</span>
+                <span class="px-3 py-1 text-xs uppercase bg-gray-100/60 rounded-full text-violet-700"><% if shift.respond_to?(:area) && shift.area.present? %><%= shift.area.name %><% end %></span>
+
               <% end %>
             </div>
 
             <div class="mt-1">
-              <p class="text-sm text-gray-600">
-                <%= shift.location.try(:name) || '—' %>
-                <% if shift.respond_to?(:area) && shift.area.present? %> - <%= shift.area.name %><% end %>
-              </p>
+              
 
               <% if timesheet %>
                 <% if timesheet.respond_to?(:notes) && timesheet.notes.to_s.include?("Auto-generated: Missed clock on.") %>
@@ -88,7 +86,7 @@
               <% end %>
 
               <%
-                scheduled_class = "text-xs text-violet-700"
+                scheduled_class = "text-md text-gray-600 ml-2"
                 if timesheet && timesheet.respond_to?(:duration_in_hours) && shift.respond_to?(:duration_in_hours)
                   if (timesheet.duration_in_hours.to_f - shift.duration_in_hours.to_f).abs > 0.01
                     scheduled_class = "text-xs text-orange-600"
@@ -98,7 +96,7 @@
                 end_label   = (defined?(format_shift_time) && shift.end_time)   ? format_shift_time(shift.end_time)   : (shift.end_time ? l(shift.end_time, format: :short) : "—")
               %>
               <p class="<%= scheduled_class %>">
-                Scheduled: <%= start_label %> - <%= end_label %>
+                <%= start_label %> - <%= end_label %>
               </p>
 
               <% if shift.try(:notes).present? %>
