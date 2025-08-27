@@ -40,7 +40,11 @@
     </tr>
   </thead>
   <tbody>
-    <% users = (defined?(@users_for_roster) && @users_for_roster.present?) ? @users_for_roster : User.where.not(role: nil) %>
+    <% users = if defined?(@users_for_roster) && @users_for_roster.present?
+                 @users_for_roster.reject { |u| u.role == User::ROLES[:client] }
+               else
+                 User.where.not(role: User::ROLES[:client])
+               end %>
     <% users.each do |user| %>
       <tr class="align-top">
         <td class="p-2 border-t border-zinc-200 bg-white">
