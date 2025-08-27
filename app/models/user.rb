@@ -72,6 +72,20 @@ class User < ApplicationRecord
     name.split.last
   end
 
+  # Signed token for calling /client_dashboard.json as this user
+  # Rotate by changing an attribute that invalidates signed_id (e.g., updated_at)
+  def client_dashboard_token
+    signed_id(purpose: :client_dashboard, expires_in: 1.year)
+  end
+
+  # Resolve a user from a client-dashboard token
+  def self.find_by_client_dashboard_token(token)
+    return nil if token.blank?
+    find_signed(token, purpose: :client_dashboard)
+  rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveSupport::MessageEncryptor::InvalidMessage
+    nil
+  end
+
   protected
 
   # This method is called by Devise to check if a password is required.

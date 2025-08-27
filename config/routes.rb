@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   # Public pages
   get "welcome/index"
   get "dashboards", to: "dashboards#index"
+  get "client_dashboard", to: "dashboards#index", defaults: { format: :json }
 
   resources :applications, only: [ :new, :create ] do
     get "success", on: :collection

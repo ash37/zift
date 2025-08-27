@@ -29,7 +29,10 @@
      scope.includes(:user, :location, :timesheets, :roster)
    end %>
 
+
 <%= render "dashboards/client_sub_nav", selected_date: selected_date %>
+
+
 
     <% if shifts.empty? %>
       <div class="rounded-md border border-gray-200 bg-white p-6 text-gray-600">
@@ -110,3 +113,38 @@
         <% end %>
       </div>
     <% end %>
+<%# Copy JSON URL button for clients %>
+<% if defined?(current_user) && current_user.present? %>
+  <% show_copy = if current_user.respond_to?(:client?) 
+                   current_user.client?
+                 elsif defined?(User::ROLES) && User::ROLES.is_a?(Hash)
+                   current_user.role.to_i == (User::ROLES[:client] || User::ROLES["client"])
+                 else
+                   false
+                 end %>
+  <% if show_copy %>
+    <% token = current_user.respond_to?(:client_dashboard_token) ? current_user.client_dashboard_token : nil %>
+    <% json_url = begin
+         if respond_to?(:client_dashboard_url)
+           client_dashboard_url(format: :json, token: token, date: selected_date.to_s)
+         else
+           url_for(controller: "dashboards", action: "client_dashboard", format: :json, token: token, date: selected_date.to_s)
+         end
+       rescue
+         "#"
+       end %>
+    <div class="mb-3 flex w-full justify-center">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-full bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-700 hover:bg-violet-500/20"
+        data-url="<%= json_url %>"
+        onclick="navigator.clipboard.writeText(this.dataset.url).then(()=>{ const t=this; const old=t.textContent; t.textContent='Copied!'; setTimeout(()=>{t.textContent=old;},1500); }).catch(()=>{ alert('Unable to copy.'); });"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+        Copy JSON URL
+      </button>
+    </div>
+  <% end %>
+<% end %>
