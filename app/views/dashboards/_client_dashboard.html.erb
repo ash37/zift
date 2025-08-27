@@ -22,10 +22,11 @@
    end %>
 
 <% shifts ||= begin
-     scope = Shift.all
+     scope = Shift.joins(:roster)
+     scope = scope.where(rosters: { status: Roster::STATUSES[:published] })
      scope = scope.where(location_id: loc.id) if loc.present?
      scope = scope.where(start_time: selected_date.beginning_of_day..selected_date.end_of_day)
-     scope.includes(:user, :location, :timesheets)
+     scope.includes(:user, :location, :timesheets, :roster)
    end %>
 
 <%= render "dashboards/client_sub_nav", selected_date: selected_date %>

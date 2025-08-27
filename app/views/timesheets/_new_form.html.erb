@@ -16,8 +16,67 @@
   <%= form.fields_for :shift, @timesheet.shift do |shift_form| %>
     <div class="mb-4">
       <%= shift_form.label :location_id, class: "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" %>
-      <%= shift_form.collection_select :location_id, Location.all, :id, :name, { prompt: "Select a location" }, { class: "block w-full rounded-md border-gray-300 shadow-sm dark:text-gray-200", required: true } %>
+      <%= shift_form.collection_select :location_id, Location.all, :id, :name,
+            { prompt: "Select a location" },
+            { class: "block w-full rounded-md border-gray-300 shadow-sm dark:text-gray-200", required: true, id: "shift_location_id", data: { behavior: "location-select" } } %>
     </div>
+    <div class="mb-4">
+      <%= shift_form.label :area_id, class: "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" %>
+      <%= select_tag "timesheet[shift_attributes][area_id]",
+            options_for_select([["Select an area", ""]]),
+            id: "shift_area_id",
+            class: "block w-full rounded-md border-gray-300 shadow-sm dark:text-gray-200",
+            disabled: true,
+            data: { behavior: "area-select" } %>
+    </div>
+
+    <%# Serialize Areas grouped by Location to JSON for the client-side filter %>
+    <% areas_by_location = Area.all.group_by(&:location_id).transform_values { |arr| arr.map { |a| { id: a.id, name: a.name } } } %>
+    <script type="application/json" id="areas-by-location-data"><%= raw(areas_by_location.to_json) %></script>
+
+    <script>
+      (function() {
+        function ready(fn){ if(document.readyState !== 'loading'){ fn(); } else { document.addEventListener('DOMContentLoaded', fn); } }
+        ready(function(){
+          var locSelect = document.getElementById('shift_location_id');
+          var areaSelect = document.getElementById('shift_area_id');
+          var dataTag = document.getElementById('areas-by-location-data');
+          if(!locSelect || !areaSelect || !dataTag) return;
+          var map = {};
+          try { map = JSON.parse(dataTag.textContent || '{}'); } catch(e) { map = {}; }
+
+          function populateAreas(locId){
+            // Clear current options
+            while (areaSelect.firstChild) { areaSelect.removeChild(areaSelect.firstChild); }
+            var placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = 'Select an area';
+            areaSelect.appendChild(placeholder);
+
+            var list = map[String(locId)] || [];
+            list.forEach(function(item){
+              var opt = document.createElement('option');
+              opt.value = item.id;
+              opt.textContent = item.name;
+              areaSelect.appendChild(opt);
+            });
+
+            areaSelect.disabled = list.length === 0;
+          }
+
+          // Initial state: disabled until a location is chosen
+          areaSelect.disabled = true;
+
+          // If the page was re-rendered with a selected location (validation errors), restore options
+          if (locSelect.value) { populateAreas(locSelect.value); }
+
+          locSelect.addEventListener('change', function(e){
+            var val = e.target.value;
+            if (val) { populateAreas(val); } else { areaSelect.disabled = true; while (areaSelect.firstChild) { areaSelect.removeChild(areaSelect.firstChild); } var ph = document.createElement('option'); ph.value=''; ph.textContent='Select an area'; areaSelect.appendChild(ph); }
+          });
+        });
+      })();
+    </script>
   <% end %>
 
   <p class="text-gray-600 mb-4 dark:text-gray-200">You are clocking in now: <%= Time.current.strftime("%-l:%M %p") %></p>
