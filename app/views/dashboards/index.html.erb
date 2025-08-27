@@ -1,3 +1,6 @@
+<% if current_user.respond_to?(:client?) && current_user.client? %>
+  <%= render partial: "client_dashboard", locals: { date: params[:date].present? ? Date.parse(params[:date]) : Date.current } %>
+<% else %>
 <%
   today_shifts = current_user.shifts.includes(:timesheets)
                                   .where("shifts.start_time >= ? AND shifts.start_time < ?", Date.today.beginning_of_day, Date.today.end_of_day)
@@ -85,3 +88,4 @@
     </div>
   </div>
 </section>
+<% end %>
