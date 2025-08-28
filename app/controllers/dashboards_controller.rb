@@ -6,20 +6,27 @@ class DashboardsController < ApplicationController
       format.html
       format.json do
         selected_date = params[:date] ? Date.parse(params[:date]) : Date.current
+        # Determine the client's single location (clients have many locations)
+        loc = if current_user.respond_to?(:location) && current_user.location.present?
+                current_user.location
+        elsif current_user.respond_to?(:locations)
+                current_user.locations.first
+        end
 
-        shifts = Shift.published
-                      .where(location: current_user.location)
-                      .where(date: selected_date)
-                      .includes(:user, :role, :area, :location, :roster, :timesheet)
+        shifts = Shift.joins(:roster)
+                      .where(rosters: { status: Roster::STATUSES[:published] })
+                      .where(start_time: selected_date.all_day)
+                      .includes(:user, :area, :location, :roster, :timesheets)
+
+        shifts = shifts.where(location: loc) if loc.present?
 
         render json: shifts.as_json(
           include: {
             user: { only: [ :id, :name, :email ] },
-            role: { only: [ :id, :name ] },
             area: { only: [ :id, :name ] },
             location: { only: [ :id, :name ] },
             roster: { only: [ :id, :name ] },
-            timesheet: { only: [ :id, :start_time, :end_time, :status ] }
+            timesheets: { only: [ :id, :clock_in_at, :clock_out_at, :status, :notes ] }
           },
           only: [ :id, :start_time, :end_time, :notes, :date ]
         )
