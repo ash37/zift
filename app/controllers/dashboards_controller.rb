@@ -28,7 +28,7 @@ class DashboardsController < ApplicationController
             roster: { only: [ :id, :name ] },
             timesheets: { only: [ :id, :clock_in_at, :clock_out_at, :status, :notes ] }
           },
-          only: [ :id, :start_time, :end_time, :notes, :date ]
+          only: [ :id, :start_time, :end_time, :notes ]
         )
       end
     end
