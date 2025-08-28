@@ -118,7 +118,7 @@ class TimesheetsController < ApplicationController
   end
 
   def clock_off
-    if @timesheet.update(clock_off_params.merge(clock_out_at: Time.current))
+    if @timesheet.update(clock_off_params)
       redirect_to dashboards_path
     else
       render :clock_off_form, status: :unprocessable_entity
@@ -218,12 +218,23 @@ class TimesheetsController < ApplicationController
     end
 
     def clock_off_params
-      params[:timesheet]&.delete(:_present)
-      params.require(:timesheet).permit(
+      # Accept both full form submissions and the dashboard quick action.
+      # The quick action may only send `timesheet[_present]=1`, so do not `require(:timesheet)`.
+      raw = params.fetch(:timesheet, ActionController::Parameters.new)
+      raw.delete(:_present)
+
+      permitted = raw.permit(
+        :clock_out_at,
         :notes,
         :travel,
+        :status,
         shift_answers_attributes: [ :answer_text, :shift_id, :timesheet_id, :shift_question_id, :user_id ]
       )
+
+      # If no clock_out_at was provided, default to now in the app time zone.
+      permitted[:clock_out_at] ||= Time.zone.now
+
+      permitted
     end
 
     def shift_params
