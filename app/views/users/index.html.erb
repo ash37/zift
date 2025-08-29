@@ -18,7 +18,7 @@
     <%# Right Side: Add user button %>
     <% if current_user.admin? || current_user.manager? %>
       <div>
-        <%= link_to "Add", admin_new_user_path, class: "tracking-wide rounded-3xl px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white font-semibold" %>
+        <%= link_to "Add", admin_new_user_path, class: "tracking-wide rounded-3xl px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white" %>
       </div>
     <% end %>
   </div>

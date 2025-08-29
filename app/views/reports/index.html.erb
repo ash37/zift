@@ -5,7 +5,7 @@
 <section>
   <div class="flex flex-col w-full px-4 py-1 bg-transparent">
 
-    <div class="grid w-full grid-cols-1 gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div class="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <% @timesheets.each do |timesheet| %>
         <% if timesheet.notes.present? || timesheet.shift_answers.any? %>
           <div class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl dark:bg-gray-800">

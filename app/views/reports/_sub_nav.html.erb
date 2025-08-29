@@ -1,8 +1,8 @@
-<div class="bg-white p-4 rounded-lg shadow-sm mb-6">
+<div class="bg-white p-4 shadow-sm mb-6">
   <div class="flex flex-col sm:flex-row justify-between sm:items-center">
 
     <div x-data="{ open: false }" class="relative">
-      <button @click="open = !open" class="flex items-center gap-x-2 px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
+      <button @click="open = !open" class="flex items-center gap-x-2 px-4 py-2 bg-gray-100 rounded-3xl text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-500" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
         </svg>
@@ -12,7 +12,7 @@
         </svg>
       </button>
 
-      <div x-show="open" @click.away="open = false" x-transition class="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" style="display: none;">
+      <div x-show="open" @click.away="open = false" x-transition class="absolute z-10 mt-2 w-56 rounded-lg shadow-lg bg-white focus:outline-none" style="display: none;">
         <div class="py-1">
           <%= link_to "All Locations", reports_path(location_id: nil), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
           <% @locations.each do |location| %>
