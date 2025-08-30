@@ -199,16 +199,17 @@
 
 <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
   <div>
-    <%= f.label :tfn_threshold, "TFN Threshold Claimed", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= f.text_field :tfn_threshold, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
-  </div>
+    <%= f.label :tfn_threshold, "Claim Tax Free Threshold", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.select :tfn_threshold, [["Yes","Yes"],["No","No"]], { include_blank: false }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
 </div>
 
 <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
   <div>
     <%= f.label :debt, "HECS/HELP Debt", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= f.text_field :debt, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
-  </div>
+    <span class="text-xs text-gray-500">Choose yes if you have higher education debt</span>
+        <%= f.select :debt, [["No","No"],["Yes","Yes"]], { include_blank: false }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
 </div>
 
 <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
