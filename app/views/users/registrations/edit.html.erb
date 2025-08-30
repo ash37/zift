@@ -1,6 +1,7 @@
- <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f| %>
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
       <%= f.hidden_field :invitation_token, value: params[:invitation_token] || resource.invitation_token %>
+      <% user = @user || resource %>
 
 <div class="bg-zinc-100 pt-4 sm:py-12 px-0 sm:px-6 lg:px-8">
   <div class="mt-6 w-full rounded-none bg-zinc-100 p-8 sm:mt-10 sm:max-w-4xl sm:mx-auto sm:rounded-3xl">
@@ -8,6 +9,7 @@
       <span class="text-4xl font-bold text-gray-800">Welcome to the</span><span class="text-4xl font-bold text-violet-700"> team</span>
       <p class="mt-2 text-gray-600">Please set your password and complete your employee file to get started.</p>
     </div>
+  </div>
 </div>
 
     
@@ -18,12 +20,12 @@
       <div class="bg-white rounded-2xl p-6 flex items-center justify-between">
         <div class="flex items-center min-w-0">
           <div class="text-left">
-            <h1 class="text-2xl font-bold text-gray-800 truncate"><%= @user.name %></h1>
-            <p class="text-gray-600 break-all sm:break-normal"><%= @user.email %></p>
-            <p class="text-gray-600 break-all sm:break-normal"><%= @user.phone %></p>
+            <h1 class="text-2xl font-bold text-gray-800 truncate"><%= user.name %></h1>
+            <p class="text-gray-600 break-all sm:break-normal"><%= user.email %></p>
+            <p class="text-gray-600 break-all sm:break-normal"><%= user.phone %></p>
           </div>
         </div>
-        <% dob_display     = @user.date_of_birth.present? ? @user.date_of_birth.strftime('%-d %b %Y').upcase : '—' %>
+        <% dob_display = user.date_of_birth.present? ? user.date_of_birth.strftime('%-d %b %Y').upcase : '—' %>
         
          <!-- Date of birth -->
     <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
@@ -36,6 +38,8 @@
           </div>
       
       <div class="min-w-0">
+        <div class="text-xs uppercase tracking-wide text-gray-500">Date of birth</div>
+        <div class="text-gray-800"><%= dob_display %></div>
       </div>
     </div>
       </div>

@@ -1,12 +1,16 @@
 <% f = local_assigns[:f] || local_assigns[:form] %>
- <% screening_yes   = @user.obtained_screening.to_s.downcase == 'yes' %>
-  <% exp_yes         = @user.disability_experience.to_s.downcase == 'yes' %>
-  <% other_emp_yes   = @user.other_employment.to_s.downcase == 'yes' %>
-  <% licence_yes     = @user.licence.to_s.downcase == 'yes' %>
-  
-  <% suburb_display  = @user.suburb.presence || '—' %>
-  <% postcode_display= @user.postcode.presence || '—' %>
-  <% avail_display   = @user.availability.presence || '—' %>
+<% unless defined?(f) && f %>
+  <% raise ArgumentError, "_mobile_registration requires a form builder local (:f)" %>
+<% end %>
+<% user = @user || (defined?(resource) ? resource : nil) %>
+<% screening_yes    = user&.obtained_screening.to_s.downcase == 'yes' %>
+<% exp_yes          = user&.disability_experience.to_s.downcase == 'yes' %>
+<% other_emp_yes    = user&.other_employment.to_s.downcase == 'yes' %>
+<% licence_yes      = user&.licence.to_s.downcase == 'yes' %>
+
+<% suburb_display   = user&.suburb.presence || '—' %>
+<% postcode_display = user&.postcode.presence || '—' %>
+<% avail_display    = user&.availability.presence || '—' %>
 
 <!-- Applicant summary card -->
 <div class="bg-white rounded-3xl mt-4 p-6 sm:p-8">

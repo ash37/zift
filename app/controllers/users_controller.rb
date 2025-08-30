@@ -104,14 +104,23 @@ end
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(
-        :name, :email, :phone, :role, :status, :gender,
+      # Safe fields any user can update on their own profile
+      safe = [
+        :name, :email, :phone, :gender,
         :obtained_screening, :date_of_birth, :address, :suburb, :state,
         :postcode, :emergency_name, :emergency_phone, :disability_experience,
         :other_experience, :other_employment, :licence, :availability, :bio,
         :known_client, :resident, :education, :qualification, :bank_account,
         :bsb, :tfn, :training, :departure, :yellow_expiry, :blue_expiry,
-        :tfn_threshold, :debt, :super_name, :super_number, :password, :password_confirmation, location_ids: []
-      )
+        :tfn_threshold, :debt, :super_name, :super_number,
+        :password, :password_confirmation
+      ]
+
+      # Only admins can set privileged attributes
+      if current_user&.respond_to?(:admin?) ? current_user.admin? : current_user&.role == "admin"
+        safe += [ :role, :status, { location_ids: [] } ]
+      end
+
+      params.require(:user).permit(safe)
     end
 end

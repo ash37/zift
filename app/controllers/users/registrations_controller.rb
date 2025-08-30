@@ -38,17 +38,27 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   private
 
-  # Use the strong params from your users_controller
+  # Strong params for invitation/edit registration
   def user_params
-    params.require(:user).permit(
-      :password, :password_confirmation, :invitation_token,
-      :name, :email, :phone, :role, :location_id, :status, :gender,
+    # Fields a user can safely set for themselves during invitation acceptance / self-edit
+    safe = [
+      :name, :email, :phone, :gender,
       :obtained_screening, :date_of_birth, :address, :suburb, :state,
       :postcode, :emergency_name, :emergency_phone, :disability_experience,
       :other_experience, :other_employment, :licence, :availability, :bio,
       :known_client, :resident, :education, :qualification, :bank_account,
       :bsb, :tfn, :training, :departure, :yellow_expiry, :blue_expiry,
       :tfn_threshold, :debt, :super_name, :super_number
-    )
+    ]
+
+    # Always allow password fields + invitation token in this flow
+    base = safe + [ :password, :password_confirmation, :invitation_token ]
+
+    # Only admins can set privileged attributes (rare in this flow, but safe to gate)
+    if current_user && (current_user.respond_to?(:admin?) ? current_user.admin? : current_user.role == "admin")
+      base += [ :role, :status, { location_ids: [] } ]
+    end
+
+    params.require(:user).permit(base)
   end
 end
