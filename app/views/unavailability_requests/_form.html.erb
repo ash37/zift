@@ -18,7 +18,7 @@
     }" x-init="updateFromStart()" x-effect="if(repeatsWeekly){ updateFromStart() }">
     <input type="hidden" name="unavailability_request[all_day]" x-bind:value="allDay">
 
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-3xl mt-8">
       <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white"><%= unavailability_request.new_record? ? 'New Unavailability Request' : 'Edit Unavailability Request' %></h2>
 
       <% if unavailability_request.errors.any? %>
@@ -33,7 +33,7 @@
       <% end %>
 
       <%# ... (Top part of the form is unchanged) ... %>
-       <div class="mb-6">
+       <div class="mb-6 mt-2">
         <label class="flex items-center">
           <input type="checkbox" x-model="allDay" class="form-checkbox h-5 w-5 text-violet-600 rounded">
           <span class="ml-2 text-gray-700">All day</span>
