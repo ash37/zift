@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user, only: %i[ show edit update destroy employ ]
+  before_action :set_user, only: %i[ show edit update destroy employ contact ]
 
   # GET /users
   def index
@@ -93,6 +93,27 @@ end
       redirect_to @user, notice: "Employment email sent to #{@user.name}."
     else
       redirect_to @user, alert: "This user has already been processed."
+    end
+  end
+
+  # POST /users/:id/contact
+  def contact
+    # Only admins may change status
+    unless current_user && (current_user.respond_to?(:admin?) ? current_user.admin? : current_user&.role == "admin")
+      redirect_to @user, alert: "Unauthorized" and return
+    end
+
+    # Update status to contacted without relying on mass-assignment
+    target_value = if defined?(User::STATUSES) && User::STATUSES.is_a?(Hash) && User::STATUSES[:contacted]
+                     User::STATUSES[:contacted]
+    else
+                     "contacted"
+    end
+
+    if @user.update(status: target_value)
+      redirect_to(params[:redirect_to].presence || users_path(filter: "applicants"), notice: "User marked as contacted.")
+    else
+      redirect_to(params[:redirect_to].presence || users_path(filter: "applicants"), alert: @user.errors.full_messages.to_sentence)
     end
   end
 

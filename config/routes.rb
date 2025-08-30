@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   resources :users, except: [ :new, :create ] do
     member do
       post :employ
+      post :contact
     end
   end
   resources :locations do

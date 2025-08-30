@@ -30,7 +30,7 @@
         </div>
       <% end %>
 
-     <% if @user.status == User::STATUSES[:applicant] %>
+<% if [User::STATUSES[:applicant], User::STATUSES[:contacted]].include?(@user.status) %>
         <%= render 'users/applicant_details', user: @user %>
      <% elsif @user.role == 'employee' %>
         <%= render 'users/employee_details', user: @user %>
