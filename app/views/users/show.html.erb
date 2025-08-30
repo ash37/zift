@@ -30,153 +30,15 @@
         </div>
       <% end %>
 
-      <% if @user.status == User::STATUSES[:applicant] %>
-        <div class="mt-4 flex justify-end">
-          <%= button_to "Employ Applicant", employ_user_path(@user), method: :post, class: "bg-green-500 text-white font-semibold py-2 px-4 rounded-3xl" %>
-        </div>
-  <div class="bg-white rounded-3xl mt-4 p-6 sm:p-8">
-  <% screening_yes   = @user.obtained_screening.to_s.downcase == 'yes' %>
-  <% exp_yes         = @user.disability_experience.to_s.downcase == 'yes' %>
-  <% other_emp_yes   = @user.other_employment.to_s.downcase == 'yes' %>
-  <% licence_yes     = @user.licence.to_s.downcase == 'yes' %>
-  <% dob_display     = @user.date_of_birth.present? ? @user.date_of_birth.strftime('%-d %b %Y').upcase : '—' %>
-  <% suburb_display  = @user.suburb.presence || '—' %>
-  <% postcode_display= @user.postcode.presence || '—' %>
-  <% avail_display   = @user.availability.presence || '—' %>
+     <% if @user.status == User::STATUSES[:applicant] %>
+        <%= render 'users/applicant_details', user: @user %>
+     <% elsif @user.role == 'employee' %>
+        <%= render 'users/employee_details', user: @user %>
+     <% elsif (current_user&.respond_to?(:admin?) ? current_user.admin? : current_user&.role == 'admin') %>
+        <%= render 'users/employee_admin_details', user: @user %>
+     <% end %>
 
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-      Application details
-    </h2>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
-      <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
-            <svg class="h-5 w-5 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M7 3v3M17 3v3M3 11h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <rect x="3" y="6" width="18" height="15" rx="2" stroke="currentColor" stroke-width="2"/>
-            </svg>
-          </div>
-      
-      <div class="min-w-0">
-        <div class="text-xs uppercase tracking-wide text-gray-500">Date of birth</div>
-        <div class="text-gray-800 break-all sm:break-normal"><%= dob_display %></div>
-      </div>
-    </div>
-
-
-    <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
-      <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
-            <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 21s7-5.373 7-11a7 7 0 1 0-14 0c0 5.627 7 11 7 11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="2"/>
-      </svg>
-          </div>
-      
-      <div class="min-w-0">
-        <div class="text-xs uppercase tracking-wide text-gray-500">Location</div>
-        <div class="text-gray-800 break-all sm:break-normal"><%= suburb_display %>, <%= postcode_display %></div>
-      </div>
-    </div>
-
-   
-
-    <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
-      <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
-            <svg class="h-6 w-6 <%= screening_yes ? 'text-violet-600' : 'text-gray-400' %>" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
-</svg>
-          </div>
-      
-
-
-
-
-      <div class="min-w-0">
-        <div class="text-xs uppercase tracking-wide text-gray-500">Disability screening card</div>
-        <div>
-          <span class="inline-flex items-center rounded-3xl px-3 py-1 text-xs font-medium
-                       <%= screening_yes ? 'bg-violet-700 text-white' : 'bg-gray-100 text-gray-700' %>">
-            <%= screening_yes ? 'YES' : 'NO' %>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
-      <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
-            <svg class="h-6 w-6 <%= exp_yes ? 'text-violet-600' : 'text-gray-400' %>" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
-</svg>
-
-          </div>
-      
-      <div class="min-w-0">
-        <div class="text-xs uppercase tracking-wide text-gray-500">Has worked in disability</div>
-        <div>
-          <span class="inline-flex items-center rounded-3xl px-3 py-1 text-xs font-medium
-                       <%= exp_yes ? 'bg-violet-700 text-white' : 'bg-gray-100 text-gray-700' %>">
-            <%= exp_yes ? 'YES' : 'NO' %>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
-      <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
-            <svg class="h-6 w-6 text-violet-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
-</svg>
-          </div>
-      
-      
-
-      <div class="min-w-0">
-        <div class="text-xs uppercase tracking-wide text-gray-500">Has other employment</div>
-        <div>
-          <span class="inline-flex items-center rounded-3xl px-3 py-1 text-xs font-medium
-                       <%= other_emp_yes ? 'bg-violet-700 text-white' : 'bg-gray-100 text-gray-700' %>">
-            <%= other_emp_yes ? 'YES' : 'NO' %>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
-      <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
-            <svg class="h-6 w-6 text-violet-600" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M3 8L5.72187 10.2682C5.90158 10.418 6.12811 10.5 6.36205 10.5H17.6379C17.8719 10.5 18.0984 10.418 18.2781 10.2682L21 8M6.5 14H6.51M17.5 14H17.51M8.16065 4.5H15.8394C16.5571 4.5 17.2198 4.88457 17.5758 5.50772L20.473 10.5777C20.8183 11.1821 21 11.8661 21 12.5623V18.5C21 19.0523 20.5523 19.5 20 19.5H19C18.4477 19.5 18 19.0523 18 18.5V17.5H6V18.5C6 19.0523 5.55228 19.5 5 19.5H4C3.44772 19.5 3 19.0523 3 18.5V12.5623C3 11.8661 3.18166 11.1821 3.52703 10.5777L6.42416 5.50772C6.78024 4.88457 7.44293 4.5 8.16065 4.5ZM7 14C7 14.2761 6.77614 14.5 6.5 14.5C6.22386 14.5 6 14.2761 6 14C6 13.7239 6.22386 13.5 6.5 13.5C6.77614 13.5 7 13.7239 7 14ZM18 14C18 14.2761 17.7761 14.5 17.5 14.5C17.2239 14.5 17 14.2761 17 14C17 13.7239 17.2239 13.5 17.5 13.5C17.7761 13.5 18 13.7239 18 14Z" />
-</svg>
-          </div>
-      
-      <div class="min-w-0">
-        <div class="text-xs uppercase tracking-wide text-gray-500">Driver licence</div>
-        <div>
-          <span class="inline-flex items-center rounded-3xl px-3 py-1 text-xs font-medium
-                       <%= licence_yes ? 'bg-violet-700 text-white' : 'bg-gray-100 text-gray-700' %>">
-            <%= licence_yes ? 'YES' : 'NO' %>
-          </span>
-        </div>
-      </div>
-    </div>
-     <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
-      <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
-            <svg class="h-6 w-6 text-violet-500" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-        <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-          </div>
-      
-      <div class="min-w-0">
-        <div class="text-xs uppercase tracking-wide text-gray-500">Availability</div>
-        <div class="text-gray-800 break-all sm:break-normal"><%= avail_display %></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<% end %>
+      <% unless @user.status == User::STATUSES[:applicant] %>
       <div class="mt-8">
         <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center justify-between">
           Upcoming Shifts
@@ -227,6 +89,7 @@
         <% end %>
         </div>
       </div>
+      <% end %>
 
     </div>
   </section>

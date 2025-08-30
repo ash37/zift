@@ -1,96 +1,236 @@
-<%# app/views/users/_form.html.erb %>
-<%# FIX: Adjusted classes to be full-width on mobile and a centered card on larger screens %>
-<section class="relative w-full sm:max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-gray-800">
-  <%# 'Back to users' link, styled as an 'x' icon in the top-right corner. %>
-  <%= link_to users_path, class: "absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  <% end %>
+<%# app/views/users/_form.html.erb (styled using app-wide guide) %>
 
-  <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white"><%= user.persisted? ? 'Edit Employee' : 'Add Employee' %></h2>
+<!-- OUTER WRAPPER -->
+<div class="bg-zinc-100 pt-4 px-0 sm:py-12 sm:px-6 lg:px-8">
 
-  <%= form_with(
-  model: user,
-  url: user.persisted? ? user_path(user) : admin_create_user_path,
-  method: user.persisted? ? :patch : :post,
-  class: "mt-6"
-) do |form| %>
+  <!-- CARD WRAPPER -->
+  <div class="mt-6 w-full rounded-none bg-white p-8 sm:mt-10 sm:w-1/2 sm:mx-auto sm:rounded-3xl">
 
-    
-    <% if user.errors.any? %>
-      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mb-6">
-        <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
-        <ul class="list-disc ml-6 mt-2">
-          <% user.errors.each do |error| %>
-            <li><%= error.full_message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+    <div class="text-center mb-8">
+      <% if user.persisted? %>
+        <span class="text-4xl font-bold text-gray-800">Edit</span>
+        <span class="text-4xl font-bold text-violet-700">employee</span>
+        <p class="mt-6 text-gray-600">Update this employee’s account details and assignments.</p>
+      <% else %>
+        <span class="text-4xl font-bold text-gray-800">Add</span>
+        <span class="text-4xl font-bold text-violet-700">employee</span>
+        <p class="mt-6 text-gray-600">Create a new employee profile to get them started.</p>
+      <% end %>
+    </div>
 
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <%= form_with(
+      model: user,
+      url: user.persisted? ? user_path(user) : admin_create_user_path,
+      method: user.persisted? ? :patch : :post,
+      html: { class: "space-y-6" }
+    ) do |form| %>
+      <% if user.errors.any? %>
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
+          <p class="font-semibold"><%= pluralize(user.errors.count, "error") %> prevented this user from being saved:</p>
+          <ul class="mt-2 list-disc pl-5">
+            <% user.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <!-- Name -->
       <div>
-        <%= form.label :name, class: "text-gray-700 dark:text-gray-200" %>
-        <%= form.text_field :name, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+        <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :name, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Enter full name" %>
       </div>
 
+      <!-- Email -->
       <div>
-        <%= form.label :email, "Email Address", class: "text-gray-700 dark:text-gray-200" %>
-        <%= form.email_field :email, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+        <%= form.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.email_field :email, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "you@example.com" %>
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <%= form.label :phone, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :phone, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Contact number" %>
       </div>
 
       <% if user.new_record? %>
+        <!-- Password (new user only) -->
         <div>
-          <%= form.label :password, class: "text-gray-700 dark:text-gray-200" %>
-          <%= form.password_field :password, autocomplete: "new-password", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+          <%= form.label :password, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.password_field :password, autocomplete: "new-password", class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
         </div>
-
         <div>
-          <%= form.label :password_confirmation, "Password Confirmation", class: "text-gray-700 dark:text-gray-200" %>
-          <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+          <%= form.label :password_confirmation, "Password Confirmation", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
         </div>
       <% else %>
-        <div class="sm:col-span-2">
-          <details class="mt-2 rounded-md border border-gray-200 dark:border-gray-600 p-4">
-            <summary class="cursor-pointer text-gray-700 dark:text-gray-200 font-medium">
-              Change password (optional)
-            </summary>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Leave both fields blank to keep the current password.
-            </p>
-            <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <%= form.label :password, "New password", class: "text-gray-700 dark:text-gray-200" %>
-                <%= form.password_field :password, autocomplete: "new-password", placeholder: "Leave blank to keep current", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
-              </div>
-              <div>
-                <%= form.label :password_confirmation, "Confirm new password", class: "text-gray-700 dark:text-gray-200" %>
-                <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Repeat new password", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
-              </div>
+        <!-- Change password (edit only) -->
+        <details class="rounded-xl border border-gray-200 p-4">
+          <summary class="cursor-pointer text-gray-700 font-medium">Change password (optional)</summary>
+          <p class="text-sm text-gray-500 mt-2">Leave both fields blank to keep the current password.</p>
+          <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <%= form.label :password, "New password", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.password_field :password, autocomplete: "new-password", placeholder: "Leave blank to keep current", class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
             </div>
-          </details>
+            <div>
+              <%= form.label :password_confirmation, "Confirm new password", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Repeat new password", class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+            </div>
+          </div>
+        </details>
+      <% end %>
+
+      <% if user.new_record? || (defined?(current_user) && (current_user.respond_to?(:role_admin?) ? current_user.role_admin? : current_user&.role == 'admin')) %>
+        <!-- Role (admin can change) -->
+        <div>
+          <%= form.label :role, "Role", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :role,
+                (defined?(User::ROLES) ? User::ROLES.map { |k,v| [k.to_s.titleize, v] } : [["Employee","employee"],["Admin","admin"]]),
+                { prompt: "Select role" },
+                class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
         </div>
       <% end %>
 
-      <% if user.new_record? || current_user.role_admin? %>
-        <div>
-          <%= form.label :role, "Role", class: "text-gray-700 dark:text-gray-200" %>
-          <%= form.select :role,
-              User::ROLES.map { |key, val| [key.to_s.titleize, val] },
-              { prompt: "Select role" },
-              class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
-        </div>
-      <% end %>
+      <!-- Locations (multi-select) -->
+      <div>
+        <%= form.label :location_ids, "Locations", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.collection_select :location_ids, Location.all, :id, :name, {}, { multiple: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" } %>
+      </div>
+
+      <!-- Date of Birth -->
+      <div>
+        <%= form.label :date_of_birth, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.date_field :date_of_birth, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
 
       <div>
-        <%= form.label :location_ids, "Locations", class: "text-gray-700 dark:text-gray-200" %>
-        <%= form.collection_select :location_ids, Location.all, :id, :name, {}, { multiple: true, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" } %>
+        <%= form.label :gender, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :gender, [["Male", "male"], ["Female", "female"], ["Other", "other"]], { include_blank: true }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
       </div>
-    </div>
 
-    <div class="flex justify-end mt-6">
-      <%= form.submit "Save", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-3xl hover:bg-gray-600 focus:outline-none focus:bg-gray-600" %>
-    </div>
-  <% end %>
-</section>
+      <!-- Suburb / Postcode -->
+
+          <%= form.label :address, "Street", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :address, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "e.g. 15 Main St" %>
+
+      <div>
+        <%= form.label :suburb, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :suburb, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "e.g. Rockhampton" %>
+      </div>
+      <div>
+        <%= form.label :postcode, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :postcode, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "4701", inputmode: "numeric", pattern: "\\d*" %>
+      </div>
+
+      <!-- Yes/No segment controls as simple selects for now (can swap to Alpine segmented later) -->
+      <div>
+        <%= form.label :obtained_screening, "Obtained screening", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :obtained_screening, [["Yes","yes"],["No","no"]], { include_blank: true }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+      <div>
+        <%= form.label :disability_experience, "Disability experience", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :disability_experience, [["Yes","yes"],["No","no"]], { include_blank: true }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+      <div>
+        <%= form.label :other_employment, "Other employment", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :other_employment, [["Yes","yes"],["No","no"]], { include_blank: true }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+      <div>
+        <%= form.label :licence, "Licence", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :licence, [["Yes","yes"],["No","no"]], { include_blank: true }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Availability -->
+      <div>
+        <%= form.label :availability, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :availability, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "e.g., Weekdays 9–3, Weekend nights" %>
+      </div>
+
+      <!-- Emergency Contact Name -->
+      <div>
+        <%= form.label :emergency_name, "Emergency Contact Name", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :emergency_name, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Emergency Contact Phone -->
+      <div>
+        <%= form.label :emergency_phone, "Emergency Contact Phone", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :emergency_phone, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Bank Account -->
+      <div>
+        <%= form.label :bank_account, "Bank Account Number", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :bank_account, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- BSB -->
+      <div>
+        <%= form.label :bsb, "BSB", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :bsb, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- TFN -->
+      <div>
+        <%= form.label :tfn, "Tax File Number", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :tfn, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Training -->
+      <div>
+        <%= form.label :training, "Training", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :training, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Departure -->
+      <div>
+        <%= form.label :departure, "Departure", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :departure, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Yellow Card Expiry -->
+      <div>
+        <%= form.label :yellow_expiry, "Yellow Card Expiry", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :yellow_expiry, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Blue Card Expiry -->
+      <div>
+        <%= form.label :blue_expiry, "Blue Card Expiry", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :blue_expiry, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- TFN Threshold -->
+      <div>
+        <%= form.label :tfn_threshold, "Claim Tax Free Threshold", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <span class="text-xs text-gray-500">Choose yes if this is your primary income source</span>
+        <%= form.select :tfn_threshold, [["Yes","Yes"],["No","No"]], { include_blank: false }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Debt -->
+      <div>
+        <%= form.label :debt, "HECS/HELP Debt", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <span class="text-xs text-gray-500">Choose yes if you have higher education debt</span>
+        <%= form.select :debt, [["No","No"],["Yes","Yes"]], { include_blank: false }, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Superannuation Fund Name -->
+      <div>
+        <%= form.label :super_name, "Superannuation Fund Name", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :super_name, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Superannuation Member Number -->
+      <div>
+        <%= form.label :super_number, "Superannuation Member Number", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :super_number, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <!-- Submit -->
+      <div class="pt-2">
+        <%= form.submit (user.persisted? ? "Update User" : "Create User"), class: "w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-4 rounded-3xl shadow-lg transition-transform transform hover:scale-105" %>
+      </div>
+    <% end %>
+  </div>
+</div>
