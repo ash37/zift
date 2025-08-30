@@ -10,7 +10,7 @@
       <% if user.persisted? %>
         <span class="text-4xl font-bold text-gray-800">Edit</span>
         <span class="text-4xl font-bold text-violet-700">employee</span>
-        <p class="mt-6 text-gray-600">Update this employee’s account details and assignments.</p>
+        <p class="mt-6 text-gray-600">Update this employee’s details.</p>
       <% else %>
         <span class="text-4xl font-bold text-gray-800">Add</span>
         <span class="text-4xl font-bold text-violet-700">employee</span>
@@ -92,10 +92,78 @@
         </div>
       <% end %>
 
-      <!-- Locations (multi-select) -->
+      <!-- Locations (select + chips) -->
       <div>
         <%= form.label :location_ids, "Locations", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= form.collection_select :location_ids, Location.all, :id, :name, {}, { multiple: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" } %>
+
+        <div class="flex items-center gap-2">
+          <select id="location_select"
+                  class="block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500">
+            <option value="">Select a location…</option>
+            <% Location.order(:name).each do |loc| %>
+              <option value="<%= loc.id %>"><%= loc.name %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <!-- Selected chips -->
+        <div id="selected_locations" class="mt-3 flex flex-wrap gap-2">
+          <%# Prepopulate existing selections as chips + hidden inputs %>
+          <% Location.where(id: user.location_ids).order(:name).each do |loc| %>
+            <span class="inline-flex items-center gap-2 rounded-3xl bg-violet-100 text-violet-800 px-3 py-1 text-sm" data-loc-id="<%= loc.id %>">
+              <%= loc.name %>
+              <button type="button" class="remove-loc text-violet-700 hover:text-violet-900" aria-label="Remove">
+                &times;
+              </button>
+              <input type="hidden" name="user[location_ids][]" value="<%= loc.id %>">
+            </span>
+          <% end %>
+        </div>
+
+        <!-- Keep hidden field so empty selection clears associations -->
+        <%= hidden_field_tag "user[location_ids][]", "" %>
+
+        <script>
+          (function(){
+            const select = document.getElementById('location_select');
+            const container = document.getElementById('selected_locations');
+
+            function alreadySelected(id){
+              return !!container.querySelector('[data-loc-id="'+id+'"]');
+            }
+
+            function addChip(id, name){
+              if(!id) return;
+              if(alreadySelected(id)) return; // prevent duplicates
+              const chip = document.createElement('span');
+              chip.className = 'inline-flex items-center gap-2 rounded-3xl bg-violet-100 text-violet-800 px-3 py-1 text-sm';
+              chip.setAttribute('data-loc-id', id);
+              chip.innerHTML = `
+                ${name}
+                <button type="button" class="remove-loc text-violet-700 hover:text-violet-900" aria-label="Remove">&times;</button>
+                <input type="hidden" name="user[location_ids][]" value="${id}">
+              `;
+              container.appendChild(chip);
+            }
+
+            function removeHandler(e){
+              const btn = e.target.closest('.remove-loc');
+              if(!btn) return;
+              const chip = btn.closest('[data-loc-id]');
+              if(chip) chip.remove();
+            }
+
+            // also add on change (so selecting immediately adds)
+            select?.addEventListener('change', function(){
+              const id = select.value;
+              const name = select.options[select.selectedIndex]?.text || '';
+              addChip(id, name);
+              select.value = '';
+            });
+
+            container?.addEventListener('click', removeHandler);
+          })();
+        </script>
       </div>
 
       <!-- Date of Birth -->
