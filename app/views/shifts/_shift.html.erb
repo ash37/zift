@@ -43,7 +43,7 @@
     
     <div class="flex justify-between items-start">
       <div>
-        <p class="text-sm font-bold ml-2"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+        <p class="text-xs lg:text-sm font-bold ml-2"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
       </div>
       <div class="flex items-center justify-between">
       <% duration_in_hours = (shift.end_time - shift.start_time) / 3600.0 %>

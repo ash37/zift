@@ -29,7 +29,7 @@
     <% users.each do |user| %>
       <tr class="align-top">
         <td class="px-2 py-1 bg-white rounded-3xl">
-          <div class="font-semibold text-zinc-800 mt-1 ml-4"><%= user.first_name %><br><%= user.last_name %></div>
+          <div class="font-semibold text-zinc-800 mt-1 ml-1 xl:ml-4"><%= user.first_name %><br><%= user.last_name %></div>
           <div id="<%= dom_id(@roster, "user_hours_#{user.id}") %>">
             <%= render 'rosters/user_hours', roster: @roster, user: user, selected_location_id: @selected_location_id %>
           </div>
