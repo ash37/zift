@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_admin!, only: [ :index, :edit, :update, :destroy, :employ, :contact ]
   before_action :set_user, only: %i[ show edit update destroy employ contact ]
 
   # GET /users
