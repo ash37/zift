@@ -1,13 +1,15 @@
 <%# Expect: render 'users/applicant_details', user: @user %>
 <% user = local_assigns[:user] || @user %>
 <% if (current_user&.respond_to?(:admin?) ? current_user.admin? : current_user&.role == 'admin') %>
-  <div class="mt-4 flex justify-end">
-    <%= button_to "Contact",
-                  contact_user_path(user),
-                  method: :post,
-                  params: { redirect_to: users_path(filter: 'applicants') },
-                  class: "bg-gray-100 text-gray-800 font-semibold py-2 px-4 rounded-3xl mr-2 border border-gray-300" %>
-    <%= button_to "Employ Applicant", employ_user_path(user), method: :post, class: "bg-green-500 text-white font-semibold py-2 px-4 rounded-3xl" %>
+  <div class="mt-4 flex justify-end space-x-2">
+   
+     <%= button_to "Contacted",
+         contact_user_path(user),
+         method: :post,
+         params: { redirect_to: users_path(filter: 'applicants') },
+         class: "#{user.status == 'contacted' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-500 border border-gray-300'} font-semibold py-2 px-4 rounded-3xl cursor-pointer" %>
+   
+    <%= button_to "Employ Applicant", employ_user_path(user), method: :post, class: "bg-green-500 text-white font-semibold py-2 px-4 rounded-3xl cursor-pointer" %>
   </div>
 <% end %>
         <div class="bg-white rounded-3xl mt-4 p-6 sm:p-8">
