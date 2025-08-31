@@ -1,5 +1,15 @@
 <% content_for :title, "Roster for #{@roster.starts_on.strftime('%B %d, %Y')}" %>
 
+<style>
+  @layer utilities {
+    @media (max-width: 1024px) {
+      .text-xs {
+        font-size: 8px !important;
+      }
+    }
+  }
+</style>
+
 <div class="hidden sm:block">
   <%= render "sub_nav", selected_location_id: @selected_location_id %>
 </div>
