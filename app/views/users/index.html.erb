@@ -1,24 +1,63 @@
 <% content_for :title, "Users" %>
-<% if current_user.admin? || current_user.manager? %>
-  <div class="mb-4">
-    <%= link_to "Employees", users_path, class: "px-3 py-2 rounded-md #{params[:filter].nil? ? 'bg-violet-500 text-white' : 'bg-gray-200 text-gray-700'}" %>
-    <%= link_to "Applicants", users_path(filter: 'applicants'), class: "px-3 py-2 rounded-md #{params[:filter] == 'applicants' ? 'bg-violet-500 text-white' : 'bg-gray-200 text-gray-700'}" %>
-    <%= link_to "Contacted", users_path(filter: 'contacted'), class: "px-3 py-2 rounded-md #{params[:filter] == 'contacted' ? 'bg-violet-500 text-white' : 'bg-gray-200 text-gray-700'}" %>
-    <%= link_to "Ended", users_path(filter: 'ended'), class: "px-3 py-2 rounded-md #{params[:filter] == 'ended' ? 'bg-violet-500 text-white' : 'bg-gray-200 text-gray-700'}" %>
-  </div>
-<% end %>
-<section class="container px-4 py-4 mx-auto">
+<section class="container px-4 py-4 mx-auto bg-white">
   <div class="flex justify-between items-center">
     <%# Left Side: Title and user count %>
     <div class="flex items-center gap-x-3">
-      <h2 class="text-lg font-medium text-gray-800">Team</h2>
-      
+      <% if current_user.admin? || current_user.manager? %>
+        <% current_label =
+          case params[:filter]
+          when 'applicants' then 'Applicants'
+          when 'contacted'  then 'Contacted'
+          when 'ended'      then 'Ended'
+          else 'Employees'
+          end
+        %>
+        <div class="relative inline-block text-left" x-data="{ open: false }">
+          <!-- Trigger button -->
+          <button
+            type="button"
+            @click="open = !open"
+            @keydown.escape.window="open = false"
+            class="inline-flex w-full justify-between items-center gap-x-2 rounded-3xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+            aria-haspopup="true"
+            :aria-expanded="open"
+          >
+            <span><%= current_label %></span>
+            <!-- Chevron Down Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.207l3.71-2.977a.75.75 0 111.06 1.06l-4.24 3.4a.75.75 0 01-.94 0l-4.24-3.4a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+          <!-- Dropdown menu -->
+          <div
+            x-cloak
+            x-show="open"
+            x-transition
+            @click.outside="open = false"
+            @keydown.escape.window="open = false"
+            class="absolute z-50 mt-2 w-56 rounded-lg shadow-md bg-white focus:outline-none"
+            style="display: none;"
+            role="menu"
+          >
+            <div class="py-1" role="none">
+              <%= link_to "Employees", users_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem" %>
+              <%= link_to "Applicants", users_path(filter: 'applicants'), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem" %>
+              <%= link_to "Contacted", users_path(filter: 'contacted'), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem" %>
+              <%= link_to "Ended", users_path(filter: 'ended'), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
 
     <%# Right Side: Add user button %>
     <% if current_user.admin? || current_user.manager? %>
       <div>
-        <%= link_to "Add", admin_new_user_path, class: "tracking-wide rounded-3xl px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white" %>
+        <%= link_to admin_new_user_path, class: "flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-violet-500">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+          </svg>
+        <% end %>
       </div>
     <% end %>
   </div>
