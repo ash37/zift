@@ -207,6 +207,7 @@ class TimesheetsController < ApplicationController
 
     def timesheet_params
       params.require(:timesheet).permit(
+        :user_id,
         :clock_in_at,
         :clock_out_at,
         :notes,
