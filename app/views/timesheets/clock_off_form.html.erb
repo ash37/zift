@@ -1,19 +1,19 @@
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <section class="relative max-w-4xl p-6 mx-auto bg-white rounded-3xl dark:bg-gray-800">
-    <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white">Clock Off</h2>
+  <section class="relative max-w-4xl p-6 mx-auto bg-white rounded-3xl">
+    <h2 class="text-lg font-semibold text-gray-700 capitalize">Clock Off</h2>
     <%= form_with(model: @timesheet, url: clock_off_timesheet_path(@timesheet), method: :patch, class: "mt-6") do |form| %>
       <%= hidden_field_tag "timesheet[_present]", "1" %>
       <div class="grid grid-cols-1 gap-6">
         <% if @timesheet&.shift&.area&.show_timesheet_notes? %>
           <div>
-            <%= form.label :notes, "Shift Summary", class: "text-gray-700 dark:text-gray-200" %>
-            <%= form.text_area :notes, rows: 4, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+            <%= form.label :notes, "Shift Summary", class: "text-gray-700" %>
+            <%= form.text_area :notes, rows: 4, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 focus:outline-none focus:ring" %>
           </div>
         <% end %>
         <% if @timesheet&.shift&.area&.show_timesheet_travel? %>
           <div>
-            <%= form.label :travel, "Travel", class: "text-gray-700 dark:text-gray-200" %><span class="text-xs text-gray-500 dark:text-gray-400"> Any km in addition to home-work and back again.</span>
-            <%= form.number_field :travel, value: nil, placeholder: "Add Qty of km", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
+            <%= form.label :travel, "Travel", class: "text-gray-700" %><span class="text-xs text-gray-500"> Any km in addition to home-work and back again.</span>
+            <%= form.number_field :travel, value: nil, placeholder: "Add Qty of km", class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 focus:outline-none focus:ring" %>
           </div>
         <% end %>
       </div>
@@ -26,7 +26,7 @@ post_questions = [
 
       <% if post_questions.any? %>
         <div class="mt-6 pt-4">
-          <h3 class="text-lg font-semibold text-gray-700 capitalize dark:text-white mb-6">Shift Questions</h3>
+          <h3 class="text-lg font-semibold text-gray-700 capitalize mb-6">Shift Questions</h3>
 
           <% post_questions.each_with_index do |q, idx| %>
             <div class="mb-4">
