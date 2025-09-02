@@ -1,13 +1,16 @@
 <div class="bg-white p-4 shadow-sm mb-6">
-  <div class="flex flex-col sm:flex-row justify-between sm:items-center">
+  <div class="flex flex-row flex-wrap justify-between items-center gap-2">
 
     <div x-data="{ open: false }" class="relative">
-      <button @click="open = !open" class="flex items-center gap-x-2 px-4 py-2 bg-gray-100 rounded-3xl text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
+      <button
+        @click="open = !open"
+        class="p-3 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500
+               sm:h-full sm:flex sm:items-center sm:gap-x-2 sm:px-4 sm:py-2 sm:rounded-3xl">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-500" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
         </svg>
-        <span><%= @selected_location_id ? Location.find(@selected_location_id).name : "All Locations" %></span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+        <span class="hidden sm:inline"><%= @selected_location_id ? Location.find(@selected_location_id).name : "All Locations" %></span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="hidden sm:block h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
       </button>
@@ -23,7 +26,7 @@
     </div>
 
     <!-- Date selector -->
-    <div class="flex items-center gap-x-1 p-1 bg-gray-100 rounded-3xl mt-4 sm:mt-0">
+    <div class="flex items-center gap-x-1 p-1 bg-gray-100 rounded-3xl sm:mt-0">
       <%= link_to reports_path(week: @prev_week_start, location_id: @selected_location_id), class: "p-2 rounded-full hover:bg-gray-200" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
