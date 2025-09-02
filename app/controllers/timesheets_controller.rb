@@ -200,6 +200,26 @@ class TimesheetsController < ApplicationController
     end
   end
 
+  def open_for_shift
+    shift = Shift.find(params[:shift_id])
+
+    # If an admin/manager is navigating from the weekly view, create the timesheet for the rostered user.
+    # Otherwise, for regular staff, create it for the current user (like pressing Clock On).
+    target_user = (current_user.admin? || current_user.manager?) ? shift.user : current_user
+
+    timesheet = shift.timesheets.where(user: target_user, clock_out_at: nil).first_or_initialize
+
+    if timesheet.new_record?
+      timesheet.clock_in_at = shift.start_time
+      timesheet.status = Timesheet::STATUSES[:pending]
+      timesheet.save!
+    end
+
+    redirect_to edit_timesheet_path(timesheet)
+  rescue ActiveRecord::RecordNotFound
+    redirect_to week_timesheets_path(date: Date.today.beginning_of_week(:wednesday)), alert: "Shift not found."
+  end
+
   private
     def set_timesheet
       @timesheet = Timesheet.find(params[:id])

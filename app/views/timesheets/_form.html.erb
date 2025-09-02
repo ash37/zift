@@ -2,7 +2,7 @@
   <%
     status_color_class = case @timesheet.status_name
                          when 'approved'
-                           'bg-emerald-100 text-emerald-800'
+                           'bg-green-100 text-green-500'
                          when 'rejected'
                            'bg-red-100 text-red-800'
                          else
@@ -18,14 +18,14 @@
       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
   <% end %>
-
-  <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white pt-12"><%= @timesheet.user&.name %></h2>
-
-  <div class="flex items-center gap-x-2 mt-2 text-gray-700 dark:text-gray-200">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-    </svg>
-    <span class="font-semibold"><%= @timesheet.shift&.location&.name %></span>
+  <div class="flex items-center gap-x-2 mt-2 text-violet-500 mt-4">
+    <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+      <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 21s7-5.373 7-11a7 7 0 1 0-14 0c0 5.627 7 11 7 11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </div>
+    <span class="font-semibold text-gray-600"><%= @timesheet.shift&.location&.name %></span>
   </div>
 
 

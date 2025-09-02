@@ -57,6 +57,7 @@ Rails.application.routes.draw do
       post "create_unscheduled", to: "timesheets#create_unscheduled", as: :create_unscheduled
     end
   end
+  get "timesheets/open_for_shift/:shift_id", to: "timesheets#open_for_shift", as: :open_timesheet_for_shift
 
   namespace :admin do
     resource :xero_connection, only: [ :show, :new, :create, :destroy, :update ] do
