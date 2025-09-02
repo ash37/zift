@@ -86,7 +86,7 @@ class Admin::XeroInvoiceExportsController < ApplicationController
 
       # New description format: "One Staff on DATE from TIME - TIME"
       if ts.clock_in_at && ts.clock_out_at
-        desc = "One Staff on #{ts.clock_in_at.strftime('%d %^b %Y')} from #{ts.clock_in_at.strftime('%-l:%M%P')} - #{ts.clock_out_at.strftime('%-l:%M%P')}"
+        desc = "One Staff on #{ts.clock_in_at.strftime('%^a %d %^b %Y')} from #{ts.clock_in_at.strftime('%-l:%M%P')} - #{ts.clock_out_at.strftime('%-l:%M%P')}"
       else
         desc = "One Staff on #{work_day.strftime('%d %^b %Y')} (incomplete times)"
       end
