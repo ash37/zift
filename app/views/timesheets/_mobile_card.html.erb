@@ -14,11 +14,11 @@
                          when 'approved'
                            'bg-green-100 text-green-500'
                          when 'rejected'
-                           'bg-red-100 text-red-800'
+                           'bg-red-100 text-red-500'
                          when 'started', 'auto'
-                           'bg-orange-100 text-orange-800'
+                           'bg-orange-100 text-orange-500'
                          else # pending
-                           'bg-yellow-100 text-yellow-800'
+                           'bg-orange-100 text-orange-500'
                          end
       %>
       <span class="px-3 py-1 text-xs uppercase rounded-full <%= status_classes %>"><%= timesheet.status_name.titleize %></span>
@@ -31,18 +31,18 @@
     <p class="text-sm text-gray-600 dark:text-gray-300"><%= shift.location.name %> - <%= shift.area&.name %></p>
     <% if timesheet %>
       <% if timesheet.notes&.include?("Auto-generated: Missed clock on.") %>
-        <p class="text-sm text-orange-500 dark:text-orange-400">Unattended</p>
+        <p class="text-sm text-orange-500">Unattended</p>
       <% else %>
-        <p class="text-sm text-gray-600 dark:text-gray-300">Worked: <%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></p>
+        <p class="text-sm text-gray-600">Worked: <%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></p>
       <% end %>
     <% end %>
     <% if shift.roster.draft? %>
-      <p class="text-xs text-orange-500 dark:text-orange-400">Unscheduled</p>
+      <p class="text-xs text-orange-500">Unscheduled</p>
     <% else %>
       <%
-        rostered_time_class = "text-xs text-violet-700 dark:text-violet-600"
+        rostered_time_class = "text-xs text-violet-700"
         if timesheet && (timesheet.duration_in_hours - shift.duration_in_hours).abs > 0.01
-          rostered_time_class = "text-xs text-orange-500 dark:text-orange-400"
+          rostered_time_class = "text-xs text-orange-500"
         end
       %>
       <p class="<%= rostered_time_class %>">Scheduled: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>

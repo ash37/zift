@@ -37,18 +37,18 @@
       <%
         status_classes = case timesheet.status_name.downcase
                          when 'approved'
-                           'bg-green-100 text-green-800'
+                           'bg-green-100 text-green-500'
                          when 'rejected'
-                           'bg-red-100 text-red-800'
+                           'bg-red-100 text-red-500'
                          when 'started', 'auto'
-                           'bg-orange-100 text-orange-800'
+                           'bg-orange-100 text-orange-500'
                          else # pending
-                           'bg-yellow-100 text-yellow-800'
+                           'bg-orange-100 text-orange-500'
                          end
       %>
       <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 <%= status_classes %>">
         <% if timesheet.auto_clock_off? %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.414L11 9.586V6z" clip-rule="evenodd" />
           </svg>
         <% end %>
