@@ -1,6 +1,35 @@
 <% content_for :title, "Reports" %>
 
+
 <%= render 'sub_nav' %>
+<!-- Date selector -->
+<div class="flex items-center gap-x-1 p-1 bg-gray-100 rounded-3xl">
+  <%= link_to reports_path(week: @prev_week_start, location_id: @selected_location_id), class: "p-2 rounded-full hover:bg-gray-200" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+  <% end %>
+
+  <div class="px-3 py-1.5 text-center">
+    <p class="text-sm font-medium text-gray-700">
+      <%= @current_week_start.strftime('%-d %b') %> - <%= (@current_week_start + 6.days).strftime('%-d %b') %>
+    </p>
+  </div>
+
+  <% if @next_week_start <= @max_week_start %>
+    <%= link_to reports_path(week: @next_week_start, location_id: @selected_location_id), class: "p-2 rounded-full hover:bg-gray-200" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    <% end %>
+  <% else %>
+    <span class="p-2 rounded-full text-gray-400 cursor-not-allowed">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </span>
+  <% end %>
+</div>
 
 <section>
   <div class="flex flex-col w-full px-4 py-1 bg-transparent">
