@@ -3,7 +3,12 @@ class DashboardsController < ApplicationController
 
   def index
     respond_to do |format|
-      format.html
+      format.html do
+        unless user_signed_in?
+          redirect_to new_user_session_path and return
+        end
+        # fall through to render the default HTML template
+      end
       format.json do
         # token auth path
         if params[:token].present?
