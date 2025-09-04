@@ -9,7 +9,7 @@
                            'bg-orange-100 text-orange-500'
                          end
   %>
-  <div class="absolute top-0 left-0 right-0 p-1 text-center font-semibold <%= status_color_class %>">
+  <div class="absolute top-0 left-0 right-0 p-1 text-center <%= status_color_class %>">
     <%= @timesheet.status_name.titleize %> Timesheet
   </div>
 
@@ -135,7 +135,7 @@
     </div>
 
     <div class="mt-2 hidden sm:block">
-      <p class="text-sm font-semibold text-orange-600">Scheduled: <%= format_shift_time(@timesheet.shift&.start_time) %> - <%= format_shift_time(@timesheet.shift&.end_time) %></p>
+      <p class="text-sm text-orange-600">Scheduled: <%= format_shift_time(@timesheet.shift&.start_time) %> - <%= format_shift_time(@timesheet.shift&.end_time) %></p>
     </div>
 
     <div class="mt-6">
@@ -147,7 +147,7 @@
 
     <div class="flex justify-end items-center mt-6">
       <%= link_to "Match Roster", match_roster_times_timesheet_path(@timesheet), method: :patch, class: "text-violet-800 px-4 py-2.5 hover:bg-violet-100 hover:rounded-3xl" if @timesheet.persisted? %>
-      <%= form.submit "Update Timesheet", class: "px-8 py-2.5 leading-5 font-semibold text-white transition-colors duration-300 transform bg-green-600 rounded-3xl hover:bg-green-500 focus:outline-none focus:bg-green-700" %>
+      <%= form.submit "Update Timesheet", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-green-600 rounded-3xl hover:bg-green-500 focus:outline-none focus:bg-green-700" %>
     </div>
   <% end %>
 </section>
