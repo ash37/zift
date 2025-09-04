@@ -89,7 +89,7 @@ class TimesheetsController < ApplicationController
     end
 
     if @timesheet.update(updated_params)
-      redirect_to timesheets_path
+      redirect_to timesheets_path, status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
