@@ -56,7 +56,11 @@
               <div class="flex items-center gap-x-3">
                 <% if missed_clock_on %>
                   <div title="Missed clock on. A timesheet has been automatically created for review.">
-                    <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.21 3.03-1.742 3.03H4.42c-1.532 0-2.492-1.696-1.742-3.03l5.58-9.92zM10 13a1 1 0 110-2 1 1 0 010 2zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    <div class="bg-red-100 rounded-full p-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-500">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                      </svg>
+                    </div>
                   </div>
                 <% end %>
                 <div>
@@ -86,10 +90,12 @@
           <% upcoming_shifts.each do |shift| %>
             <div class="p-4 bg-white rounded-3xl flex justify-between items-center">
               <div>
-                <p class="font-semibold"><%= shift.location.name %></p>
-                <p class="text-sm text-gray-600"><%= shift.start_time.strftime("%a, %d %b") %>: <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+                <p class="font-semibold"><%= shift.start_time.strftime("%A") %></p>
+                <p class="font-semibold"><%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %></p>
+                <p class="text-sm text-gray-600"><%= shift.location.name %></p>
               </div>
               <%= render 'shift_actions', shift: shift, upcoming: true %>
+              <span class="rounded-3xl bg-violet-100 px-2 py-1 text-xs text-violet-500 mr-4"><%= shift.start_time.strftime("%d %b").upcase %></span>
             </div>
           <% end %>
         <% else %>

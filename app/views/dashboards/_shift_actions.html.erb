@@ -33,7 +33,7 @@
       }
   }" class="flex items-center gap-x-4">
     <% if timesheet&.clocked_out? %>
-      <span class="px-3 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">Completed</span>
+      <span class="px-3 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">Missed clock on</span>
     <% elsif timesheet %>
       <a :href="canClockOut ? '<%= clock_off_form_timesheet_path(timesheet) %>' : '#'"
          :class="{ 'opacity-50 cursor-not-allowed': !canClockOut }"
