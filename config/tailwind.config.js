@@ -1,4 +1,6 @@
 // config/tailwind.config.js
+const safelistColors = ['red','orange','amber','yellow','lime','green','emerald','teal','cyan','sky','blue','indigo','violet','purple','fuchsia','pink','rose','gray','slate','zinc','neutral','stone'];
+
 module.exports = {
   content: [
     "./app/views/**/*.{erb,haml,html,slim}",
@@ -8,9 +10,10 @@ module.exports = {
     "./app/assets/tailwind/**/*.{css}"
   ],
   safelist: [
-    {
-      pattern: /(bg|text)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|gray|slate|zinc|neutral|stone)-(100|500)/,
-    },
+    ...safelistColors.flatMap(c => [
+      `bg-${c}-100`,
+      `text-${c}-500`,
+    ]),
   ],
   theme: { extend: {} },
   plugins: [],
