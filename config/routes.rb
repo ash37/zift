@@ -29,8 +29,7 @@ Rails.application.routes.draw do
     end
   end
   resources :locations do
-    # THE FIX IS HERE: Added edit and update to the areas resource
-    resources :areas, only: [ :create, :edit, :update ]
+    resources :areas, only: [ :index, :create, :edit, :update, :destroy ]
     member do
       patch :archive
       patch :restore

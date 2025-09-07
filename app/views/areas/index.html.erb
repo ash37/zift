@@ -1,0 +1,81 @@
+
+
+<%# app/views/areas/index.html.erb %>
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <section class="relative max-w-5xl p-6 mx-auto bg-white rounded-md shadow-md">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-semibold text-gray-800">Areas for <span class="text-violet-700"><%= @location.name %></span></h2>
+      <%= link_to "Back to Location", location_path(@location), class: "px-4 py-2 text-sm font-semibold text-white bg-zinc-800 rounded-3xl hover:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500" %>
+    </div>
+
+    <!-- Areas Table -->
+    <div class="flex flex-col mt-6">
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+          <div class="overflow-hidden border border-gray-200 md:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500">Name</th>
+                  <th scope="col" class="px-12 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500">Export Code</th>
+                  <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500">Color</th>
+                  <th scope="col" class="relative py-3.5 px-4"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <% @areas.each do |area| %>
+                  <tr>
+                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                      <div><%= area.name %></div>
+                      <% if area.respond_to?(:shift_questions) && area.shift_questions.present? %>
+                        <ul class="mt-1 space-y-0.5">
+                          <% area.shift_questions.each do |sq| %>
+                            <% txt = sq.try(:text) || sq.try(:question_text) || sq.try(:content) || sq.try(:title) %>
+                            <% next if txt.blank? %>
+                            <li class="text-xs font-normal text-gray-500"><%= txt %></li>
+                          <% end %>
+                        </ul>
+                      <% end %>
+                    </td>
+                    <td class="px-12 py-4 text-sm font-medium text-gray-700 whitespace-nowrap"><%= area.export_code %></td>
+                    <td class="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
+                      <div class="w-6 h-6 rounded" style="background-color: <%= area.color %>;"></div>
+                    </td>
+                    <td class="px-4 py-4 text-sm whitespace-nowrap text-right">
+                      <%= link_to "Edit", edit_location_area_path(@location, area), class: "text-blue-600 hover:text-blue-800" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Area Form -->
+    <div class="mt-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">Add a new Area</h3>
+      <%= form_with(model: [@location, Area.new], local: true) do |f| %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :name, class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" %>
+          </div>
+          <div>
+            <%= f.label :export_code, class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :export_code, class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" %>
+          </div>
+          <div>
+            <%= f.label :color, class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :color, placeholder: "#RRGGBB", class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" %>
+          </div>
+        </div>
+        <div class="flex justify-end mt-4">
+          <%= f.submit "Create Area", class: "px-6 py-2 text-sm font-semibold text-white bg-green-600 rounded-3xl hover:bg-green-700" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+</div>

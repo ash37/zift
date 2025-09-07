@@ -9,5 +9,13 @@
     <h2 class="text-lg font-semibold text-gray-700 capitalize">Edit Area</h2>
     
     <%= render "form", location: @location, area: @area %>
+
+    <div class="flex justify-end mt-6">
+      <%= button_to "Delete Area",
+          location_area_path(@location, @area),
+          method: :delete,
+          data: { confirm: "Are you sure you want to delete this area?" },
+          class: "px-4 py-2 text-sm font-semibold bg-white text-red-600 border border-red-600 rounded-3xl hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+    </div>
   </section>
 </div>

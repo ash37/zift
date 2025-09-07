@@ -4,6 +4,10 @@ class AreasController < ApplicationController
   before_action :set_location
   before_action :set_area, only: [ :edit, :update ]
 
+  def index
+    @areas = @location.areas.order(:name)
+  end
+
   def create
     @area = @location.areas.build(area_params)
 
@@ -25,6 +29,12 @@ class AreasController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    @area = @location.areas.find(params[:id])
+    @area.destroy
+    redirect_to location_areas_path(@location), notice: "Area was successfully deleted."
   end
 
   private

@@ -1,94 +1,51 @@
 <%# app/views/locations/show.html.erb %>
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <section class="relative max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md">
-    <%# 'Back to locations' link, styled as an 'x' icon in the top-right corner. %>
-    <%= link_to locations_path, class: "absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-600" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    <% end %>
+<div class="bg-zinc-100 min-h-screen">
+  <section class="container mx-auto px-4 py-10">
+    <div class="w-full max-w-4xl mx-auto">
 
-    <div class="flex justify-between items-center">
-        <h2 class="text-lg font-semibold text-gray-700 capitalize">Location Details</h2>
-    </div>
+      <div class="relative bg-white rounded-2xl p-6 flex items-start justify-between">
+        <%# Back (X) to locations %>
+        <%= link_to locations_path, class: "absolute top-4 right-4 text-gray-400 hover:text-gray-600" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        <% end %>
 
+        <div class="flex items-center min-w-0">
+          <div class="text-left">
+            <h1 class="text-2xl font-bold text-gray-800 truncate"><%= @location.name %></h1>
+            <% if @location.address.present? %>
+              <p class="text-gray-600 break-all sm:break-normal"><%= @location.address %></p>
+            <% end %>
+          </div>
+        </div>
 
-    <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-      <div>
-        <label class="text-gray-700">Name</label>
-        <p class="block w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-md"><%= @location.name %></p>
+        <div class="ml-4 flex items-center gap-3">
+          <%= link_to "Areas", location_areas_path(@location), class: "px-4 py-2 text-sm font-semibold text-white bg-violet-600 rounded-3xl hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+          <% if @location.archived? %>
+            <%= button_to "Restore", restore_location_path(@location), method: :patch, class: "px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-3xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+          <% else %>
+            <%= link_to "Edit", edit_location_path(@location), class: "px-4 py-2 text-sm font-semibold text-violet-700 hover:text-violet-900" %>
+            <%= button_to "Archive", archive_location_path(@location), method: :patch, class: "px-4 py-2 text-sm font-semibold bg-white text-red-600 border border-red-600 rounded-3xl hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500", data: { confirm: "Are you sure you want to archive this location?" } %>
+          <% end %>
+        </div>
       </div>
 
-      <div>
-        <label class="text-gray-700">Address</label>
-        <p class="block w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-md"><%= @location.address %></p>
-      </div>
-    </div>
+      <div class="mt-4 bg-white rounded-3xl p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Location Details</h2>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label class="text-gray-700">Name</label>
+            <p class="block w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-md"><%= @location.name %></p>
+          </div>
 
-    <div class="flex justify-end items-center mt-4">
-      <% if @location.archived? %>
-        <%= button_to "Restore", restore_location_path(@location), method: :patch, class: "px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-3xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
-      <% else %>
-        <%= link_to "Edit", edit_location_path(@location), class: "mr-4 px-4 py-2 text-sm font-semibold text-white bg-zinc-800 rounded-3xl hover:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500" %>
-        <%= button_to "Archive", archive_location_path(@location), method: :patch, class: "ml-3 px-4 py-2 text-sm font-semibold bg-white text-red-600 border border-red-600 rounded-3xl hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500", data: { confirm: "Are you sure you want to archive this location?" } %>
-      <% end %>
-    </div>
-
-    <hr class="my-8">
-
-    <%# Areas Section %>
-    <div>
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-700 capitalize">Areas</h3>
-      </div>
-
-      <%# Areas Table %>
-      <div class="flex flex-col mt-6">
-        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-            <div class="overflow-hidden border border-gray-200 md:rounded-lg">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500">Name</th>
-                    <th scope="col" class="px-12 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500">Export Code</th>
-                    <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500">Color</th>
-                    <th scope="col" class="relative py-3.5 px-4"><span class="sr-only">Actions</span></th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <% @areas.each do |area| %>
-                    <tr>
-                      <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                        <div><%= area.name %></div>
-                        <% if area.respond_to?(:shift_questions) && area.shift_questions.present? %>
-                          <ul class="mt-1 space-y-0.5">
-                            <% area.shift_questions.each do |sq| %>
-                              <% txt = sq.try(:text) || sq.try(:question_text) || sq.try(:content) || sq.try(:title) %>
-                              <% next if txt.blank? %>
-                              <li class="text-xs font-normal text-gray-500"><%= txt %></li>
-                            <% end %>
-                          </ul>
-                        <% end %>
-                      </td>
-                      <td class="px-12 py-4 text-sm font-medium text-gray-700 whitespace-nowrap"><%= area.export_code %></td>
-                      <td class="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
-                        <div class="w-6 h-6 rounded" style="background-color: <%= area.color %>;"></div>
-                      </td>
-                      <td class="px-4 py-4 text-sm whitespace-nowrap text-right">
-                        <%# THE FIX IS HERE: Added the Edit link for each area %>
-                        <%= link_to "Edit", edit_location_area_path(@location, area), class: "text-blue-500 hover:text-blue-700" %>
-                      </td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
+          <div>
+            <label class="text-gray-700">Address</label>
+            <p class="block w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-md"><%= @location.address %></p>
           </div>
         </div>
       </div>
-      <%# New Area Form %>
-      <%= render "areas/form", location: @location, area: @area %>
+
     </div>
   </section>
 </div>
