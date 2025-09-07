@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user, only: %i[ show edit update destroy employ contact ]
+  before_action :set_user, only: %i[ show edit update destroy employ contact archive restore ]
 
   # GET /users
   def index
@@ -10,7 +10,8 @@ class UsersController < ApplicationController
     when "contacted"
       @users = User.contacted
     when "ended"
-      @users = User.ended
+      # Show users whose status is ended OR who are archived
+      @users = User.with_archived.where("status = :ended OR archived_at IS NOT NULL", ended: User::STATUSES[:ended])
     else
       # Now correctly fetches all users with a role.
       @users = User.where.not(role: nil)
@@ -80,6 +81,26 @@ end
     redirect_to users_url, notice: "User was successfully destroyed.", status: :see_other
   end
 
+  # PATCH /users/:id/archive
+  def archive
+    unless current_user&.admin? || current_user&.manager?
+      redirect_to @user, alert: "Unauthorized" and return
+    end
+
+    @user.update(archived_at: Time.current)
+    redirect_to(users_path, notice: "User was successfully archived.")
+  end
+
+  # PATCH /users/:id/restore
+  def restore
+    unless current_user&.admin? || current_user&.manager?
+      redirect_to @user, alert: "Unauthorized" and return
+    end
+
+    @user.update(archived_at: nil)
+    redirect_to(user_path(@user), notice: "User was successfully restored.")
+  end
+
   # POST /users/:id/employ
   def employ
     if @user.status == User::STATUSES[:applicant]
@@ -120,7 +141,8 @@ end
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
-      @user = User.find(params[:id])
+      # Use with_archived so archive/restore and show can target archived users
+      @user = User.with_archived.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

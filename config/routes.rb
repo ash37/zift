@@ -26,6 +26,8 @@ Rails.application.routes.draw do
     member do
       post :employ
       post :contact
+      patch :archive
+      patch :restore
     end
   end
   resources :locations do

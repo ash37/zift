@@ -12,8 +12,15 @@
             <p class="text-gray-600 break-all sm:break-normal"><%= @user.phone %></p>
           </div>
         </div>
-        <div class="ml-4">
+        <div class="ml-4 flex items-center gap-3">
           <%= link_to "Edit", edit_user_path(@user), class: "text-violet-700" %>
+          <% if current_user&.admin? || current_user&.manager? %>
+            <% if @user.respond_to?(:archived?) && @user.archived? %>
+              <%= button_to "Restore", restore_user_path(@user), method: :patch, class: "px-3 py-1 rounded-full text-sm bg-green-100 text-green-700" %>
+            <% else %>
+              <%= button_to "Archive", archive_user_path(@user), method: :patch, data: { turbo_confirm: "Archive this user?" }, class: "px-3 py-1 rounded-full text-sm bg-red-100 text-red-700" %>
+            <% end %>
+          <% end %>
         </div>
       </div>
 

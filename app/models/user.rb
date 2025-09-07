@@ -39,6 +39,15 @@ class User < ApplicationRecord
   scope :contacted, -> { where(status: STATUSES[:contacted]) }
   scope :ended, -> { where(status: STATUSES[:ended]) }
 
+  # Archiving
+  default_scope { where(archived_at: nil) }
+  scope :archived, -> { unscope(where: :archived_at).where.not(archived_at: nil) }
+  scope :with_archived, -> { unscope(where: :archived_at) }
+
+  def archived?
+    archived_at.present?
+  end
+
   def role_name
     ROLES.key(role)&.to_s&.titleize || "—"
   end

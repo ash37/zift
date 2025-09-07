@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_07_112819) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_07_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -318,6 +318,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_07_112819) do
     t.datetime "invitation_sent_at"
     t.string "phone"
     t.string "xero_employee_id"
+    t.datetime "archived_at"
+    t.index ["archived_at"], name: "index_users_on_archived_at"
   end
 
   create_table "xero_connections", force: :cascade do |t|
