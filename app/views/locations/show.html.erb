@@ -4,46 +4,220 @@
     <div class="w-full max-w-4xl mx-auto">
 
       <div class="relative bg-white rounded-2xl p-6 flex items-start justify-between">
-        <%# Back (X) to locations %>
-        <%= link_to locations_path, class: "absolute top-4 right-4 text-gray-400 hover:text-gray-600" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        <% end %>
+       
 
         <div class="flex items-center min-w-0">
           <div class="text-left">
             <h1 class="text-2xl font-bold text-gray-800 truncate"><%= @location.name %></h1>
-            <% if @location.address.present? %>
-              <p class="text-gray-600 break-all sm:break-normal"><%= @location.address %></p>
-            <% end %>
+            
           </div>
         </div>
 
         <div class="ml-4 flex items-center gap-3">
-          <%= link_to "Areas", location_areas_path(@location), class: "px-4 py-2 text-sm font-semibold text-white bg-violet-600 rounded-3xl hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
-          <% if @location.archived? %>
-            <%= button_to "Restore", restore_location_path(@location), method: :patch, class: "px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-3xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
-          <% else %>
+          
             <%= link_to "Edit", edit_location_path(@location), class: "px-4 py-2 text-sm font-semibold text-violet-700 hover:text-violet-900" %>
-            <%= button_to "Archive", archive_location_path(@location), method: :patch, class: "px-4 py-2 text-sm font-semibold bg-white text-red-600 border border-red-600 rounded-3xl hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500", data: { confirm: "Are you sure you want to archive this location?" } %>
-          <% end %>
+            
         </div>
       </div>
 
+
+      <!-- Additional Information -->
       <div class="mt-4 bg-white rounded-3xl p-6 sm:p-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Location Details</h2>
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div>
-            <label class="text-gray-700">Name</label>
-            <p class="block w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-md"><%= @location.name %></p>
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Additional Information</h2>
+        <% rep_name   = @location.representative_name.presence %>
+        <% rep_email  = @location.representative_email.presence %>
+        <% email_disp = @location.email.presence %>
+        <% phone_disp = @location.phone.presence %>
+        <% dob_disp   = @location.date_of_birth.present? ? @location.date_of_birth.strftime('%-d %b %Y').upcase : nil %>
+        <% ndis_disp  = @location.ndis_number.presence %>
+        <% funding    = @location.funding.presence %>
+        <% pm_email   = @location.plan_manager_email.presence %>
+        <% gender     = @location.gender.presence %>
+        <% lives_with = @location.lives_with.presence %>
+        <% pets       = @location.pets.presence %>
+
+        <% interview  = @location.interview_info.presence %>
+        <% schedule   = @location.schedule_info.presence %>
+        <% activities = @location.activities_of_interest.presence %>
+        <% tasks      = @location.tasks.presence %>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <%# Representative Name %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.333 0-6 2-6 4v1h12v-1c0-2-2.667-4-6-4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Representative name</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= rep_name || '—' %></div>
+            </div>
           </div>
 
-          <div>
-            <label class="text-gray-700">Address</label>
-            <p class="block w-full px-4 py-2 mt-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-md"><%= @location.address %></p>
+          <%# Representative Email %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="2"/>
+                <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Representative email</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= rep_email || '—' %></div>
+            </div>
+          </div>
+
+          <%# Email %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="2"/>
+                <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Email</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= email_disp || '—' %></div>
+            </div>
+          </div>
+
+          <%# Phone %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6.5 3h3l1.5 4-2 2a12 12 0 0 0 6 6l2-2 4 1.5v3a2 2 0 0 1-2 2 16 16 0 0 1-16-16 2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Phone</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= phone_disp || '—' %></div>
+            </div>
+          </div>
+
+          <%# Date of birth %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-5 w-5 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 3v3M17 3v3M3 11h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="3" y="6" width="18" height="15" rx="2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Date of birth</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= dob_disp || '—' %></div>
+            </div>
+          </div>
+
+          <%# NDIS Number %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">NDIS number</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= ndis_disp || '—' %></div>
+            </div>
+          </div>
+
+          <%# Funding %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7h16v10H4z" stroke="currentColor" stroke-width="2"/>
+                <path d="M4 9h16M8 13h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Funding</div>
+              <div>
+                <% if funding.present? %>
+                  <span class="inline-flex items-center rounded-3xl px-3 py-1 text-xs font-medium bg-violet-700 text-white"><%= funding %></span>
+                <% else %>
+                  <span class="text-gray-800">—</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <%# Plan Manager Email %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="2"/>
+                <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Plan manager email</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= pm_email || '—' %></div>
+            </div>
+          </div>
+
+          <%# Gender %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-3 7a5 5 0 0 0-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Gender</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= gender || '—' %></div>
+            </div>
+          </div>
+
+          <%# Lives with %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m3 12 9-7 9 7v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Lives with</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= lives_with || '—' %></div>
+            </div>
+          </div>
+
+          <%# Pets %>
+          <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+              <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 11a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm10 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4ZM12 21c2-1 4-2 4-5a4 4 0 1 0-8 0c0 3 2 4 4 5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs uppercase tracking-wide text-gray-500">Pets</div>
+              <div class="text-gray-800 break-all sm:break-normal"><%= pets || '—' %></div>
+            </div>
           </div>
         </div>
+
+        <% if interview || schedule || activities || tasks %>
+          <div class="mt-6 grid grid-cols-1 gap-4">
+            <%# Long text blocks %>
+            <% [["Interview info", interview], ["Schedule info", schedule], ["Activities of interest", activities], ["Tasks", tasks]].each do |label, value| %>
+              <% next unless value.present? %>
+              <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
+                <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-violet-100 rounded-full">
+                  <svg class="h-6 w-6 text-violet-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M7 9h10M7 13h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs uppercase tracking-wide text-gray-500"><%= label %></div>
+                  <div class="text-gray-800 whitespace-pre-line"><%= value %></div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
       </div>
 
     </div>

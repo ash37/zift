@@ -1,40 +1,143 @@
-<%= form_with(model: location) do |form| %>
-  <% if location.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(location.errors.count, "error") %> prohibited this location from being saved:</h2>
-      <ul>
-        <% location.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+<!-- OUTER WRAPPER -->
+<div class="bg-zinc-100 pt-4 px-0 sm:py-12 sm:px-6 lg:px-2">
 
-  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-    <div>
-      <%= form.label :name, class: "text-gray-700 dark:text-gray-200" %>
-      <%= form.text_field :name, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
-    </div>
-
-    <div>
-      <%= form.label :address, class: "text-gray-700 dark:text-gray-200" %>
-      <%= form.text_field :address, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring" %>
-    </div>
-
-  
-  </div>
-
-  <div class="mt-8 border-t pt-6">
-    <h3 class="text-lg font-semibold text-gray-700 dark:text-white">Areas</h3>
-    <div id="areas" class="mt-4 space-y-6">
-      <%= form.fields_for :areas do |area_form| %>
-        <%= render 'locations/area_fields', form: area_form %>
-      <% end %>
-    </div>
-    <%# You will need JavaScript to dynamically add new area fields %>
-  </div>
-
-  <div class="flex justify-end mt-6">
-    <%= form.submit "Save Location", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-3xl hover:bg-gray-600 focus:outline-none focus:bg-gray-600" %>
+  <!-- CARD WRAPPER -->
+  <div class="mt-2 w-full rounded-3xl bg-white p-8 sm:mt-2 sm:w-1/2 sm:mx-auto sm:rounded-3xl">
+<% if location.persisted? %>
+  <div class="flex justify-end space-x-2 mb-4">
+    <%= link_to "Areas", location_areas_path(location), class: "px-3 py-1.5 text-xs text-violet-500 bg-white border border-violet-500 rounded-3xl hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+    <% if location.archived? %>
+      <%= button_to "Restore", restore_location_path(location), method: :patch, class: "px-3 py-1.5 text-xs text-white bg-green-600 rounded-3xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+    <% else %>
+      <%= button_to "Archive", archive_location_path(location), method: :patch, class: "px-3 py-1.5 text-xs bg-white text-red-600 border border-red-600 rounded-3xl hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500", data: { confirm: "Are you sure you want to archive this location?" } %>
+    <% end %>
   </div>
 <% end %>
+    <div class="text-center mb-8">
+      <% if location.persisted? %>
+        <span class="text-4xl font-bold text-gray-800">Edit</span>
+        <span class="text-4xl font-bold text-violet-700">client</span>
+        <p class="mt-6 text-gray-600">Update this client’s details.</p>
+      <% else %>
+        <span class="text-4xl font-bold text-gray-800">New</span>
+        <span class="text-4xl font-bold text-violet-700">client</span>
+        <p class="mt-6 text-gray-600">Please add your details.</p>
+      <% end %>
+    </div>
+
+    <%= form_with(model: location, html: { class: "space-y-6" }) do |form| %>
+      <% if location.errors.any? %>
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
+          <p class="font-semibold"><%= pluralize(location.errors.count, "error") %> prevented this location from being saved:</p>
+          <ul class="mt-2 list-disc pl-5">
+            <% location.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <!-- Basic Info -->
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :name, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "First name and Last name" %>
+      </div>
+
+      <div>
+        <%= form.label :address, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :address, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Street, Suburb, State" %>
+      </div>
+
+      <!-- Contact / Admin Details -->
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div>
+          <%= form.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.email_field :email, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "location@example.com" %>
+        </div>
+        <div>
+          <%= form.label :phone, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :phone, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Contact number" %>
+        </div>
+        <div>
+          <%= form.label :date_of_birth, "Date of Birth", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.date_field :date_of_birth, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+        <div>
+          <%= form.label :gender, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :gender, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+        <div>
+          <%= form.label :ndis_number, "NDIS Number", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :ndis_number, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+        <div>
+          <%= form.label :representative_name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :representative_name, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+        <div>
+          <%= form.label :representative_email, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.email_field :representative_email, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "rep@example.com" %>
+        </div>
+        <div>
+          <%= form.label :funding, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :funding,
+                [["Plan managed", "Plan managed"], ["Agency managed", "Agency managed"], ["Self managed", "Self managed"]],
+                { selected: "Plan managed" },
+                class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+        <div>
+          <%= form.label :plan_manager_email, "Plan Manager Email", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.email_field :plan_manager_email, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+        
+        
+        
+        <div>
+          <%= form.label :lives_with, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :lives_with, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "e.g. Parents" %>
+        </div>
+        <div>
+          <%= form.label :pets, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :pets, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "e.g. Dog (friendly)" %>
+        </div>
+        
+      </div>
+
+      <!-- Long Text Sections -->
+      <div>
+        <%= form.label :interview_info, "Interview Info", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_area :interview_info, rows: 4, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+      <div>
+        <%= form.label :schedule_info, "Schedule Info", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_area :schedule_info, rows: 4, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+      <div>
+        <%= form.label :activities_of_interest, "Activities of Interest", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_area :activities_of_interest, rows: 4, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+      <div>
+        <%= form.label :tasks, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_area :tasks, rows: 4, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <% if location.persisted? %>
+        <!-- Areas (nested) -->
+        <div class="pt-2 border-t">
+          <h3 class="text-lg font-semibold text-gray-700 mt-6">Areas</h3>
+          <div id="areas" class="mt-4 space-y-6">
+            <%= form.fields_for :areas do |area_form| %>
+              <%= render 'locations/area_fields', form: area_form %>
+            <% end %>
+          </div>
+          <%# hook for dynamic add/remove via JS if needed %>
+        </div>
+      <% end %>
+
+      <!-- Submit -->
+      <div class="pt-2">
+        <%= form.submit (location.persisted? ? "Update Location" : "Create Location"), class: "w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-4 rounded-3xl shadow-lg transition-transform transform hover:scale-105" %>
+      </div>
+    <% end %>
+  </div>
+</div>
