@@ -1,0 +1,24 @@
+<% content_for :title, "Settings" %>
+
+<section class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-2xl p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Settings</h1>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <%= link_to admin_xero_connection_path, class: "block p-4 rounded-xl border border-gray-200 hover:bg-gray-50" do %>
+        <div class="text-lg font-semibold text-gray-800">Xero Connection</div>
+        <div class="text-sm text-gray-500">Manage the Xero OAuth connection</div>
+      <% end %>
+
+      <%= link_to shift_questions_path, class: "block p-4 rounded-xl border border-gray-200 hover:bg-gray-50" do %>
+        <div class="text-lg font-semibold text-gray-800">Shift Questions</div>
+        <div class="text-sm text-gray-500">Configure questions shown on shifts</div>
+      <% end %>
+
+      <%= link_to admin_agreements_path, class: "block p-4 rounded-xl border border-gray-200 hover:bg-gray-50" do %>
+        <div class="text-lg font-semibold text-gray-800">Agreements</div>
+        <div class="text-sm text-gray-500">Manage employment and service agreements</div>
+      <% end %>
+    </div>
+  </div>
+</section>
+

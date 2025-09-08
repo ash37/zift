@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   get "dashboards", to: "dashboards#index"
   get "client_dashboard", to: "dashboards#index", defaults: { format: :json }
 
+  # Settings
+  get "settings", to: "settings#index", as: :settings
+
   resources :applications, only: [ :new, :create ] do
     get "success", on: :collection
   end
@@ -61,6 +64,11 @@ Rails.application.routes.draw do
   get "timesheets/open_for_shift/:shift_id", to: "timesheets#open_for_shift", as: :open_timesheet_for_shift
 
   namespace :admin do
+    resources :agreements, only: [:index, :new, :create, :edit, :update] do
+      collection do
+        get :view
+      end
+    end
     resource :xero_connection, only: [ :show, :new, :create, :destroy, :update ] do
       get :callback, on: :collection
       get :edit_user_mappings, on: :collection
@@ -85,6 +93,10 @@ Rails.application.routes.draw do
       patch :decline
     end
   end
+
+  # Agreements
+  get  "agreements/:document_type", to: "agreements#show",   as: :agreement
+  post "agreements/:document_type/accept", to: "agreements#accept", as: :accept_agreement
 
   resources :rosters do
     member do

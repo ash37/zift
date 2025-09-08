@@ -13,7 +13,9 @@
           </div>
         </div>
         <div class="ml-4 flex items-center gap-3">
-          <%= link_to "Edit", edit_user_path(@user), class: "text-violet-700" %>
+          <% unless current_user.employee? && current_user == @user %>
+            <%= link_to "Edit", edit_user_path(@user), class: "text-violet-700" %>
+          <% end %>
           <% if current_user&.admin? || current_user&.manager? %>
             <% if @user.respond_to?(:archived?) && @user.archived? %>
               <%= button_to "Restore", restore_user_path(@user), method: :patch, class: "px-3 py-1 rounded-full text-sm bg-green-100 text-green-700" %>
@@ -23,6 +25,25 @@
           <% end %>
         </div>
       </div>
+
+      <%# Employment agreement link for employees %>
+      <% if @user.employee? %>
+        <% current_employment_agreement = Agreement.current_for('employment') %>
+        <% acceptance = current_employment_agreement && AgreementAcceptance.find_by(user: @user, agreement: current_employment_agreement) %>
+        <div class="mt-4 bg-white rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-gray-800 font-semibold">Employment Agreement</div>
+            <% if acceptance.present? %>
+              <div class="text-sm text-green-600">Complete — signed <%= acceptance.signed_at.strftime('%-d %b %Y') %></div>
+            <% else %>
+              <div class="text-sm text-orange-500">Outstanding — please review and accept</div>
+            <% end %>
+          </div>
+          <% if current_employment_agreement.present? %>
+            <%= link_to "View", agreement_path('employment', user_id: @user.id), class: "px-3 py-1 rounded-lg bg-violet-600 text-white hover:bg-violet-700" %>
+          <% end %>
+        </div>
+      <% end %>
 
       <% if @user.locations.any? %>
         <div class="mt-4 bg-white rounded-3xl p-6 sm:p-8">

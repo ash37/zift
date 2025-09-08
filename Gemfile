@@ -76,3 +76,5 @@ gem "devise", "~> 4.9"
 gem "xero-ruby", "~> 12.0.0"
 
 gem "httparty"
+gem "prawn"
+gem "prawn-table"

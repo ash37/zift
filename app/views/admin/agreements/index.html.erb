@@ -1,0 +1,74 @@
+<% content_for :title, "Agreements" %>
+
+<section class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-2xl p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-bold text-gray-800">Agreements</h1>
+      <div class="flex gap-2">
+        <%= link_to "New Employment", new_admin_agreement_path(document_type: 'employment'), class: "px-3 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700" %>
+        <%= link_to "New Service", new_admin_agreement_path(document_type: 'service'), class: "px-3 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700" %>
+      </div>
+    </div>
+
+    <div class="mb-6 p-4 border border-gray-200 rounded-xl bg-gray-50">
+      <h2 class="text-lg font-semibold text-gray-800 mb-3">View Agreement As User</h2>
+      <%= form_with url: view_admin_agreements_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-4 gap-3 items-end" do |f| %>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Agreement</label>
+          <%= select_tag :document_type,
+                options_for_select([['Employment','employment'], ['Service','service']], params[:document_type]),
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">User</label>
+          <%= select_tag :user_id,
+                options_for_select(@users.map { |u| ["#{u.name} (#{u.email})", u.id] }, params[:user_id]),
+                include_blank: "Select a user",
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Location (optional)</label>
+          <%= select_tag :location_id,
+                options_for_select(@locations.map { |l| [l.name, l.id] }, params[:location_id]),
+                include_blank: "—",
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+        </div>
+        <div class="md:col-span-4 flex justify-end">
+          <%= submit_tag "Open", class: "px-4 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700" %>
+        </div>
+      <% end %>
+      <p class="mt-2 text-xs text-gray-500">Tip: Limit shows first 200 users and locations alphabetically.</p>
+    </div>
+
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Type</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Version</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Title</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Active</th>
+          <th class="px-4 py-2"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @agreements.each do |agreement| %>
+          <tr>
+            <td class="px-4 py-2 text-sm text-gray-700"><%= agreement.document_type.titleize %></td>
+            <td class="px-4 py-2 text-sm text-gray-700">v<%= agreement.version %></td>
+            <td class="px-4 py-2 text-sm text-gray-700"><%= agreement.title %></td>
+            <td class="px-4 py-2 text-sm">
+              <% if agreement.active? %>
+                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Active</span>
+              <% else %>
+                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">Inactive</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-2 text-sm text-right">
+              <%= link_to "Edit", edit_admin_agreement_path(agreement), class: "text-violet-700 hover:underline" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

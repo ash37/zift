@@ -1,31 +1,71 @@
 
 
-<section class="container mx-auto p-6">
+<%# Shift Questions Index %>
+<section class="container mx-auto px-4 py-6">
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-xl font-semibold">Shift Questions</h1>
-    <%= link_to "Add new question", new_shift_question_path, class: "px-3 py-2 bg-blue-600 text-white rounded" %>
+    <h1 class="text-2xl font-bold text-gray-800">Shift Questions</h1>
+    <%= link_to "Add Question", new_shift_question_path, class: "px-4 py-2 rounded-3xl bg-violet-600 text-white hover:bg-violet-700" %>
   </div>
-  <div class="bg-white rounded shadow divide-y">
-    <% @shift_questions.each do |q| %>
-      <div class="p-4 flex items-center justify-between">
-        <div>
-          <div class="font-medium"><%= q.question_text %></div>
-          <div class="text-xs text-gray-600 mt-1">
-            Type: <%= q.question_type %> • Order: <%= q.display_order %> •
-            <%= q.is_mandatory ? "Mandatory" : "Optional" %> •
-            <%= q.is_active ? "Active" : "Inactive" %>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <%= link_to "Edit", edit_shift_question_path(q), class: "px-2 py-1 border rounded" %>
-          <%= button_to "Delete", shift_question_path(q), method: :delete,
-                        data: { confirm: "Delete this question?" },
-                        class: "px-2 py-1 border rounded text-red-600" %>
-        </div>
-      </div>
-    <% end %>
-    <% if @shift_questions.empty? %>
-      <div class="p-6 text-sm text-gray-600">No questions yet.</div>
-    <% end %>
+
+  <div class="bg-white md:rounded-2xl border border-gray-200 overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Question</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Order</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @shift_questions.each do |q| %>
+          <% type_label = case q.question_type.to_s
+              when ShiftQuestion::QUESTION_TYPES[:PRE_SHIFT].to_s then 'Pre Shift'
+              when ShiftQuestion::QUESTION_TYPES[:POST_SHIFT].to_s then 'Post Shift'
+              when ShiftQuestion::QUESTION_TYPES[:POST_SHIFT_YN].to_s then 'Post Shift (Yes/No)'
+              else q.question_type.to_s
+            end %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm text-gray-800"><%= q.question_text %></td>
+            <td class="px-6 py-4 text-sm text-gray-600"><%= type_label %></td>
+            <td class="px-6 py-4 text-sm text-gray-600"><%= q.display_order %></td>
+            <td class="px-6 py-4 text-sm">
+              <%# Mandatory/Optional %>
+              <% if q.is_mandatory %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">Mandatory</span>
+              <% else %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">Optional</span>
+              <% end %>
+              <%# Active/Inactive %>
+              <% if q.is_active %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 ml-2">Active</span>
+              <% else %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 ml-2">Inactive</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
+              <div class="flex items-center gap-3 justify-end">
+                <%= link_to edit_shift_question_path(q), class: "text-gray-500 hover:text-yellow-600" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                  </svg>
+                <% end %>
+                <%= button_to shift_question_path(q), method: :delete, data: { turbo_confirm: "Delete this question?" }, class: "text-gray-500 hover:text-red-600" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916" />
+                  </svg>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @shift_questions.empty? %>
+          <tr>
+            <td colspan="5" class="px-6 py-8 text-sm text-gray-600">No questions yet.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
 </section>

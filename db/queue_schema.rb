@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_07_230000) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_07_231500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,33 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_07_230000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "agreement_acceptances", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "agreement_id", null: false
+    t.string "signed_name", null: false
+    t.datetime "signed_at", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.string "content_hash", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agreement_id"], name: "index_agreement_acceptances_on_agreement_id"
+    t.index ["user_id", "agreement_id"], name: "index_agreement_acceptances_on_user_id_and_agreement_id", unique: true
+    t.index ["user_id"], name: "index_agreement_acceptances_on_user_id"
+  end
+
+  create_table "agreements", force: :cascade do |t|
+    t.string "document_type", null: false
+    t.integer "version", default: 1, null: false
+    t.string "title", null: false
+    t.text "body", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["document_type", "active"], name: "index_agreements_on_document_type_and_active"
+    t.index ["document_type", "version"], name: "index_agreements_on_document_type_and_version", unique: true
   end
 
   create_table "areas", force: :cascade do |t|
@@ -345,6 +372,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_07_230000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "agreement_acceptances", "agreements"
+  add_foreign_key "agreement_acceptances", "users"
   add_foreign_key "areas", "locations"
   add_foreign_key "areas_shift_questions", "areas"
   add_foreign_key "areas_shift_questions", "shift_questions"
