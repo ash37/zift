@@ -1,4 +1,3 @@
-<%# Agreements#show %>
 <% content_for :title, @agreement.title %>
 
 <div class="bg-zinc-100 min-h-screen">
@@ -7,30 +6,21 @@
       <div class="bg-white rounded-2xl p-6">
         <div class="flex items-center justify-between mb-4">
           <h1 class="text-2xl font-bold text-gray-800"><%= @agreement.title %></h1>
-          <% if @acceptance.present? %>
-            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Complete</span>
-          <% else %>
-            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Outstanding</span>
-          <% end %>
         </div>
 
         <article class="prose max-w-none">
           <div class="text-gray-800">
-            <%= render_agreement_html(@agreement, user: (@subject_user || current_user), acceptance: @acceptance, location: @location) %>
+            <%= render_agreement_html(@agreement, user: nil, acceptance: nil, location: @location) %>
           </div>
         </article>
 
-        <% if @acceptance.present? %>
-          <div class="mt-6 text-sm text-gray-600">
-            Accepted by <strong><%= @acceptance.signed_name %></strong> on <%= @acceptance.signed_at.strftime('%-d %b %Y %H:%M %Z') %>
-          </div>
-        <% elsif (@subject_user || current_user) == current_user %>
+        <% if @acceptance.signed_at.blank? %>
           <hr class="my-6" />
           <div x-data="{ signedName: '' }">
-          <%= form_with url: accept_agreement_path(@agreement.document_type), method: :post, local: true do |f| %>
+          <%= form_with url: accept_service_agreement_path(@acceptance.token), method: :post, local: true do |f| %>
             <div class="mb-4">
-              <label for="agreement_signed_name" class="mt-4 block text-sm font-medium text-gray-700">Signed</label>
-              <input x-model="signedName" type="text" name="agreement[signed_name]" id="agreement_signed_name" placeholder="Type your legal name to sign." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm placeholder:text-gray-400 px-4 py-3 text-lg" required>
+              <label for="agreement_signed_name" class="block text-sm font-medium text-gray-700">Type your legal name to sign</label>
+              <input x-model="signedName" type="text" name="agreement[signed_name]" id="agreement_signed_name" placeholder="Type legal name to sign." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm placeholder:text-gray-400 px-4 py-3 text-lg" required>
             </div>
             <div class="mb-6">
               <div class="text-xs uppercase tracking-wide text-gray-500">Signature preview</div>
@@ -57,10 +47,13 @@
           <% end %>
           </div>
         <% else %>
-          <div class="mt-6 text-sm text-gray-600">This agreement is outstanding.</div>
+          <div class="mt-6 text-sm text-gray-600">
+            Accepted by <strong><%= @acceptance.signed_name %></strong> on <%= @acceptance.signed_at.strftime('%-d %b %Y %H:%M %Z') %>
+          </div>
         <% end %>
       </div>
     </div>
   </section>
   
 </div>
+

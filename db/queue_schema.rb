@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_07_231500) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_08_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -128,6 +128,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_07_231500) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["location_id"], name: "index_items_on_location_id"
+  end
+
+  create_table "location_agreement_acceptances", force: :cascade do |t|
+    t.bigint "location_id", null: false
+    t.bigint "agreement_id", null: false
+    t.string "email"
+    t.string "signed_name"
+    t.datetime "signed_at"
+    t.string "ip_address"
+    t.string "user_agent"
+    t.string "content_hash", null: false
+    t.string "token", null: false
+    t.datetime "emailed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agreement_id"], name: "index_location_agreement_acceptances_on_agreement_id"
+    t.index ["location_id", "agreement_id"], name: "idx_on_location_id_agreement_id_3ab4c917a4"
+    t.index ["location_id"], name: "index_location_agreement_acceptances_on_location_id"
+    t.index ["token"], name: "index_location_agreement_acceptances_on_token", unique: true
   end
 
   create_table "locations", force: :cascade do |t|
@@ -382,6 +401,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_07_231500) do
   add_foreign_key "invoice_export_lines", "locations"
   add_foreign_key "invoice_export_lines", "timesheets"
   add_foreign_key "items", "locations"
+  add_foreign_key "location_agreement_acceptances", "agreements"
+  add_foreign_key "location_agreement_acceptances", "locations"
   add_foreign_key "shift_answers", "shift_questions"
   add_foreign_key "shift_answers", "shifts"
   add_foreign_key "shift_answers", "timesheets"

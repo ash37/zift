@@ -23,13 +23,13 @@
 
       <!-- Service Agreement -->
       <% current_service_agreement = Agreement.current_for('service') %>
-      <% service_acceptance = current_service_agreement && AgreementAcceptance.find_by(user: current_user, agreement: current_service_agreement) %>
+      <% latest_loc_acceptance = current_service_agreement && LocationAgreementAcceptance.where(location: @location, agreement: current_service_agreement).order(signed_at: :desc, created_at: :desc).first %>
       <div class="mt-4 bg-white rounded-3xl p-6 sm:p-8 flex items-center justify-between">
         <div>
           <h2 class="text-xl font-bold text-gray-800 mb-1">Service Agreement</h2>
           <% if current_service_agreement.present? %>
-            <% if service_acceptance.present? %>
-              <div class="text-sm text-green-700">Complete — signed <%= service_acceptance.signed_at.strftime('%-d %b %Y') %></div>
+            <% if latest_loc_acceptance&.signed_at.present? %>
+              <div class="text-sm text-green-700">Complete — signed <%= latest_loc_acceptance.signed_at.strftime('%-d %b %Y') %></div>
             <% else %>
               <div class="text-sm text-yellow-700">Outstanding — please review and accept</div>
             <% end %>
@@ -39,7 +39,13 @@
         </div>
         <div>
           <% if current_service_agreement.present? %>
-            <%= link_to "View", agreement_path('service', location_id: @location.id), class: "px-3 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700" %>
+            <% if current_user.admin? %>
+              <% if latest_loc_acceptance&.signed_at.blank? && latest_loc_acceptance.present? %>
+                <%= button_to "Resend link", resend_service_agreement_location_path(@location), method: :post, class: "ml-2 px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200" %>
+              <% else %>
+                <%= button_to "Send for signature", send_service_agreement_location_path(@location), method: :post, class: "ml-2 px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200" %>
+              <% end %>
+            <% end %>
           <% elsif current_user&.admin? %>
             <%= link_to "Configure", new_admin_agreement_path(document_type: 'service'), class: "px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200" %>
           <% end %>

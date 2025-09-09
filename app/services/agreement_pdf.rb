@@ -80,8 +80,9 @@ class AgreementPdf
         data = parse_html_table(content)
         next if data.empty?
         if defined?(Prawn::Table)
-          pdf.table(data, header: table_has_header?(content), cell_style: { size: 10, inline_format: false }) do
-            row(0).font_style = :bold if table_has_header?(content)
+          header_flag = table_has_header?(content)
+          pdf.table(data, header: header_flag, cell_style: { size: 10, inline_format: false }) do
+            row(0).font_style = :bold if header_flag
             self.position = :left
             self.width = pdf.bounds.width
           end

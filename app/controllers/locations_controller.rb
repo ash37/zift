@@ -1,6 +1,6 @@
 class LocationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_location, only: %i[ show edit update destroy archive restore ]
+  before_action :set_location, only: %i[ show edit update destroy archive restore send_service_agreement resend_service_agreement ]
 
   # GET /locations or /locations.json
   def index
@@ -75,6 +75,58 @@ class LocationsController < ApplicationController
   def restore
     @location.update(archived_at: nil)
     redirect_to locations_url, notice: "Location was successfully restored."
+  end
+
+  def send_service_agreement
+    unless current_user&.admin?
+      redirect_to @location, alert: 'Unauthorized' and return
+    end
+    agreement = Agreement.current_for('service')
+    if agreement.nil?
+      redirect_to @location, alert: 'No active service agreement configured.' and return
+    end
+
+    acceptance = LocationAgreementAcceptance.create!(
+      location: @location,
+      agreement: agreement,
+      email: @location.representative_email.presence || @location.email,
+      content_hash: agreement.content_hash,
+      emailed_at: Time.current
+    )
+
+    ServiceAgreementMailer.with(acceptance: acceptance).invite.deliver_later
+    redirect_to @location, notice: 'Service agreement link sent.'
+  end
+
+  def resend_service_agreement
+    unless current_user&.admin?
+      redirect_to @location, alert: 'Unauthorized' and return
+    end
+    agreement = Agreement.current_for('service')
+    if agreement.nil?
+      redirect_to @location, alert: 'No active service agreement configured.' and return
+    end
+
+    acceptance = LocationAgreementAcceptance.where(location: @location, agreement: agreement, signed_at: nil)
+                                            .order(created_at: :desc)
+                                            .first
+
+    if acceptance.present?
+      acceptance.update(emailed_at: Time.current)
+      ServiceAgreementMailer.with(acceptance: acceptance).invite.deliver_later
+      redirect_to @location, notice: 'Service agreement link re-sent.'
+    else
+      # No pending acceptance; create a fresh one
+      acceptance = LocationAgreementAcceptance.create!(
+        location: @location,
+        agreement: agreement,
+        email: @location.representative_email.presence || @location.email,
+        content_hash: agreement.content_hash,
+        emailed_at: Time.current
+      )
+      ServiceAgreementMailer.with(acceptance: acceptance).invite.deliver_later
+      redirect_to @location, notice: 'Service agreement link sent.'
+    end
   end
 
   private

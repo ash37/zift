@@ -29,7 +29,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       # Invalidate the token after use
       @user.update(invitation_token: nil, invitation_sent_at: nil)
       sign_in(@user)
-      redirect_to dashboards_path, notice: "Your account has been successfully set up!"
+      redirect_to user_path(@user), notice: "Your account has been successfully set up!"
     else
       self.resource = @user
       render :edit, status: :unprocessable_entity

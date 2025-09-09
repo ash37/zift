@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   root to: "welcome#index"
 
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
+
   # Public pages
   get "welcome/index"
   get "dashboards", to: "dashboards#index"
@@ -38,6 +42,8 @@ Rails.application.routes.draw do
     member do
       patch :archive
       patch :restore
+      post :send_service_agreement
+      post :resend_service_agreement
     end
   end
   resources :shifts
@@ -97,6 +103,10 @@ Rails.application.routes.draw do
   # Agreements
   get  "agreements/:document_type", to: "agreements#show",   as: :agreement
   post "agreements/:document_type/accept", to: "agreements#accept", as: :accept_agreement
+
+  # Public service agreement signing (no login)
+  get  "service_agreements/:token", to: "service_agreements#show", as: :service_agreement
+  post "service_agreements/:token/accept", to: "service_agreements#accept", as: :accept_service_agreement
 
   resources :rosters do
     member do
