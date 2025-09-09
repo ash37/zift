@@ -39,4 +39,14 @@
       </div>
     <% end %>
   </div>
+
+  <div class="mt-6 px-4 pb-6">
+    <div class="mb-6 bg-white rounded-3xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      
+      <div class="mt-2 sm:mt-0 flex items-center gap-4">
+        <div class="text-gray-700 text-sm"><span class="font-semibold">Total Hours:</span> <%= sprintf('%.2f', @total_hours) %></div>
+        <div class="text-gray-700 text-sm"><span class="font-semibold">Total Km:</span> <%= sprintf('%.0f', @total_travel_km) %></div>
+      </div>
+    </div>
+  </div>
 </div>

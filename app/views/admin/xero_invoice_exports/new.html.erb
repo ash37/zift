@@ -63,7 +63,7 @@
                   <span class="text-gray-500"><%= user&.name %></span>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900"><%= ts.travel.to_f %></td>
-                <td class="px-4 py-3 text-sm text-gray-900"><%= (ts.duration.to_f / 3600.0).round(2) %></td>
+                <td class="px-4 py-3 text-sm text-gray-900"><%= ts.duration_in_hours.round(2) %></td>
               </tr>
             <% end %>
           </tbody>

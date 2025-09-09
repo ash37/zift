@@ -162,12 +162,15 @@ class Admin::XeroTimesheetExportsController < ApplicationController
   end
 
   def fetch_user_hours(pay_period_start, pay_period_end)
+    approved_range = pay_period_start.beginning_of_day..pay_period_end.end_of_day
     User.where.not(xero_employee_id: nil).map do |user|
-      total_hours = user.timesheets
-                        .where(status: Timesheet::STATUSES[:approved])
-                        .where(clock_in_at: pay_period_start.beginning_of_day..pay_period_end.end_of_day)
-                        .sum { |t| (t.clock_out_at - t.clock_in_at) / 3600.0 }
-      { user: user, total_hours: total_hours }
-    end.reject { |data| data[:total_hours].zero? }
+      scope = user.timesheets.where(status: Timesheet::STATUSES[:approved])
+                             .where(clock_in_at: approved_range)
+
+      total_hours = scope.sum { |t| ((t.clock_out_at - t.clock_in_at) / 3600.0) rescue 0.0 }
+      travel_km   = scope.sum(:travel).to_f
+
+      { user: user, total_hours: total_hours, travel_hours: travel_km }
+    end.reject { |data| data[:total_hours].to_f.zero? && data[:travel_hours].to_f.zero? }
   end
 end

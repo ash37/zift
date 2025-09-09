@@ -39,6 +39,22 @@ class TimesheetsController < ApplicationController
     else
       @shifts = @shifts.where(user_id: current_user.id)
     end
+
+    # Weekly totals for approved timesheets (hours and travel km)
+    approved_scope = Timesheet.where(status: Timesheet::STATUSES[:approved])
+                              .joins(:shift)
+                              .where(shifts: { start_time: week_range })
+
+    if @selected_location_id.present?
+      approved_scope = approved_scope.where(shifts: { location_id: @selected_location_id })
+    end
+
+    unless current_user.admin? || current_user.manager?
+      approved_scope = approved_scope.where(user_id: current_user.id)
+    end
+
+    @total_travel_km = approved_scope.sum(:travel).to_f
+    @total_hours = approved_scope.find_each.inject(0.0) { |sum, ts| sum + ts.duration_in_hours.to_f }
   end
 
   def new
