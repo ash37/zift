@@ -15,11 +15,10 @@ class ServiceAgreementMailer < ApplicationMailer
     pdf_data    = params[:pdf_data]
 
     attachments["service-agreement-#{@location.id}-v#{@agreement.version}.pdf"] = {
-      mime_type: 'application/pdf',
+      mime_type: "application/pdf",
       content: pdf_data
     }
 
     mail(to: @acceptance.email || @location.representative_email || @location.email, subject: "Signed Service Agreement – #{@location.name}")
   end
 end
-

@@ -1,11 +1,87 @@
-<div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height: 1.5; color: #111827;">
-  <p>Hello,</p>
-  <p>You have a service agreement to review and sign for <strong><%= @location.name %></strong>.</p>
-  <p><strong>Agreement:</strong> <%= @agreement.title %></p>
-  <p>
-    <a href="<%= @url %>" style="display: inline-block; background: #6D28D9; color: #fff; padding: 10px 16px; border-radius: 8px; text-decoration: none;">Open Agreement</a>
-  </p>
-  <p style="color:#6B7280; font-size: 12px;">If you weren’t expecting this, please contact us.</p>
-  <p>Thank you,<br>Qcare</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>Service Agreement – <%= @location.name %></title>
+  <style type="text/css">
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f4f4f4; }
+    :root { color-scheme: light; supported-color-schemes: light; }
+    .brand-bg { background-color: #60006A !important; }
+    .btn-bg { background-color: #60006A !important; border-color: #60006A !important; }
+    @media screen and (max-width: 600px) {
+      .email-container { width: 100% !important; margin: auto !important; }
+    }
+  </style>
+  <!--[if mso]>
+    <style type="text/css">.fallback-font{font-family: Arial, sans-serif !important;}</style>
+  <![endif]-->
+  <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+</head>
+<body style="margin:0; padding:0; background-color:#f4f4f4;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+      <td align="center" style="background-color:#f4f4f4;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="background-color:#ffffff;">
+          <tr>
+            <td align="center" class="brand-bg" style="padding:12px 16px; color:#ffffff; font-family:sans-serif;">
+              <div style="font-size:16px; font-weight:700;">Qcare</div>
+            </td>
+          </tr>
 
+          <tr>
+            <td style="padding:24px; font-family:sans-serif;">
+              <h1 class="fallback-font" style="margin:0 0 8px; font-size:22px; line-height:28px; color:#111827; font-weight:700;">Service Agreement</h1>
+              <p style="margin:0; font-size:14px; line-height:22px; color:#6B7280;">For <strong><%= @location.name %></strong></p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:0 24px 8px; font-family:sans-serif;">
+              <p style="margin:0; font-size:16px; line-height:24px; color:#374151;">Please review and sign the service agreement below. Clicking the button will open a secure page where you can type your legal name to sign.</p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:16px 24px 24px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td class="btn-bg" style="border-radius:9999px;">
+                    <a href="<%= @url %>" style="display:inline-block; font-size:16px; font-family:sans-serif; font-weight:600; color:#ffffff; text-decoration:none; border-radius:9999px; padding:12px 22px; border:1px solid #60006A;">Open Agreement</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:0 24px 24px; font-family:sans-serif;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #E5E7EB; border-radius:12px;">
+                <tr>
+                  <td style="padding:16px;">
+                    <div style="font-size:14px; line-height:22px; color:#111827; font-weight:600; margin-bottom:6px;">Agreement</div>
+                    <div style="font-size:14px; line-height:22px; color:#374151;"> <%= @agreement.title %> (v<%= @agreement.version %>)</div>
+                    <div style="font-size:12px; line-height:20px; color:#6B7280; margin-top:8px;">This link is unique to <strong><%= @location.name %></strong>. If you weren’t expecting this email, please disregard it and contact Qcare.</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:16px 24px 32px; font-family:sans-serif; font-size:12px; line-height:18px; color:#9CA3AF;">
+              <div>Qcare QLD Pty Ltd • PO Box 5553, Red Hill, QLD 4701, Australia</div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
