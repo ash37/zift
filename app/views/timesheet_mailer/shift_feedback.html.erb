@@ -1,0 +1,35 @@
+<div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height: 1.5; color: #111827;">
+  <h2 style="margin:0 0 8px; font-size:18px;">Timesheet feedback received</h2>
+  <p style="margin:0 0 8px;">Participant: <strong><%= @location&.name || 'Unknown' %></strong></p>
+  <p style="margin:0 0 16px;">Employee: <strong><%= @user&.name || 'Unknown' %></strong></p>
+
+  <% if @timesheet.notes.present? %>
+    <div style="margin:0 0 16px;">
+      <div style="font-weight:600;">Timesheet note:</div>
+      <pre style="margin:6px 0 0; white-space:pre-wrap; background:#F9FAFB; padding:8px; border-radius:6px; border:1px solid #E5E7EB;">
+<%= @timesheet.notes %>
+      </pre>
+    </div>
+  <% end %>
+
+  <div>
+    <div style="font-weight:600; margin-bottom:6px;">Shift answers:</div>
+    <table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th align="left" style="padding:6px; border-bottom:1px solid #E5E7EB; font-size:13px; color:#6B7280;">Question</th>
+          <th align="left" style="padding:6px; border-bottom:1px solid #E5E7EB; font-size:13px; color:#6B7280;">Answer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @answers.each do |ans| %>
+          <tr>
+            <td style="padding:6px; border-bottom:1px solid #F3F4F6; font-size:14px; color:#111827;"><%= ans.shift_question&.question_text %></td>
+            <td style="padding:6px; border-bottom:1px solid #F3F4F6; font-size:14px; color:#111827;"><%= ans.answer_text %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+

@@ -119,6 +119,14 @@ class TimesheetsController < ApplicationController
 
   def clock_off
     if @timesheet.update(clock_off_params)
+      # Notify only if a Post Shift (Yes/No) answer was submitted
+      if @timesheet.shift_answers
+                    .joins(:shift_question)
+                    .where(shift_questions: { question_type: ShiftQuestion::QUESTION_TYPES[:POST_SHIFT_YN] })
+                    .where.not(answer_text: [ nil, "" ])
+                    .exists?
+        TimesheetMailer.with(timesheet: @timesheet).shift_feedback.deliver_later
+      end
       redirect_to dashboards_path
     else
       render :clock_off_form, status: :unprocessable_entity

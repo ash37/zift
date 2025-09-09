@@ -31,7 +31,7 @@
             <% if latest_loc_acceptance&.signed_at.present? %>
               <div class="text-sm text-green-700">Complete — signed <%= latest_loc_acceptance.signed_at.strftime('%-d %b %Y') %></div>
             <% else %>
-              <div class="text-sm text-yellow-700">Outstanding — please review and accept</div>
+              <div class="text-sm text-orange-500">Outstanding — please review and accept</div>
             <% end %>
           <% else %>
             <div class="text-sm text-gray-600">No active service agreement configured.</div>

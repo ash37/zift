@@ -1,0 +1,15 @@
+Timesheet feedback received
+
+Location: <%= @location&.name || 'Unknown' %>
+User: <%= @user&.name || 'Unknown' %>
+
+<% if @timesheet.notes.present? %>
+Timesheet note:
+<%= @timesheet.notes %>
+
+<% end %>
+Shift answers:
+<% @answers.each do |ans| %>
+- <%= ans.shift_question&.question_text %>: <%= ans.answer_text %>
+<% end %>
+
