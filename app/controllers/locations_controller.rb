@@ -89,7 +89,8 @@ class LocationsController < ApplicationController
     acceptance = LocationAgreementAcceptance.create!(
       location: @location,
       agreement: agreement,
-      email: @location.representative_email.presence || @location.email,
+      # Store the location's email for record, but we will always mail to location.email
+      email: @location.email,
       content_hash: agreement.content_hash,
       emailed_at: Time.current
     )
@@ -112,7 +113,8 @@ class LocationsController < ApplicationController
                                             .first
 
     if acceptance.present?
-      acceptance.update(emailed_at: Time.current)
+      # Refresh the stored email to the current location email and bump emailed_at
+      acceptance.update(emailed_at: Time.current, email: @location.email)
       ServiceAgreementMailer.with(acceptance: acceptance).invite.deliver_later
       redirect_to @location, notice: "Service agreement link re-sent."
     else
@@ -120,7 +122,7 @@ class LocationsController < ApplicationController
       acceptance = LocationAgreementAcceptance.create!(
         location: @location,
         agreement: agreement,
-        email: @location.representative_email.presence || @location.email,
+        email: @location.email,
         content_hash: agreement.content_hash,
         emailed_at: Time.current
       )

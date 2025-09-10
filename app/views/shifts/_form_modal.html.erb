@@ -26,7 +26,14 @@
 
         <div class="mb-4">
           <%= f.label :area_id, class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= f.collection_select :area_id, [], :id, :name, { prompt: "Select an Area" }, { class: "block w-full rounded-md border-gray-300 shadow-sm", data: { 'dynamic-select-target': 'target' } } %>
+          <% if @shift.location_id.present? %>
+            <% loc = Location.find(@shift.location_id) rescue nil %>
+            <%= f.collection_select :area_id, (loc ? loc.areas.order(:name) : []), :id, :name,
+                  { prompt: "Select an Area", selected: @shift.area_id },
+                  { class: "block w-full rounded-md border-gray-300 shadow-sm", data: { 'dynamic-select-target': 'target' } } %>
+          <% else %>
+            <%= f.collection_select :area_id, [], :id, :name, { prompt: "Select an Area" }, { class: "block w-full rounded-md border-gray-300 shadow-sm", data: { 'dynamic-select-target': 'target' } } %>
+          <% end %>
         </div>
         
         <div class="mb-4">

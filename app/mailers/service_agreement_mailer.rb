@@ -5,7 +5,8 @@ class ServiceAgreementMailer < ApplicationMailer
     @agreement  = @acceptance.agreement
     @url = service_agreement_url(@acceptance.token)
 
-    mail(to: @acceptance.email || @location.representative_email || @location.email, subject: "Service Agreement – #{@location.name}")
+    # Always send to the location's primary email
+    mail(to: @location.email, subject: "Service Agreement – #{@location.name}")
   end
 
   def signed
@@ -19,6 +20,7 @@ class ServiceAgreementMailer < ApplicationMailer
       content: pdf_data
     }
 
-    mail(to: @acceptance.email || @location.representative_email || @location.email, subject: "Signed Service Agreement – #{@location.name}")
+    # Always send to the location's primary email
+    mail(to: @location.email, subject: "Signed Service Agreement – #{@location.name}")
   end
 end
