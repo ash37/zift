@@ -41,13 +41,11 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :letter_opener_web
   config.action_mailer.perform_deliveries = true
 
-  # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
-
-  # Set the host for URL helpers in development
-  config.action_mailer.default_url_options = { host: "99567e05ec1d.ngrok-free.app", protocol: "https" }
-  Rails.application.routes.default_url_options[:host] = "99567e05ec1d.ngrok-free.app"
-  Rails.application.routes.default_url_options[:protocol] = "https"
+  # Development URLs should point to localhost (not ngrok)
+  config.action_mailer.default_url_options = { host: "localhost", port: 3000, protocol: "http" }
+  Rails.application.routes.default_url_options[:host] = "localhost"
+  Rails.application.routes.default_url_options[:port] = 3000
+  Rails.application.routes.default_url_options[:protocol] = "http"
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
