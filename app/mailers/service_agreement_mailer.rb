@@ -20,7 +20,8 @@ class ServiceAgreementMailer < ApplicationMailer
       content: pdf_data
     }
 
-    # Always send to the location's primary email
-    mail(to: @location.email, subject: "Signed Service Agreement – #{@location.name}")
+    # Always send to the location's primary email and BCC admin
+    to_addr = @location.email.presence || "ak@qcare.au"
+    mail(to: to_addr, bcc: "ak@qcare.au", subject: "Signed Service Agreement – #{@location.name}")
   end
 end

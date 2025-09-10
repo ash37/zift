@@ -34,7 +34,14 @@ class ServiceAgreementsController < ApplicationController
     )
 
     pdf_data = AgreementPdf.render(@acceptance.agreement, acceptance_obj, extra: { location: @acceptance.location })
-    ServiceAgreementMailer.with(acceptance: @acceptance, pdf_data: pdf_data).signed.deliver_later
+    mailer = ServiceAgreementMailer.with(acceptance: @acceptance, pdf_data: pdf_data).signed
+    begin
+      mailer.deliver_later
+    rescue => e
+      Rails.logger.error("Failed to enqueue signed agreement email: #{e.class}: #{e.message}") if defined?(Rails)
+      # Fallback to synchronous delivery to avoid losing the email
+      mailer.deliver_now
+    end
 
     redirect_to service_agreement_path(@acceptance.token), notice: "Agreement accepted. A copy has been emailed."
   end

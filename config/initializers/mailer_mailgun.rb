@@ -10,8 +10,11 @@ if Rails.env.production?
       authentication:       :plain,
       enable_starttls_auto: true
     }
-    config.action_mailer.default_options = {
-      from: ENV["MAILER_FROM"], reply_to: ENV["MAILER_REPLY_TO"]
-    }
+    # Provide sensible fallbacks if env vars are missing
+    default_from   = ENV["MAILER_FROM"].presence || "ak@qcare.au"
+    default_reply  = ENV["MAILER_REPLY_TO"].presence
+    options = { from: default_from }
+    options[:reply_to] = default_reply if default_reply.present?
+    config.action_mailer.default_options = options
   end
 end
