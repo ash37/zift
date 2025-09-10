@@ -14,7 +14,6 @@ class CreateLocationAgreementAcceptances < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :location_agreement_acceptances, :token, unique: true
-    add_index :location_agreement_acceptances, [:location_id, :agreement_id]
+    add_index :location_agreement_acceptances, [ :location_id, :agreement_id ]
   end
 end
-

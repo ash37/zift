@@ -79,11 +79,11 @@ class LocationsController < ApplicationController
 
   def send_service_agreement
     unless current_user&.admin?
-      redirect_to @location, alert: 'Unauthorized' and return
+      redirect_to @location, alert: "Unauthorized" and return
     end
-    agreement = Agreement.current_for('service')
+    agreement = Agreement.current_for("service")
     if agreement.nil?
-      redirect_to @location, alert: 'No active service agreement configured.' and return
+      redirect_to @location, alert: "No active service agreement configured." and return
     end
 
     acceptance = LocationAgreementAcceptance.create!(
@@ -95,16 +95,16 @@ class LocationsController < ApplicationController
     )
 
     ServiceAgreementMailer.with(acceptance: acceptance).invite.deliver_later
-    redirect_to @location, notice: 'Service agreement link sent.'
+    redirect_to @location, notice: "Service agreement link sent."
   end
 
   def resend_service_agreement
     unless current_user&.admin?
-      redirect_to @location, alert: 'Unauthorized' and return
+      redirect_to @location, alert: "Unauthorized" and return
     end
-    agreement = Agreement.current_for('service')
+    agreement = Agreement.current_for("service")
     if agreement.nil?
-      redirect_to @location, alert: 'No active service agreement configured.' and return
+      redirect_to @location, alert: "No active service agreement configured." and return
     end
 
     acceptance = LocationAgreementAcceptance.where(location: @location, agreement: agreement, signed_at: nil)
@@ -114,7 +114,7 @@ class LocationsController < ApplicationController
     if acceptance.present?
       acceptance.update(emailed_at: Time.current)
       ServiceAgreementMailer.with(acceptance: acceptance).invite.deliver_later
-      redirect_to @location, notice: 'Service agreement link re-sent.'
+      redirect_to @location, notice: "Service agreement link re-sent."
     else
       # No pending acceptance; create a fresh one
       acceptance = LocationAgreementAcceptance.create!(
@@ -125,7 +125,7 @@ class LocationsController < ApplicationController
         emailed_at: Time.current
       )
       ServiceAgreementMailer.with(acceptance: acceptance).invite.deliver_later
-      redirect_to @location, notice: 'Service agreement link sent.'
+      redirect_to @location, notice: "Service agreement link sent."
     end
   end
 

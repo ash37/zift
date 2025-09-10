@@ -1,4 +1,4 @@
-require 'digest'
+require "digest"
 class Agreement < ApplicationRecord
   DOCUMENT_TYPES = %w[employment service].freeze
 
@@ -14,6 +14,6 @@ class Agreement < ApplicationRecord
   end
 
   def content_hash
-    Digest::SHA256.hexdigest([document_type, version, title, body].join("\n---\n"))
+    Digest::SHA256.hexdigest([ document_type, version, title, body ].join("\n---\n"))
   end
 end

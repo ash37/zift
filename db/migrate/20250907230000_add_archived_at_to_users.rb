@@ -4,4 +4,3 @@ class AddArchivedAtToUsers < ActiveRecord::Migration[8.0]
     add_index :users, :archived_at
   end
 end
-

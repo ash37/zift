@@ -6,4 +6,3 @@ class AgreementAcceptance < ApplicationRecord
   validates :signed_at, presence: true
   validates :content_hash, presence: true
 end
-

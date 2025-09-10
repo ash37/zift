@@ -70,7 +70,7 @@ Rails.application.routes.draw do
   get "timesheets/open_for_shift/:shift_id", to: "timesheets#open_for_shift", as: :open_timesheet_for_shift
 
   namespace :admin do
-    resources :agreements, only: [:index, :new, :create, :edit, :update] do
+    resources :agreements, only: [ :index, :new, :create, :edit, :update ] do
       collection do
         get :view
       end

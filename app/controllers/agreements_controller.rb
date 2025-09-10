@@ -1,6 +1,6 @@
 class AgreementsController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_employee_or_admin!, only: [:show, :accept], if: -> { params[:document_type] == 'employment' }
+  before_action :require_employee_or_admin!, only: [ :show, :accept ], if: -> { params[:document_type] == "employment" }
 
   def show
     @document_type = params[:document_type]
@@ -13,9 +13,9 @@ class AgreementsController < ApplicationController
     # Allow admins to view agreement as any user (via user_id), others see their own
     @subject_user = if current_user&.admin? && params[:user_id].present?
                       User.with_archived.find_by(id: params[:user_id]) || current_user
-                    else
+    else
                       current_user
-                    end
+    end
 
     @acceptance = AgreementAcceptance.find_by(user: @subject_user, agreement: @agreement)
   end

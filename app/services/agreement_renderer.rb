@@ -32,7 +32,7 @@ class AgreementRenderer
         "allowed_radius" => (loc.allowed_radius if loc.respond_to?(:allowed_radius)),
         "representative_name" => (loc.representative_name if loc.respond_to?(:representative_name)),
         "representative_email" => (loc.representative_email if loc.respond_to?(:representative_email)),
-        "date_of_birth" => (loc.date_of_birth&.strftime('%-d %b %Y') if loc.respond_to?(:date_of_birth)),
+        "date_of_birth" => (loc.date_of_birth&.strftime("%-d %b %Y") if loc.respond_to?(:date_of_birth)),
         "ndis_number" => (loc.ndis_number if loc.respond_to?(:ndis_number)),
         "funding" => (loc.funding if loc.respond_to?(:funding)),
         "plan_manager_email" => (loc.plan_manager_email if loc.respond_to?(:plan_manager_email)),
@@ -57,14 +57,14 @@ class AgreementRenderer
         "phone" => user&.phone
       },
       "date" => {
-        "today" => Date.current.strftime('%-d %b %Y'),
-        "now" => Time.current.strftime('%-d %b %Y %H:%M %Z')
+        "today" => Date.current.strftime("%-d %b %Y"),
+        "now" => Time.current.strftime("%-d %b %Y %H:%M %Z")
       },
       "location" => (location_hash || {}),
       "acceptance" => (
         acceptance ? {
           "signed_name" => acceptance.signed_name,
-          "signed_at" => acceptance.signed_at&.strftime('%-d %b %Y %H:%M %Z'),
+          "signed_at" => acceptance.signed_at&.strftime("%-d %b %Y %H:%M %Z"),
           "ip_address" => acceptance.ip_address
         } : {}
       )
@@ -72,7 +72,7 @@ class AgreementRenderer
   end
 
   def self.lookup(path, context)
-    keys = path.split('.')
+    keys = path.split(".")
     value = context
     keys.each do |k|
       return nil unless value.is_a?(Hash)

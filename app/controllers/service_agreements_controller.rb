@@ -1,7 +1,7 @@
-require 'ostruct'
+require "ostruct"
 
 class ServiceAgreementsController < ApplicationController
-  layout 'application'
+  layout "application"
   skip_before_action :authenticate_user!
 
   before_action :set_acceptance
@@ -14,7 +14,7 @@ class ServiceAgreementsController < ApplicationController
   def accept
     signed_name = params.require(:agreement).permit(:signed_name)[:signed_name]
     if signed_name.blank?
-      redirect_to service_agreement_path(@acceptance.token), alert: 'Please enter your legal name.' and return
+      redirect_to service_agreement_path(@acceptance.token), alert: "Please enter your legal name." and return
     end
 
     @acceptance.update!(
@@ -36,7 +36,7 @@ class ServiceAgreementsController < ApplicationController
     pdf_data = AgreementPdf.render(@acceptance.agreement, acceptance_obj, extra: { location: @acceptance.location })
     ServiceAgreementMailer.with(acceptance: @acceptance, pdf_data: pdf_data).signed.deliver_later
 
-    redirect_to service_agreement_path(@acceptance.token), notice: 'Agreement accepted. A copy has been emailed.'
+    redirect_to service_agreement_path(@acceptance.token), notice: "Agreement accepted. A copy has been emailed."
   end
 
   private
