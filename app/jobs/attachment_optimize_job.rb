@@ -27,15 +27,17 @@ class AttachmentOptimizeJob < ApplicationJob
     record = attachment.record
     name = attachment.name
 
+    # Attach optimized blob first to reduce immediate broken-link window
     if attachment.record.public_send(name).is_a?(ActiveStorage::Attached::Many)
-      # Replace this one attachment in the collection
+      # Add optimized version alongside, then purge the old one shortly after
       record.public_send(name).attach(new_blob)
-      attachment.purge
     else
-      # Replace single attachment
+      # For single attachment, attach will switch association to new blob
       record.public_send(name).attach(new_blob)
-      attachment.purge
     end
+
+    # Purge old attachment asynchronously to avoid race with page reloads
+    attachment.purge_later
   ensure
     File.delete(io_path) if io_path && File.exist?(io_path)
   end
@@ -53,4 +55,3 @@ class AttachmentOptimizeJob < ApplicationJob
     nil
   end
 end
-
