@@ -56,6 +56,30 @@ class AgreementsController < ApplicationController
     end
   end
 
+  def download
+    @document_type = params[:document_type]
+    @agreement = Agreement.current_for(@document_type)
+    if @agreement.nil?
+      redirect_to root_path, alert: "No #{@document_type} agreement found." and return
+    end
+
+    # Pick the subject user similarly to show
+    subject_user = if current_user&.admin? && params[:user_id].present?
+                     User.with_archived.find_by(id: params[:user_id]) || current_user
+                   else
+                     current_user
+                   end
+
+    acceptance = AgreementAcceptance.find_by(user: subject_user, agreement: @agreement)
+    if acceptance.blank? || acceptance.signed_at.blank?
+      redirect_to agreement_path(@document_type, user_id: subject_user&.id), alert: "Agreement is not yet signed." and return
+    end
+
+    pdf_data = AgreementPdf.render(@agreement, acceptance, extra: {})
+    filename = "#{@agreement.document_type}-agreement-#{subject_user.id}-v#{@agreement.version}.pdf"
+    send_data pdf_data, filename: filename, type: "application/pdf", disposition: "attachment"
+  end
+
   private
   def require_employee_or_admin!
     unless current_user&.employee? || current_user&.admin?

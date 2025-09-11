@@ -6,7 +6,31 @@
       <div class="bg-white rounded-2xl p-6">
         <div class="flex items-center justify-between mb-4">
           <h1 class="text-2xl font-bold text-gray-800"><%= @agreement.title %></h1>
+          <div class="flex items-center gap-2">
+            <% if @acceptance.signed_at.present? %>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Complete</span>
+              <%= link_to "Download PDF", download_service_agreement_path(@acceptance.token), class: "px-3 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200" %>
+            <% else %>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Outstanding</span>
+            <% end %>
+          </div>
         </div>
+
+        <% if @acceptance.signed_at.present? %>
+          <% participant_email = (@location.email.presence || @acceptance.email.presence || "N/A") %>
+          <% sent_at_str = @acceptance.emailed_at.present? ? @acceptance.emailed_at.strftime('%-d %b %Y %H:%M %Z') : "N/A" %>
+          <div class="mb-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div class="text-sm text-gray-700">
+              <div class="mb-1">Accepted by <strong><%= @acceptance.signed_name %></strong> on <%= @acceptance.signed_at.strftime('%-d %b %Y %H:%M %Z') %></div>
+              <div class="mb-1"><span class="font-medium">Signed Participant Email:</span> <%= participant_email %></div>
+              <div class="mb-1"><span class="font-medium">IP:</span> <%= @acceptance.ip_address %></div>
+              <div class="mb-1 break-words"><span class="font-medium">User-Agent:</span> <%= @acceptance.user_agent %></div>
+              <div class="mb-1 break-all"><span class="font-medium">Content Hash:</span> <%= @acceptance.content_hash %></div>
+              <div class="mb-1"><span class="font-medium">Agreement Created:</span> <%= sent_at_str %></div>
+              <div class=""><span class="font-medium">Email:</span> ak@qcare.au</div>
+            </div>
+          </div>
+        <% end %>
 
         <article class="prose max-w-none">
           <div class="text-gray-800">
@@ -46,14 +70,9 @@
             </div>
           <% end %>
           </div>
-        <% else %>
-          <div class="mt-6 text-sm text-gray-600">
-            Accepted by <strong><%= @acceptance.signed_name %></strong> on <%= @acceptance.signed_at.strftime('%-d %b %Y %H:%M %Z') %>
-          </div>
         <% end %>
       </div>
     </div>
   </section>
   
 </div>
-

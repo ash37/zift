@@ -7,51 +7,55 @@ class AgreementPdf
       # Table rendering will be skipped if prawn-table is unavailable
     end
     Prawn::Document.new(page_size: "A4") do |pdf|
-      # Try to use a Unicode TTF to avoid encoding issues with smart quotes/arrows/etc.
-      unicode_candidates = [
-        Rails.root.join("app/assets/fonts/NotoSans-Regular.ttf"),
-        Rails.root.join("app/assets/fonts/DejaVuSans.ttf")
-      ]
-      unicode_path = unicode_candidates.find { |p| File.exist?(p) }
-      if unicode_path
-        pdf.font_families.update(
-          "Unicode" => {
-            normal: unicode_path.to_s,
-            bold: unicode_path.to_s,
-            italic: unicode_path.to_s,
-            bold_italic: unicode_path.to_s
-          }
-        )
-        pdf.font("Unicode")
-      end
+      # Register fonts with proper bold support; fall back to Helvetica if bold not available
+      register_fonts_with_bold(pdf)
+      pdf.font(@@pdf_base_font || "Helvetica")
       pdf.text agreement.title, size: 20, style: :bold, align: :center
-      pdf.move_down 10
+      pdf.move_down 4
       pdf.text "Version: #{agreement.version}", size: 10, align: :center
-      pdf.move_down 20
+      pdf.move_down 6
 
       rendered = AgreementRenderer.render(agreement, user: acceptance.user, acceptance: acceptance, extra: extra)
       render_html_with_tables(pdf, rendered)
 
-      pdf.move_down 30
+      pdf.move_down 10
       pdf.stroke_horizontal_rule
-      pdf.move_down 15
+      pdf.move_down 6
       pdf.text "Signed by:", style: :bold
       # Use a cursive font if available, otherwise fall back to italic
       cursive_ttf = Rails.root.join("app/assets/fonts/MrDafoe-Regular.ttf")
       if File.exist?(cursive_ttf)
         pdf.font_families.update("MrDafoe" => { normal: cursive_ttf.to_s })
         pdf.font("MrDafoe")
-        pdf.text ensure_pdf_compatible(acceptance.signed_name), size: 28
+        pdf.text ensure_pdf_compatible(acceptance.signed_name), size: 24
         pdf.font("Helvetica")
       else
-        pdf.text ensure_pdf_compatible(acceptance.signed_name), size: 22, style: :italic
+        pdf.text ensure_pdf_compatible(acceptance.signed_name), size: 20, style: :italic
       end
-      pdf.move_down 10
-      pdf.text "Date: #{acceptance.signed_at.strftime('%-d %b %Y %H:%M %Z')}"
-      pdf.text "IP: #{acceptance.ip_address}"
-      pdf.text "User-Agent: #{acceptance.user_agent}"
-      pdf.move_down 10
-      pdf.text "Content Hash: #{acceptance.content_hash}", size: 8
+      pdf.move_down 4
+      # Use a monospace font for metadata
+      begin
+        pdf.font("Courier")
+      rescue
+        # Fall back if Courier unavailable (should exist in Prawn)
+      end
+      pdf.text "Date: #{acceptance.signed_at.strftime('%-d %b %Y %H:%M %Z')}", size: 10
+      # Signed participant email immediately under the signed date
+      participant_email = (extra[:location]&.email.presence if extra.is_a?(Hash)) || (acceptance.respond_to?(:email) ? acceptance.email : nil)
+      participant_email = participant_email.presence || "N/A"
+      pdf.text "Signed Participant Email: #{ensure_pdf_compatible(participant_email)}", size: 10
+      
+      pdf.text "IP: #{ensure_pdf_compatible(acceptance.ip_address)}", size: 10
+      pdf.text "User-Agent: #{ensure_pdf_compatible(acceptance.user_agent)}", size: 10
+      pdf.text "Content Hash: #{ensure_pdf_compatible(acceptance.content_hash)}", size: 9
+      # Extra spacing before the created/sent details
+      pdf.move_down 12
+
+      # Additional details
+      sent_at = acceptance.respond_to?(:emailed_at) ? acceptance.emailed_at : nil
+      sent_at_str = sent_at.present? ? sent_at.strftime('%-d %b %Y %H:%M %Z') : "N/A"
+      pdf.text "Agreement Created: #{sent_at_str}", size: 10
+      pdf.text "Email: ak@qcare.au", size: 10
     end.render
   end
 
@@ -74,23 +78,23 @@ class AgreementPdf
         formatted = inline_text_from_html(content)
         formatted = ensure_pdf_compatible(formatted)
         next if formatted.strip.empty?
-        pdf.text formatted, size: 11, leading: 2, inline_format: true
-        pdf.move_down 6
+        # As tight as possible without overlapping; avoid extra gap after blocks
+        pdf.text formatted, size: 11, leading: -1, inline_format: true
       when :table
         data = parse_html_table(content)
         next if data.empty?
         if defined?(Prawn::Table)
           header_flag = table_has_header?(content)
-          pdf.table(data, header: header_flag, cell_style: { size: 10, inline_format: false }) do
+          pdf.table(data, header: header_flag, cell_style: { size: 10, inline_format: false, padding: [2,2,2,2] }) do
             row(0).font_style = :bold if header_flag
             self.position = :left
             self.width = pdf.bounds.width
           end
-          pdf.move_down 10
+          pdf.move_down 4
         else
           # Fallback: render as plain text rows
           data.each { |row| pdf.text ensure_pdf_compatible(row.join(" | ")), size: 10 }
-          pdf.move_down 10
+          pdf.move_down 4
         end
       end
     end
@@ -101,7 +105,7 @@ class AgreementPdf
       .gsub(/<(\/?)strong>/i, '<\1b>')
       .gsub(/<(\/?)em>/i, '<\1i>')
       .gsub(/<br\s*\/?\s*>/i, "\n")
-      .gsub(/<\/(p|li|h[1-4])>/i, "\n\n")
+      .gsub(/<\/(p|li|h[1-4])>/i, "\n")
       .gsub(/<[^>]+>/, "")
   end
 
@@ -155,5 +159,46 @@ class AgreementPdf
     }
     s.gsub!(Regexp.union(replacements.keys), replacements)
     s
+  end
+
+  # Try to register a font family with real bold support. Sets @@pdf_base_font accordingly.
+  def self.register_fonts_with_bold(pdf)
+    begin
+      base_dir = Rails.root.join("app/assets/fonts")
+      # Prefer Noto Sans if both regular and bold are available
+      noto_regular = base_dir.join("NotoSans-Regular.ttf")
+      noto_bold    = base_dir.join("NotoSans-Bold.ttf")
+      if File.exist?(noto_regular) && File.exist?(noto_bold)
+        pdf.font_families.update(
+          "Unicode" => {
+            normal: noto_regular.to_s,
+            bold:   noto_bold.to_s,
+            italic: noto_regular.to_s,
+            bold_italic: noto_bold.to_s
+          }
+        )
+        @@pdf_base_font = "Unicode"
+        return
+      end
+
+      # Fallback to DejaVu if available
+      deja_regular = base_dir.join("DejaVuSans.ttf")
+      deja_bold    = base_dir.join("DejaVuSans-Bold.ttf")
+      if File.exist?(deja_regular) && File.exist?(deja_bold)
+        pdf.font_families.update(
+          "Unicode" => {
+            normal: deja_regular.to_s,
+            bold:   deja_bold.to_s,
+            italic: deja_regular.to_s,
+            bold_italic: deja_bold.to_s
+          }
+        )
+        @@pdf_base_font = "Unicode"
+        return
+      end
+    rescue => _e
+      # If anything fails, we will fall back to Helvetica below
+    end
+    @@pdf_base_font = "Helvetica"
   end
 end

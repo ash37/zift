@@ -30,6 +30,8 @@ class ServiceAgreementsController < ApplicationController
       signed_at: @acceptance.signed_at,
       ip_address: @acceptance.ip_address,
       user_agent: @acceptance.user_agent,
+      content_hash: @acceptance.content_hash,
+      emailed_at: @acceptance.emailed_at,
       user: nil
     )
 
@@ -44,6 +46,26 @@ class ServiceAgreementsController < ApplicationController
     end
 
     redirect_to service_agreement_path(@acceptance.token), notice: "Agreement accepted. A copy has been emailed."
+  end
+
+  def download
+    unless @acceptance.signed_at.present?
+      redirect_to service_agreement_path(@acceptance.token), alert: "Agreement is not yet signed." and return
+    end
+
+    acceptance_obj = OpenStruct.new(
+      signed_name: @acceptance.signed_name,
+      signed_at: @acceptance.signed_at,
+      ip_address: @acceptance.ip_address,
+      user_agent: @acceptance.user_agent,
+      content_hash: @acceptance.content_hash,
+      emailed_at: @acceptance.emailed_at,
+      user: nil
+    )
+
+    pdf_data = AgreementPdf.render(@acceptance.agreement, acceptance_obj, extra: { location: @acceptance.location })
+    filename = "service-agreement-#{@acceptance.location.id}-v#{@acceptance.agreement.version}.pdf"
+    send_data pdf_data, filename: filename, type: "application/pdf", disposition: "attachment"
   end
 
   private

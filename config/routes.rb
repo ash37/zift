@@ -103,9 +103,11 @@ Rails.application.routes.draw do
   # Agreements
   get  "agreements/:document_type", to: "agreements#show",   as: :agreement
   post "agreements/:document_type/accept", to: "agreements#accept", as: :accept_agreement
+  get  "agreements/:document_type/download", to: "agreements#download", as: :download_agreement
 
   # Public service agreement signing (no login)
   get  "service_agreements/:token", to: "service_agreements#show", as: :service_agreement
+  get  "service_agreements/:token/download", to: "service_agreements#download", as: :download_service_agreement
   post "service_agreements/:token/accept", to: "service_agreements#accept", as: :accept_service_agreement
 
   resources :rosters do
