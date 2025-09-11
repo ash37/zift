@@ -41,6 +41,11 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
+    # Be explicit to ensure @user is set for the form partial
+    @user ||= User.with_archived.find_by(id: params[:id])
+    unless @user
+      redirect_to users_path, alert: "User not found" and return
+    end
   end
 
   # POST /users
@@ -77,7 +82,17 @@ class UsersController < ApplicationController
     updated_params.delete(:password_confirmation)
   end
 
+  # Extract multi-file attachments so we can append, not replace
+  new_id_docs = updated_params.delete("id_documents") || updated_params.delete(:id_documents)
+
   if @user.update(updated_params)
+    # Append new ID documents if provided (do not overwrite existing)
+    if new_id_docs.present?
+      Array(new_id_docs).reject(&:blank?).each do |doc|
+        @user.id_documents.attach(doc)
+      end
+    end
+
     enqueue_attachment_optimization!
     redirect_to @user, notice: "User was successfully updated."
   else

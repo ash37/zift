@@ -1,4 +1,6 @@
 <%# app/views/users/_form.html.erb (styled using app-wide guide) %>
+<%# Be resilient to being called without the `user:` local %>
+<% user = (defined?(user) && user) || @user || User.new %>
 
 <!-- OUTER WRAPPER -->
 <div class="bg-zinc-100 pt-4 px-0 sm:py-12 sm:px-6 lg:px-2">
