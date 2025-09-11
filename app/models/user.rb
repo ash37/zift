@@ -18,6 +18,44 @@ class User < ApplicationRecord
   has_many :unavailability_requests, dependent: :destroy
   has_many :timesheet_export_lines
 
+  # Employee compliance documents
+  has_one_attached :ndis_screening_card
+  has_many_attached :id_documents
+  has_one_attached :ndis_orientation_certificate
+  has_one_attached :qcare_induction_certificate
+
+  MAX_ATTACHMENT_SIZE = 12.megabytes
+  ALLOWED_CONTENT_TYPES = %w[
+    image/jpeg image/png image/webp image/heic image/heif application/pdf
+  ].freeze
+
+  validate :validate_uploads
+
+  def validate_uploads
+    [
+      [:ndis_screening_card, ndis_screening_card],
+      [:ndis_orientation_certificate, ndis_orientation_certificate],
+      [:qcare_induction_certificate, qcare_induction_certificate]
+    ].each do |name, attachment|
+      next unless attachment.attached?
+      validate_blob(attachment.blob, name: name)
+    end
+
+    id_documents.each do |doc|
+      validate_blob(doc.blob, name: :id_documents)
+    end
+  end
+
+  def validate_blob(blob, name:)
+    return unless blob
+    unless ALLOWED_CONTENT_TYPES.include?(blob.content_type)
+      errors.add(name, "must be an image (JPEG/PNG/WEBP/HEIC) or PDF")
+    end
+    if blob.byte_size > MAX_ATTACHMENT_SIZE
+      errors.add(name, "is too large (max #{(MAX_ATTACHMENT_SIZE / 1.megabyte).to_i}MB)")
+    end
+  end
+
   ROLES = {
     employee: 0,
     manager: 1,

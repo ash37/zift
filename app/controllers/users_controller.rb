@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_user, only: %i[ show edit update destroy employ contact archive restore ]
+  before_action :set_user, only: %i[ remove_attachment remove_id_document ]
 
   # GET /users
   def index
@@ -51,7 +52,7 @@ class UsersController < ApplicationController
   end
 
 # PATCH/PUT /users/1
-def update
+  def update
   # Create a mutable copy of the parameters
   updated_params = user_params.to_h
 
@@ -67,6 +68,7 @@ def update
   end
 
   if @user.update(updated_params)
+    enqueue_attachment_optimization!
     redirect_to @user, notice: "User was successfully updated."
   else
     # This will print the validation errors to your terminal
@@ -79,6 +81,40 @@ end
   def destroy
     @user.destroy!
     redirect_to users_url, notice: "User was successfully destroyed.", status: :see_other
+  end
+
+  # DELETE /users/:id/remove_attachment?name=:field
+  def remove_attachment
+    unless current_user == @user || current_user&.admin?
+      redirect_to @user, alert: "Unauthorized" and return
+    end
+    name = params[:name].to_s
+    allowed = %w[ ndis_screening_card ndis_orientation_certificate qcare_induction_certificate ]
+    unless allowed.include?(name)
+      redirect_to @user, alert: "Unknown attachment" and return
+    end
+    att = @user.public_send(name)
+    if att.attached?
+      att.purge
+      redirect_to @user, notice: "Attachment removed."
+    else
+      redirect_to @user, alert: "No attachment to remove."
+    end
+  end
+
+  # DELETE /users/:id/remove_id_document?signed_id=...
+  def remove_id_document
+    unless current_user == @user || current_user&.admin?
+      redirect_to @user, alert: "Unauthorized" and return
+    end
+    signed_id = params[:signed_id].to_s
+    attachment = @user.id_documents.attachments.find { |a| a.blob.signed_id == signed_id }
+    if attachment
+      attachment.purge
+      redirect_to @user, notice: "ID document removed."
+    else
+      redirect_to @user, alert: "Document not found."
+    end
   end
 
   # PATCH /users/:id/archive
@@ -164,6 +200,23 @@ end
         safe += [ :role, :status, { location_ids: [] } ]
       end
 
+      # File attachments (employee uploads)
+      safe += [ :ndis_screening_card, :ndis_orientation_certificate, :qcare_induction_certificate, { id_documents: [] } ]
+
       params.require(:user).permit(safe)
+    end
+
+    def enqueue_attachment_optimization!
+      # Enqueue optimization for any images; job will skip already-optimized
+      [
+        @user.ndis_screening_card,
+        @user.ndis_orientation_certificate,
+        @user.qcare_induction_certificate
+      ].each do |att|
+        AttachmentOptimizeJob.perform_later(att.attachment.id) if att.attached?
+      end
+      @user.id_documents.each do |att|
+        AttachmentOptimizeJob.perform_later(att.id)
+      end
     end
 end

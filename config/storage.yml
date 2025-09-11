@@ -14,6 +14,14 @@ local:
 #   region: us-east-1
 #   bucket: your_own_bucket-<%= Rails.env %>
 
+# Amazon S3 using ENV variables (good for Heroku)
+amazon_env:
+  service: S3
+  access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV.fetch("AWS_REGION", "ap-southeast-2") %>
+  bucket: <%= ENV.fetch("AWS_BUCKET") %>
+
 # Remember not to checkin your GCS keyfile to a repository
 # google:
 #   service: GCS

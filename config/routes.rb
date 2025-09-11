@@ -35,6 +35,8 @@ Rails.application.routes.draw do
       post :contact
       patch :archive
       patch :restore
+      delete :remove_attachment
+      delete :remove_id_document
     end
   end
   resources :locations do
