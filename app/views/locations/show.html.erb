@@ -40,7 +40,7 @@
           <h2 class="text-xl font-bold text-gray-800 mb-1">Service Agreement</h2>
           <% if current_service_agreement.present? %>
             <% if latest_signed_acceptance&.signed_at.present? %>
-              <div class="text-sm text-green-700">Complete — signed <%= latest_signed_acceptance.signed_at.strftime('%-d %b %Y') %></div>
+              <div class="text-sm text-green-500">Complete — signed <%= latest_signed_acceptance.signed_at.strftime('%-d %b %Y') %></div>
             <% elsif pending_current_acceptance.present? %>
               <div class="text-sm text-orange-500">Outstanding — please review and accept</div>
             <% else %>
