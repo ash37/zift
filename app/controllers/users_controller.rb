@@ -21,6 +21,11 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
+    # Defensive: ensure @user is loaded even if before_action is skipped in some edge cases
+    @user ||= User.with_archived.find_by(id: params[:id])
+    unless @user
+      redirect_to users_path, alert: "User not found" and return
+    end
     @upcoming_shifts = @user.shifts.joins(:roster)
                               .where(rosters: { status: Roster::STATUSES[:published] })
                               .where("shifts.start_time >= ?", Time.current)
@@ -53,6 +58,11 @@ class UsersController < ApplicationController
 
 # PATCH/PUT /users/1
   def update
+  # Ensure target user is loaded; fallback if before_action didn't set it
+  @user ||= User.with_archived.find_by(id: params[:id])
+  unless @user
+    redirect_to users_path, alert: "User not found" and return
+  end
   # Create a mutable copy of the parameters
   updated_params = user_params.to_h
 
@@ -203,7 +213,8 @@ end
       # File attachments (employee uploads)
       safe += [ :ndis_screening_card, :ndis_orientation_certificate, :qcare_induction_certificate, { id_documents: [] } ]
 
-      params.require(:user).permit(safe)
+      # Be lenient: when some forms submit only attachments or no fields, avoid raising
+      params.fetch(:user, {}).permit(safe)
     end
 
     def enqueue_attachment_optimization!

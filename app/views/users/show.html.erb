@@ -41,23 +41,16 @@
               <% end %>
             </div>
             <% if current_employment_agreement.present? %>
-              <%= link_to "View", agreement_path('employment', user_id: @user.id), class: "px-3 py-1 rounded-lg bg-gray-600 text-white hover:bg-gray-700" %>
+              <%= link_to "View", agreement_path('employment', user_id: @user.id), class: "px-3 py-1 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200" %>
             <% end %>
           </div>
 
           <%# Required uploads %>
-          <% def status_icon(attached) %>
-            if attached
-              raw('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-green-600"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"/></svg>')
-            else
-              raw('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-orange-500"><path d="M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5zM11.25 6h1.5v7.5h-1.5V6zm0 9h1.5v1.5h-1.5V15z"/></svg>')
-            end
-          end %>
 
           <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="p-3 rounded-xl border border-gray-200">
               <div class="flex items-center justify-between">
-                <div class="font-medium text-gray-800">NDIS screening card</div>
+                <div class="font-semibold text-gray-800">NDIS screening card</div>
                 <div><%= status_icon(@user.ndis_screening_card.attached?) %></div>
               </div>
               <div class="mt-2 text-sm text-gray-600">Upload a clear photo or PDF of your valid NDIS screening card.</div>
@@ -79,7 +72,7 @@
 
             <div class="p-3 rounded-xl border border-gray-200">
               <div class="flex items-center justify-between">
-                <div class="font-medium text-gray-800">Two forms of ID</div>
+                <div class="font-semibold text-gray-800">Two forms of ID</div>
                 <div><%= status_icon(@user.id_documents.attachments.any?) %></div>
               </div>
               <div class="mt-2 text-sm text-gray-600">Upload two separate IDs (e.g. licence, passport, Medicare). You can select multiple files.</div>
@@ -105,7 +98,7 @@
 
             <div class="p-3 rounded-xl border border-gray-200">
               <div class="flex items-center justify-between">
-                <div class="font-medium text-gray-800">NDIS worker orientation certificate</div>
+                <div class="font-semibold text-gray-800">NDIS worker orientation certificate</div>
                 <div><%= status_icon(@user.ndis_orientation_certificate.attached?) %></div>
               </div>
               <div class="mt-2 text-sm text-gray-600">Upload your NDIS worker orientation certificate.</div>
@@ -127,7 +120,7 @@
 
             <div class="p-3 rounded-xl border border-gray-200">
               <div class="flex items-center justify-between">
-                <div class="font-medium text-gray-800">Qcare induction certificate</div>
+                <div class="font-semibold text-gray-800">Qcare induction certificate</div>
                 <div><%= status_icon(@user.qcare_induction_certificate.attached?) %></div>
               </div>
               <div class="mt-2 text-sm text-gray-600">Upload your Qcare induction certificate.</div>
