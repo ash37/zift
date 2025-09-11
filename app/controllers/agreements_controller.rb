@@ -64,11 +64,12 @@ class AgreementsController < ApplicationController
     end
 
     # Pick the subject user similarly to show
-    subject_user = if current_user&.admin? && params[:user_id].present?
-                     User.with_archived.find_by(id: params[:user_id]) || current_user
-                   else
-                     current_user
-                   end
+    subject_user =
+      if current_user&.admin? && params[:user_id].present?
+        User.with_archived.find_by(id: params[:user_id]) || current_user
+      else
+        current_user
+      end
 
     acceptance = AgreementAcceptance.find_by(user: subject_user, agreement: @agreement)
     if acceptance.blank? || acceptance.signed_at.blank?

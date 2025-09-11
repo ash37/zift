@@ -39,12 +39,12 @@ class AgreementPdf
       rescue
         # Fall back if Courier unavailable (should exist in Prawn)
       end
-      pdf.text "Date: #{acceptance.signed_at.strftime('%-d %b %Y %H:%M %Z')}", size: 10
+      pdf.text "Date: #{acceptance.signed_at.strftime("%-d %b %Y %H:%M %Z")}", size: 10
       # Signed participant email immediately under the signed date
       participant_email = (extra[:location]&.email.presence if extra.is_a?(Hash)) || (acceptance.respond_to?(:email) ? acceptance.email : nil)
       participant_email = participant_email.presence || "N/A"
       pdf.text "Signed Participant Email: #{ensure_pdf_compatible(participant_email)}", size: 10
-      
+
       pdf.text "IP: #{ensure_pdf_compatible(acceptance.ip_address)}", size: 10
       pdf.text "User-Agent: #{ensure_pdf_compatible(acceptance.user_agent)}", size: 10
       pdf.text "Content Hash: #{ensure_pdf_compatible(acceptance.content_hash)}", size: 9
@@ -53,7 +53,7 @@ class AgreementPdf
 
       # Additional details
       sent_at = acceptance.respond_to?(:emailed_at) ? acceptance.emailed_at : nil
-      sent_at_str = sent_at.present? ? sent_at.strftime('%-d %b %Y %H:%M %Z') : "N/A"
+      sent_at_str = sent_at.present? ? sent_at.strftime("%-d %b %Y %H:%M %Z") : "N/A"
       pdf.text "Agreement Created: #{sent_at_str}", size: 10
       pdf.text "Email: ak@qcare.au", size: 10
     end.render
@@ -85,7 +85,7 @@ class AgreementPdf
         next if data.empty?
         if defined?(Prawn::Table)
           header_flag = table_has_header?(content)
-          pdf.table(data, header: header_flag, cell_style: { size: 10, inline_format: false, padding: [2,2,2,2] }) do
+          pdf.table(data, header: header_flag, cell_style: { size: 10, inline_format: false, padding: [ 2, 2, 2, 2 ] }) do
             row(0).font_style = :bold if header_flag
             self.position = :left
             self.width = pdf.bounds.width
