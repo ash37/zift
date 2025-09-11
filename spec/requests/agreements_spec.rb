@@ -51,4 +51,3 @@ RSpec.describe "Agreements (employment)", type: :request do
     ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j[:job] == job_class }
   end
 end
-

@@ -17,4 +17,3 @@ RSpec.describe "Service agreement flow (public)", type: :system do
     expect(page).to have_link("Download PDF")
   end
 end
-

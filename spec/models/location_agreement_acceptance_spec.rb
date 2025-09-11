@@ -15,4 +15,3 @@ RSpec.describe LocationAgreementAcceptance, type: :model do
     expect(laa.signed?).to be true
   end
 end
-

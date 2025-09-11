@@ -6,4 +6,3 @@ FactoryBot.define do
     content_hash { agreement.content_hash }
   end
 end
-

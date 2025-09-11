@@ -3,4 +3,3 @@ RSpec.configure do |config|
     ActiveJob::Base.queue_adapter = :test
   end
 end
-

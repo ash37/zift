@@ -10,16 +10,15 @@ RSpec.describe ServiceAgreementMailer, type: :mailer do
   describe "invite" do
     it "sends to location.email only" do
       mail = described_class.with(acceptance: acceptance).invite
-      expect(mail.to).to eq(["loc@example.com"]) # no representative or acceptance email fallback
+      expect(mail.to).to eq([ "loc@example.com" ]) # no representative or acceptance email fallback
     end
   end
 
   describe "signed" do
     it "bccs ak@qcare.au and sends to location.email" do
       mail = described_class.with(acceptance: acceptance, pdf_data: "PDF").signed
-      expect(mail.to).to eq(["loc@example.com"]) # to address
+      expect(mail.to).to eq([ "loc@example.com" ]) # to address
       expect(Array(mail.bcc)).to include("ak@qcare.au") # bcc present
     end
   end
 end
-

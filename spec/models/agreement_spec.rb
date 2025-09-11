@@ -14,4 +14,3 @@ RSpec.describe Agreement, type: :model do
     end
   end
 end
-

@@ -10,4 +10,3 @@ RSpec.describe AgreementPdf do
     expect(pdf.bytesize).to be > 1000
   end
 end
-

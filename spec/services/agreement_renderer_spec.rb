@@ -13,4 +13,3 @@ RSpec.describe AgreementRenderer do
     expect(rendered).to include("Signed: Alex Smith")
   end
 end
-

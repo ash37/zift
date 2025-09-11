@@ -18,4 +18,3 @@ RSpec.describe "Employment agreement flow", type: :system do
     expect(page).to have_link("Download PDF")
   end
 end
-
