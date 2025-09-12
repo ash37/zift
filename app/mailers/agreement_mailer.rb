@@ -1,9 +1,12 @@
 class AgreementMailer < ApplicationMailer
   def signed
-    @user = params[:user]
-    @agreement = params[:agreement]
+    @user       = params[:user]
+    @agreement  = params[:agreement]
     @acceptance = params[:acceptance]
-    pdf_data = params[:pdf_data]
+    location    = params[:location]
+
+    # Render PDF inside the mailer to avoid enqueueing binary data in the job
+    pdf_data = AgreementPdf.render(@agreement, @acceptance, extra: { location: location })
 
     attachments["#{@agreement.document_type}-agreement-#{@agreement.version}.pdf"] = {
       mime_type: "application/pdf",

@@ -35,8 +35,8 @@ class ServiceAgreementsController < ApplicationController
       user: nil
     )
 
-    pdf_data = AgreementPdf.render(@acceptance.agreement, acceptance_obj, extra: { location: @acceptance.location })
-    mailer = ServiceAgreementMailer.with(acceptance: @acceptance, pdf_data: pdf_data).signed
+    # Avoid passing binary PDF into the job; render in the mailer
+    mailer = ServiceAgreementMailer.with(acceptance: @acceptance).signed
     begin
       mailer.deliver_later
     rescue => e

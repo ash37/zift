@@ -13,7 +13,18 @@ class ServiceAgreementMailer < ApplicationMailer
     @acceptance = params[:acceptance]
     @location   = @acceptance.location
     @agreement  = @acceptance.agreement
-    pdf_data    = params[:pdf_data]
+
+    # Build a light acceptance-like object for PDF (userless), similar to controller
+    acceptance_obj = OpenStruct.new(
+      signed_name:  @acceptance.signed_name,
+      signed_at:    @acceptance.signed_at,
+      ip_address:   @acceptance.ip_address,
+      user_agent:   @acceptance.user_agent,
+      content_hash: @acceptance.content_hash,
+      emailed_at:   @acceptance.emailed_at,
+      user:         nil
+    )
+    pdf_data = AgreementPdf.render(@agreement, acceptance_obj, extra: { location: @location })
 
     attachments["service-agreement-#{@location.id}-v#{@agreement.version}.pdf"] = {
       mime_type: "application/pdf",

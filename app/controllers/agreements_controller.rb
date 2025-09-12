@@ -48,8 +48,9 @@ class AgreementsController < ApplicationController
     )
 
     if acceptance.save
-      pdf_data = AgreementPdf.render(@agreement, acceptance, extra: { location: @location })
-      AgreementMailer.with(user: current_user, agreement: @agreement, acceptance: acceptance, pdf_data: pdf_data).signed.deliver_later
+      # Do NOT pass binary PDF data into the job payload; SolidQueue serializes params as JSON.
+      # Instead, pass record references and render the PDF inside the mailer.
+      AgreementMailer.with(user: current_user, agreement: @agreement, acceptance: acceptance, location: @location).signed.deliver_later
       redirect_to agreement_path(@document_type, location_id: @location&.id), notice: "Agreement accepted. A copy has been emailed to you."
     else
       redirect_to agreement_path(@document_type, location_id: @location&.id), alert: acceptance.errors.full_messages.to_sentence
