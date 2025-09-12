@@ -87,9 +87,13 @@
           <%= form.text_field :reason, class: "w-full border border-gray-300 rounded-md shadow-sm px-3 py-2", placeholder: "Add a reason..." %>
         </div>
 
-        <div class="flex-shrink-0">
+        <div class="flex-shrink-0 flex items-center gap-4">
           <%# FIX: Updated button styling %>
           <%= form.submit "Save", class: "px-8 py-2.5 leading-5 text-white font-semibold transition-colors duration-300 transform bg-gray-700 rounded-3xl hover:bg-gray-600 focus:outline-none focus:bg-gray-600 h-full" %>
+
+          <% if unavailability_request.persisted? && unavailability_request.starts_at.present? && unavailability_request.starts_at >= 1.week.from_now %>
+            <%= link_to "Delete", unavailability_request_path(unavailability_request), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this unavailability request?" }, class: "text-red-600 hover:text-red-800 text-sm" %>
+          <% end %>
         </div>
         
       </div>

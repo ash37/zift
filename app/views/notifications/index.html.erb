@@ -28,7 +28,8 @@
               <!-- Column 2: info -->
               <td class="px-4 sm:px-6 py-4 align-middle text-sm text-gray-800">
                 <% if req.repeats_weekly? %>
-                  <strong><%= req.user&.name || req.user&.email || "User ##{req.user_id}" %></strong> requested every <%= req.starts_at.strftime('%A') %> off.
+                  <strong><%= req.user&.name || req.user&.email || "User ##{req.user_id}" %></strong> requested every <%= req.starts_at.strftime('%A') %> off. Starting
+                  <span class="rounded-md bg-violet-100 font-semibold px-2 py-1 text-xs text-violet-700"><%= req.starts_at.strftime('%a, %d %b') %></span>
                   <span class="rounded-md bg-violet-100 font-semibold px-2 py-1 text-xs text-violet-700"><%= display_range_or_allday(req.starts_at, req.ends_at) %></span>
                   <span class="text-gray-500">Reason:</span> <%= req.reason.presence || '—' %>
                   <div class="mt-2 sm:hidden">
@@ -41,6 +42,7 @@
                   <% days = (req.ends_at.to_date - req.starts_at.to_date).to_i + 1 %>
                   <strong><%= req.user&.name || req.user&.email || "User ##{req.user_id}" %></strong>
                   requested <%= days %> <%= 'day'.pluralize(days) %> off.
+                  <span class="rounded-md bg-violet-100 font-semibold px-2 py-1 text-xs text-violet-700"><%= req.starts_at.strftime('%a, %d %b') %></span>
                   <span class="rounded-md bg-violet-100 font-semibold px-2 py-1 text-xs text-violet-700"><%= display_range_or_allday(req.starts_at, req.ends_at) %></span>
                   <span class="text-gray-500">Reason:</span> <%= req.reason.presence || '—' %>
                   <div class="mt-2 sm:hidden">
