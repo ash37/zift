@@ -31,24 +31,26 @@
         <% current_employment_agreement = Agreement.current_for('employment') %>
         <% acceptance = current_employment_agreement && AgreementAcceptance.find_by(user: @user, agreement: current_employment_agreement) %>
         <div class="mt-4 bg-white rounded-2xl p-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-gray-800 font-semibold">Employment Agreement</div>
-              <% if acceptance.present? %>
-                <div class="text-sm text-green-600">Complete — signed <%= acceptance.signed_at.strftime('%-d %b %Y') %></div>
-              <% else %>
-                <div class="text-sm text-orange-500">Outstanding — please review and accept</div>
+          <div class="<%= acceptance.present? ? '' : 'border-2 border-dashed text-orange-500 rounded-xl p-3' %>">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-gray-800 font-semibold">Employment Agreement</div>
+                <% if acceptance.present? %>
+                  <div class="text-sm text-green-600">Complete — signed <%= acceptance.signed_at.strftime('%-d %b %Y') %></div>
+                <% else %>
+                  <div class="text-sm text-orange-500">Outstanding — please review and accept</div>
+                <% end %>
+              </div>
+              <% if current_employment_agreement.present? %>
+                <%= link_to "View", agreement_path('employment', user_id: @user.id), class: "px-3 py-1 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200" %>
               <% end %>
             </div>
-            <% if current_employment_agreement.present? %>
-              <%= link_to "View", agreement_path('employment', user_id: @user.id), class: "px-3 py-1 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200" %>
-            <% end %>
           </div>
 
           <%# Required uploads %>
 
           <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-3 rounded-xl border border-gray-200">
+            <div class="p-3 bg-white rounded-xl <%= @user.ndis_screening_card.attached? ? 'text-green-500 border-2' : 'border-2 border-dashed text-orange-500' %>">
               <div class="flex items-center justify-between">
                 <div class="font-semibold text-gray-800">NDIS screening card</div>
                 <div><%= status_icon(@user.ndis_screening_card.attached?) %></div>
@@ -90,7 +92,7 @@
               <% end %>
             </div>
 
-            <div class="p-3 rounded-xl border border-gray-200">
+            <div class="p-3 bg-white rounded-xl <%= (@user.id_documents.attachments.size >= 2) ? 'border-b-2 border-gray-700' : 'border-2 border-dashed text-orange-500' %>">
               <div class="flex items-center justify-between">
                 <div class="font-semibold text-gray-800">Two forms of ID</div>
                 <div><%= status_icon(@user.id_documents.attachments.any?) %></div>
@@ -135,7 +137,7 @@
               <% end %>
             </div>
 
-            <div class="p-3 rounded-xl border border-gray-200">
+            <div class="p-3 bg-white rounded-xl <%= @user.ndis_orientation_certificate.attached? ? 'border-b-2 border-gray-700' : 'border-2 border-dashed text-orange-500' %>">
               <div class="flex items-center justify-between">
                 <div class="font-semibold text-gray-800">NDIS worker orientation certificate</div>
                 <div><%= status_icon(@user.ndis_orientation_certificate.attached?) %></div>
@@ -177,7 +179,7 @@
               <% end %>
             </div>
 
-            <div class="p-3 rounded-xl border border-gray-200">
+            <div class="p-3 bg-white rounded-xl <%= @user.qcare_induction_certificate.attached? ? 'border-b-2 border-gray-700' : 'border-2 border-dashed text-orange-500' %>">
               <div class="flex items-center justify-between">
                 <div class="font-semibold text-gray-800">Qcare induction certificate</div>
                 <div><%= status_icon(@user.qcare_induction_certificate.attached?) %></div>
