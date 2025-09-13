@@ -144,6 +144,11 @@ end
 
   # PATCH /users/:id/archive
   def archive
+    # Ensure target user is loaded in case before_action didn't set it
+    @user ||= User.with_archived.find_by(id: params[:id])
+    unless @user
+      redirect_to users_path, alert: "User not found" and return
+    end
     unless current_user&.admin? || current_user&.manager?
       redirect_to @user, alert: "Unauthorized" and return
     end
@@ -154,6 +159,11 @@ end
 
   # PATCH /users/:id/restore
   def restore
+    # Ensure target user is loaded in case before_action didn't set it
+    @user ||= User.with_archived.find_by(id: params[:id])
+    unless @user
+      redirect_to users_path, alert: "User not found" and return
+    end
     unless current_user&.admin? || current_user&.manager?
       redirect_to @user, alert: "Unauthorized" and return
     end
