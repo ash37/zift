@@ -13,7 +13,7 @@
   <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
     <% if timesheet %>
       <% if timesheet.notes&.include?("Auto-generated: Missed clock on.") %>
-        <div class="text-orange-500">Unattended</div>
+        <div class="text-gray-600">Unattended</div>
       <% else %>
         <div><%= timesheet.clock_in_at&.strftime("%I:%M%p") %> - <%= timesheet.clock_out_at&.strftime("%I:%M%p") %></div>
       <% end %>
@@ -64,7 +64,12 @@
     <% if timesheet && (current_user.admin? || current_user.manager?) %>
       <div class="flex items-center gap-x-3 justify-end">
         <% if timesheet.pending? %>
-          <%= link_to "Match Roster", match_roster_times_timesheet_path(timesheet), method: :patch, class: "text-violet-800 hover:bg-violet-100 hover:rounded-3xl px-2 py-1" %>
+          <% times_already_match = timesheet.clock_in_at.present? && timesheet.clock_out_at.present? &&
+                                   (timesheet.clock_in_at.to_i == shift.start_time.to_i) &&
+                                   (timesheet.clock_out_at.to_i == shift.end_time.to_i) %>
+          <% unless times_already_match %>
+            <%= link_to "Match Roster", match_roster_times_timesheet_path(timesheet), method: :patch, class: "text-violet-800 hover:bg-violet-100 hover:rounded-3xl px-2 py-1" %>
+          <% end %>
           <%= button_to approve_timesheet_path(timesheet), method: :patch, class: "bg-green-500 hover:bg-green-700 text-white font-semibold p-2 rounded-full" do %>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
