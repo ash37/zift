@@ -1,15 +1,16 @@
-<% flash.each do |type, message| %>
-  <% if type == "notice" && !["Signed in successfully.", "Signed out successfully."].include?(message) %>
-    <div data-controller="flash"
-         class="bg-violet-100 border-l-4 border-violet-500 text-violet-500 text-sm p-1"
-         role="alert">
-      <p><%= message %></p>
-    </div>
-  <% elsif type == "alert" %>
-    <div data-controller="flash"
-         class="bg-red-100 border-l-4 border-red-500 text-red-500 text-sm p-1"
-         role="alert">
-      <p><%= message %></p>
-    </div>
-  <% end %>
+<% if flash.any? %>
+  <div class="fixed top-4 left-1/2 -translate-x-1/2 sm:left-auto sm:right-4 sm:translate-x-0 z-50 space-y-2 pointer-events-none mt-2">
+    <% flash.each do |type, message| %>
+      <% next if type == "notice" && ["Signed in successfully.", "Signed out successfully."].include?(message) %>
+      <% classes = if type == "alert"
+                     "bg-red-100 text-red-700 border-red-400"
+                   else
+                     "bg-violet-100 text-violet-700 border-violet-400"
+                   end %>
+      <div class="pointer-events-auto rounded-3xl px-4 py-2 border border-gray-400 #{classes} opacity-60 transition-opacity duration-500"
+           data-controller="flash" data-flash-timeout-value="3000" role="alert">
+        <p class="text-sm text-violet-500"><%= message %></p>
+      </div>
+    <% end %>
+  </div>
 <% end %>

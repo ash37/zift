@@ -25,18 +25,21 @@ export default class extends Controller {
       }
     }
 
-    // Render content
+    // Render content with dynamic height
     let html = ""
     if (fileType.startsWith("image/")) {
       html = `<img src="${fileUrl}" alt="${this._escape(fileName)}" class="max-h-80 max-w-full mx-auto rounded object-contain" />`
+      if (this.hasContentTarget) this.contentTarget.style.height = '24rem' // ~ h-96
     } else if (fileType === "application/pdf") {
-      html = `<iframe src="${fileUrl}" class="w-full h-80 border rounded"></iframe>`
+      html = `<iframe src="${fileUrl}" class="w-full h-full border rounded"></iframe>`
+      if (this.hasContentTarget) this.contentTarget.style.height = '80vh'
     } else {
       html = `
         <div class="text-center">
           <p class="text-sm text-gray-600 mb-3">Preview not available for this file type.</p>
           <a href="${downloadUrl}" class="px-3 py-1 rounded-md bg-violet-600 text-white hover:bg-violet-700">Download</a>
         </div>`
+      if (this.hasContentTarget) this.contentTarget.style.height = '24rem'
     }
     if (this.hasContentTarget) this.contentTarget.innerHTML = html
 
