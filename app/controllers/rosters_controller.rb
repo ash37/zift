@@ -16,17 +16,20 @@ class RostersController < ApplicationController
   def show_by_date
     date_param = params[:date].to_s
     begin
-      date = Date.parse(date_param)
+      parsed = Date.parse(date_param)
     rescue ArgumentError
       return redirect_to(rosters_path, alert: "Invalid date provided.")
     end
 
-    roster = Roster.find_by(starts_on: date)
+    # Normalize to the Wednesday of that week to ensure a single canonical period (Wed–Tue)
+    week_start = parsed.beginning_of_week(:wednesday)
+
+    roster = Roster.find_by(starts_on: week_start)
     unless roster
-      roster = Roster.create!(starts_on: date, status: 0)
+      roster = Roster.create!(starts_on: week_start, status: Roster::STATUSES[:draft])
     end
 
-    redirect_to roster_path(roster, date: date, location_id: params[:location_id])
+    redirect_to roster_path(roster, date: week_start, location_id: params[:location_id])
   end
   # POST /rosters/:id/copy_previous_week
   def copy_previous_week
@@ -120,7 +123,8 @@ class RostersController < ApplicationController
     if @roster.nil? && params[:date].present?
       begin
         parsed_date = Date.parse(params[:date].to_s)
-        @roster = Roster.find_by(starts_on: parsed_date)
+        week_start = parsed_date.beginning_of_week(:wednesday)
+        @roster = Roster.find_by(starts_on: week_start)
       rescue ArgumentError
         # Invalid date provided; leave @roster nil so we fall through to redirect
       end
@@ -129,7 +133,7 @@ class RostersController < ApplicationController
     # Prepare commonly used view vars
     @date = if params[:date].present?
       begin
-        Date.parse(params[:date].to_s)
+        Date.parse(params[:date].to_s).beginning_of_week(:wednesday)
       rescue ArgumentError
         nil
       end

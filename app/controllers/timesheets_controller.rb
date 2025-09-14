@@ -66,8 +66,10 @@ class TimesheetsController < ApplicationController
   end
 
   def create
-    starts_on = Date.today.beginning_of_week
-    roster = Roster.find_or_create_by!(starts_on: starts_on, status: Roster::STATUSES[:draft])
+    starts_on = Date.today.beginning_of_week(:wednesday)
+    roster = Roster.find_or_create_by!(starts_on: starts_on) do |r|
+      r.status = Roster::STATUSES[:draft]
+    end
 
     @shift = Shift.new(shift_params.merge(
       roster: roster,
@@ -192,7 +194,9 @@ class TimesheetsController < ApplicationController
     start_time = Time.zone.parse("#{ts_params[:date]} #{ts_params[:clock_in_at]}")
     end_time = Time.zone.parse("#{ts_params[:date]} #{ts_params[:clock_out_at]}")
 
-    roster = Roster.find_or_create_by!(starts_on: start_time.to_date.beginning_of_week(:wednesday), status: Roster::STATUSES[:draft])
+    roster = Roster.find_or_create_by!(starts_on: start_time.to_date.beginning_of_week(:wednesday)) do |r|
+      r.status = Roster::STATUSES[:draft]
+    end
 
     shift = Shift.new(
       user: user,

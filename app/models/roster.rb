@@ -12,6 +12,8 @@ class Roster < ApplicationRecord
 
 
   validates :starts_on, presence: true
+  validates :starts_on, uniqueness: true
+  validate :starts_on_must_be_wednesday
   validates :status, inclusion: { in: STATUSES.values }
 
   def draft?
@@ -32,5 +34,12 @@ class Roster < ApplicationRecord
 
   def public_holiday?(date)
     public_holidays.include?(date)
+  end
+
+  private
+  def starts_on_must_be_wednesday
+    return if starts_on.blank?
+    # In Ruby, wday: 0=Sunday, 3=Wednesday
+    errors.add(:starts_on, "must be a Wednesday") unless starts_on.wday == 3
   end
 end
