@@ -1,0 +1,17 @@
+<% content_for :title, "Roster (Compact) for #{@roster.starts_on.strftime('%B %d, %Y')}" %>
+
+<div class="hidden sm:block">
+  <%= render "sub_nav", selected_location_id: @selected_location_id %>
+  <div class="bg-zinc-100">
+    <%= render "compact_table", roster: @roster, selected_location_id: @selected_location_id %>
+  </div>
+</div>
+
+<div class="sm:hidden">
+  <%= render "mobile_sub_nav", selected_location_id: @selected_location_id %>
+  <div class="bg-zinc-100">
+    <%= render 'mobile_roster_table', roster: @roster, selected_location_id: @selected_location_id, date: @date %>
+  </div>
+</div>
+
+<turbo-frame id="assign_shift_modal"></turbo-frame>

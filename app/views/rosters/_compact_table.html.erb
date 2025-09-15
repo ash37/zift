@@ -1,0 +1,42 @@
+<table class="w-full border-separate table-fixed" style="border-spacing: 4px 4px;">
+  <thead>
+    <tr>
+      <th class="w-48">EMPLOYEE</th>
+      <% 7.times do |i| %>
+        <% date = @roster.starts_on + i.days %>
+        <th class="text-center font-normal py-1 px-2">
+          <p class="text-xs text-zinc-500"><%= date.strftime('%a').upcase %></p>
+          <p class="text-lg font-bold <%= date == Date.today ? 'text-violet-600' : 'text-zinc-800' %>"><%= date.strftime('%d') %></p>
+        </th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% users = if defined?(@users_for_roster) && @users_for_roster.present?
+                 @users_for_roster
+               else
+                 User.where.not(role: nil)
+               end %>
+    <% users = if users.respond_to?(:where)
+                 users.where.not(role: User::ROLES[:client])
+               else
+                 users.reject { |u| u.respond_to?(:client?) ? u.client? : u.role == User::ROLES[:client] }
+               end %>
+
+    <% users.each do |user| %>
+      <tr class="align-top">
+        <td class="px-3 py-2 bg-white rounded-3xl">
+          <div class="font-semibold text-gray-600"><%= user.first_name %> <%= user.last_name %></div>
+          
+        </td>
+        <% 7.times do |i| %>
+          <% date = @roster.starts_on + i.days %>
+          <td class="p-0 bg-white rounded-2xl border-2 <%= @roster.published? ? 'border-transparent' : 'border-dashed border-gray-200' %>">
+            <%= render 'rosters/compact_cell_content', roster: @roster, user: user, date: date, selected_location_id: @selected_location_id, compact: true %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+

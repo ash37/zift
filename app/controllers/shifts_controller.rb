@@ -91,20 +91,23 @@ class ShiftsController < ApplicationController
       @new_date = @shift.start_time.to_date
 
       streams = []
+      # Detect compact view by referer
+      compact_view = request.referer.to_s.include?("/rosters/") && request.referer.to_s.include?("/compact")
+      cell_partial = compact_view ? "rosters/compact_cell_content" : "rosters/cell_content"
 
       # Always update the destination cell
       streams << turbo_stream.replace(
         dom_id(@roster, "cell_content_#{@new_user.id}_#{@new_date}"),
-        partial: "rosters/cell_content",
-        locals: { roster: @roster, user: @new_user, date: @new_date, selected_location_id: @selected_location_id }
+        partial: cell_partial,
+        locals: { roster: @roster, user: @new_user, date: @new_date, selected_location_id: @selected_location_id, compact: compact_view }
       )
 
       # Update the source cell if it changed (user and/or date)
       if @old_user.id != @new_user.id || @old_date != @new_date
         streams << turbo_stream.replace(
           dom_id(@roster, "cell_content_#{@old_user.id}_#{@old_date}"),
-          partial: "rosters/cell_content",
-          locals: { roster: @roster, user: @old_user, date: @old_date, selected_location_id: @selected_location_id }
+          partial: cell_partial,
+          locals: { roster: @roster, user: @old_user, date: @old_date, selected_location_id: @selected_location_id, compact: compact_view }
         )
       end
 

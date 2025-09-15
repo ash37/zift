@@ -1,5 +1,6 @@
 class RostersController < ApplicationController
-  before_action :set_roster, only: [ :show, :copy_previous_week, :revert_to_draft, :publish, :publish_with_email ]
+  include ActionView::RecordIdentifier
+  before_action :set_roster, only: [ :show, :compact, :day_details, :day_pills, :copy_previous_week, :revert_to_draft, :publish, :publish_with_email ]
 
   # GET /rosters
   def index
@@ -9,6 +10,14 @@ class RostersController < ApplicationController
   # GET /rosters/:id
   def show
     # @roster, @date, and @selected_location_id are set in set_roster
+  end
+
+  # GET /rosters/:id/compact
+  # Compact roster view with denser layout and drag-and-drop
+  def compact
+    # Loads same instance vars as show via set_roster
+    # Optionally set current location for sub-nav label
+    @current_location = Location.find_by(id: @selected_location_id) if @selected_location_id.present?
   end
 
   # GET /rosters/week/:date
@@ -111,6 +120,44 @@ class RostersController < ApplicationController
     end
 
     redirect_to roster_path(@roster), notice: "Roster published and notifications sent."
+  end
+
+  # GET /rosters/:id/day_details
+  # Returns all shifts for a user on a date within the roster; renders into assign_shift_modal
+  def day_details
+    user = User.find(params[:user_id])
+    date = Date.parse(params[:date].to_s)
+
+    scope = @roster.shifts.where(user: user, start_time: date.all_day)
+    scope = scope.where(location_id: @selected_location_id) if @selected_location_id.present?
+    @shifts_for_day = scope.includes(:area, :location).to_a
+    @day            = date
+    @user           = user
+
+    render partial: "rosters/day_details_modal"
+  end
+
+  # GET /rosters/:id/day_pills
+  # Returns compact draggable list of shifts for user/date; used to refresh a cell via Turbo Streams
+  def day_pills
+    user = User.find(params[:user_id])
+    date = Date.parse(params[:date].to_s)
+
+    @user = user
+    @day  = date
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          dom_id(@roster, "cell_content_#{user.id}_#{date}"),
+          partial: "rosters/compact_cell_content",
+          locals: { roster: @roster, user: user, date: date, selected_location_id: @selected_location_id, compact: true }
+        )
+      end
+      format.html do
+        render partial: "rosters/compact_cell_content", locals: { roster: @roster, user: user, date: date, selected_location_id: @selected_location_id, compact: true }
+      end
+    end
   end
 
   private

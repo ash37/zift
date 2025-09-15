@@ -1,5 +1,6 @@
+<% compact_view = request.referer.to_s.include?("/rosters/") && request.referer.to_s.include?("/compact") %>
 <%= turbo_stream.replace dom_id(@shift.roster, "cell_content_#{@shift.user_id}_#{@shift.start_time.to_date}") do %>
-  <%= render 'rosters/cell_content', roster: @shift.roster, user: @shift.user, date: @shift.start_time.to_date, selected_location_id: @selected_location_id %>
+  <%= render (compact_view ? 'rosters/compact_cell_content' : 'rosters/cell_content'), roster: @shift.roster, user: @shift.user, date: @shift.start_time.to_date, selected_location_id: @selected_location_id, compact: compact_view %>
 <% end %>
 <%= turbo_stream.replace dom_id(@shift.user, 'hours_total') do %>
   <%= render 'rosters/user_hours', roster: @shift.roster, user: @shift.user, selected_location_id: @selected_location_id %>

@@ -1,0 +1,31 @@
+<%# Renders a draggable shift as a compact pill. Must be wrapped in a turbo-frame with data-id for Sortable. %>
+<% roster = shift.roster %>
+<% wrapper_classes = local_assigns[:stacked] ? "absolute inset-0" : "inline-block" %>
+<%= turbo_frame_tag dom_id(shift), data: { id: shift.id }, target: "assign_shift_modal", class: wrapper_classes do %>
+  <button class="flex items-center px-[2.5px] py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden">
+    <!-- Left circle (count) -->
+    <span class="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white text-xs">
+      <%= count_for_day %>
+    </span>
+
+    <!-- Centered time text -->
+    <% st = shift.start_time.in_time_zone %>
+    <% et = shift.end_time.in_time_zone %>
+    <% start_label = st.min.zero? ? st.strftime('%-l') : st.strftime('%-l:%M') %>
+    <% end_label = et.min.zero? ? et.strftime('%-l%P') : et.strftime('%-l:%M%P') %>
+    <span class="mx-2 grow text-center font-semibold text-violet-700 text-sm truncate"><%= "#{start_label} - #{end_label}" %></span>
+
+    <!-- Right circle (add) or placeholder to keep center true -->
+    <% if roster.draft? %>
+      <span class="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-violet-300 text-white hover:bg-violet-500 transition">
+        <%= link_to new_shift_path(user_id: user.id, roster_id: roster.id, date: date, location_id: selected_location_id), data: { turbo_frame: 'assign_shift_modal' }, aria_label: 'Add shift' do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        <% end %>
+      </span>
+    <% else %>
+      <span class="shrink-0 w-6 h-6"></span>
+    <% end %>
+  </button>
+<% end %>

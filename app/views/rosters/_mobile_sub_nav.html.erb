@@ -46,8 +46,13 @@
       <% end %>
     </div>
 
-    <!-- Right: Publish (when draft) or Revert (when published) -->
+    <!-- Right: Toggle + Publish/Revert -->
     <div class="flex items-center gap-x-2">
+      <% if action_name == 'compact' %>
+        <%= link_to "Detail", roster_path(@roster, location_id: selected_location_id), class: "px-3 py-2 rounded-3xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm" %>
+      <% else %>
+        <%= link_to "Compact", compact_roster_path(@roster, location_id: selected_location_id), class: "px-3 py-2 rounded-3xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm" %>
+      <% end %>
       <% if @roster.draft? %>
         <!-- Publish: mobile round icon, desktop pill with label -->
         <%= button_to publish_roster_path(@roster), method: :post,

@@ -1,0 +1,33 @@
+<%= turbo_frame_tag "assign_shift_modal" do %>
+  <div class="fixed inset-0 w-full h-full bg-black/50 z-10" data-controller="modal" data-action="click->modal#close">
+    <div class="relative absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-full max-w-md" data-action="click->modal#stopClose">
+      <h2 class="text-xl font-bold mb-4">Shifts for <%= @user.first_name %> on <%= @day.strftime('%a %d %b') %></h2>
+
+      <% if @shifts_for_day.present? %>
+        <ul class="space-y-2 mb-4">
+          <% @shifts_for_day.each do |shift| %>
+            <li class="flex justify-between items-center px-3 py-2 rounded-2xl bg-gray-100">
+              <div class="text-sm font-medium text-gray-800">
+                <%= format_shift_time(shift.start_time) %> - <%= format_shift_time(shift.end_time) %>
+                <% if shift.location %>
+                  <span class="text-xs text-gray-500">@ <%= shift.location.name %></span>
+                <% end %>
+              </div>
+              <div class="flex items-center gap-2">
+                <%= link_to 'Edit', edit_shift_path(shift, location_id: @selected_location_id), data: { turbo_frame: 'assign_shift_modal' }, class: 'text-violet-700 text-sm hover:underline' %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-gray-600 mb-4">No shifts scheduled.</p>
+      <% end %>
+
+      <div class="flex justify-end gap-3">
+        <%= link_to 'Add Shift', new_shift_path(user_id: @user.id, roster_id: @roster.id, date: @day, location_id: @selected_location_id), data: { turbo_frame: 'assign_shift_modal' }, class: 'px-4 py-2 rounded-3xl text-sm bg-violet-600 text-white hover:bg-violet-700' %>
+        <button type="button" data-action="click->modal#close" class="px-4 py-2 rounded-3xl text-sm bg-gray-100 hover:bg-gray-200">Close</button>
+      </div>
+    </div>
+  </div>
+<% end %>
+

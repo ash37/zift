@@ -1,0 +1,42 @@
+<%
+  # Load shifts like main view
+  if defined?(@shifts_by_user_and_date) && @shifts_by_user_and_date
+    shifts = (@shifts_by_user_and_date[[user.id, date]] || [])
+  else
+    shifts = roster.shifts.where(user: user, start_time: date.all_day)
+  end
+  if selected_location_id.present?
+    shifts = shifts.select { |s| s.location_id.to_s == selected_location_id.to_s }
+  end
+  shifts = shifts.sort_by(&:start_time)
+  count_for_day = shifts.size
+%>
+
+<div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>"
+     class="shifts-container relative w-45 h-9 rounded-2xl p-0"
+     data-controller="drag"
+     data-drag-enabled-value="<%= roster.draft? %>"
+     data-drag-url-value="/shifts/:id"
+     data-drag-user-id-value="<%= user.id %>"
+     data-drag-date-value="<%= date.to_s %>">
+
+  <% if shifts.any? %>
+    <%# Stack pills directly on top of each other (no offset) %>
+    <% shifts.each do |shift| %>
+      <%= render 'rosters/shift_pill', shift: shift, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true %>
+    <% end %>
+  <% else %>
+    <% if roster.draft? %>
+      <%= link_to new_shift_path(user_id: user.id, roster_id: roster.id, date: date, location_id: selected_location_id),
+                  data: { turbo_frame: 'assign_shift_modal' },
+                  class: 'block w-full h-full text-center group',
+                  aria_label: "Add shift for #{user.name} on #{date.strftime('%A, %B %d')}" do %>
+        <div class="flex items-center justify-center w-full h-full">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white text-xs">
+            +
+          </span>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

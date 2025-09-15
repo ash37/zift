@@ -16,4 +16,7 @@
   .drag-enabled { @apply cursor-grab; }
   .drag-enabled:active { @apply cursor-grabbing; }
   .drag-disabled { @apply cursor-not-allowed opacity-60; }
+
+  /* Fixed width utility for compact pills */
+  .w-45 { width: 11.25rem; }
 }

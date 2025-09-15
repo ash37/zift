@@ -118,6 +118,9 @@ Rails.application.routes.draw do
       post :publish_with_email
       post :revert_to_draft
       post :copy_previous_week
+      get :compact
+      get :day_details
+      get :day_pills
     end
     collection do
         get "week(/:date)", to: "rosters#show_by_date", as: "show_by_date"
