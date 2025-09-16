@@ -18,12 +18,26 @@
      data-drag-enabled-value="<%= roster.draft? %>"
      data-drag-url-value="/shifts/:id"
      data-drag-user-id-value="<%= user.id %>"
-     data-drag-date-value="<%= date.to_s %>">
+     data-drag-date-value="<%= date.to_s %>"
+     data-drag-roster-id-value="<%= roster.id %>">
 
   <% if shifts.any? %>
-    <%# Stack pills directly on top of each other (no offset) %>
-    <% shifts.each do |shift| %>
-      <%= render 'rosters/shift_pill', shift: shift, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true %>
+    <%# Stack pills directly on top of each other (no offset). Top pill shows aggregated range when multiple. %>
+    <% if count_for_day > 1 %>
+      <% first_shift = shifts.first %>
+      <% last_shift  = shifts.last %>
+      <% fst = first_shift.start_time.in_time_zone %>
+      <% let = last_shift.end_time.in_time_zone %>
+      <% start_label = fst.min.zero? ? fst.strftime('%-l') : fst.strftime('%-l:%M') %>
+      <% end_label   = let.min.zero? ? let.strftime('%-l%P') : let.strftime('%-l:%M%P') %>
+      <% aggregate_label = "#{start_label} - #{end_label}" %>
+      <%# Render individual pills first so the aggregate (rendered last) sits on top visually %>
+      <% shifts.drop(1).each do |shift| %>
+        <%= render 'rosters/shift_pill', shift: shift, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true %>
+      <% end %>
+      <%= render 'rosters/shift_pill', shift: first_shift, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true, time_label: aggregate_label, group_ids: shifts.map(&:id).join(',') %>
+    <% else %>
+      <%= render 'rosters/shift_pill', shift: shifts.first, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true %>
     <% end %>
   <% else %>
     <% if roster.draft? %>

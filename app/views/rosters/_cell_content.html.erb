@@ -57,7 +57,8 @@
       data-drag-enabled-value="<%= roster.draft? %>"
       data-drag-url-value="/shifts/:id"
       data-drag-user-id-value="<%= user.id %>"
-      data-drag-date-value="<%= date.to_s %>">
+      data-drag-date-value="<%= date.to_s %>"
+      data-drag-roster-id-value="<%= roster.id %>">
 
   <% if approved_unavailability && shifts.blank? && roster.draft? %>
     <% ua_day_start = approved_unavailability.starts_at %>

@@ -7,7 +7,8 @@ export default class extends Controller {
     url: String,
     userId: String,
     date: String,
-    enabled: Boolean
+    enabled: Boolean,
+    rosterId: Number
   }
 
   connect() {
@@ -65,8 +66,10 @@ export default class extends Controller {
 
     // --- The rest of the onEnd logic to update the server ---
     const shiftId = event.item.dataset.id;
+    const groupIds = (event.item.dataset.groupIds || "").split(',').map(s => s.trim()).filter(Boolean);
     const url = this.urlValue.replace(":id", shiftId);
     const dropTargetController = this.application.getControllerForElementAndIdentifier(event.to, "drag");
+    const sourceController = this.application.getControllerForElementAndIdentifier(event.from, "drag");
 
     if (!dropTargetController) {
       console.error("Could not find Stimulus 'drag' controller on the drop target.");
@@ -75,7 +78,11 @@ export default class extends Controller {
 
     const userId = dropTargetController.userIdValue;
     const date = dropTargetController.dateValue;
-    
+    const newRosterId = dropTargetController.rosterIdValue || this.rosterIdValue;
+    const oldUserId = sourceController ? sourceController.userIdValue : null;
+    const oldDate = sourceController ? sourceController.dateValue : null;
+    const oldRosterId = sourceController ? (sourceController.rosterIdValue || this.rosterIdValue) : this.rosterIdValue;
+
     const urlParams = new URLSearchParams(window.location.search);
     const locationId = urlParams.get('location_id');
 
@@ -88,28 +95,57 @@ export default class extends Controller {
     };
 
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+    const csrfHeaders = {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrfToken,
+      'Accept': 'text/vnd.turbo-stream.html'
+    };
 
-    fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': csrfToken,
-        'Accept': 'text/vnd.turbo-stream.html'
-      },
-      body: JSON.stringify(body)
-    })
-    .then(response => {
-      if (!response.ok && response.status === 422) {
-        // If the server responds with a validation error,
-        // we need to revert the drag on the frontend.
-        // We use SortableJS's native `closest` and `sort` methods to do this.
-        const originalSortable = Sortable.get(event.from);
-        originalSortable.sort(originalSortable.toArray(), true);
+    const refreshCells = () => {
+      // Refresh destination cell via day_pills (compact view helper)
+      if (newRosterId && userId && date) {
+        fetch(`/rosters/${newRosterId}/day_pills?user_id=${userId}&date=${encodeURIComponent(date)}&location_id=${encodeURIComponent(locationId || "")}`, {
+          headers: { 'Accept': 'text/vnd.turbo-stream.html' }
+        }).then(r => r.text()).then(html => Turbo.renderStreamMessage(html));
       }
-      return response.text()
-    })
-    .then(html => {
-      Turbo.renderStreamMessage(html)
-    });
+      // Refresh source cell if changed
+      if (oldRosterId && oldUserId && oldDate && (oldUserId !== userId || oldDate !== date)) {
+        fetch(`/rosters/${oldRosterId}/day_pills?user_id=${oldUserId}&date=${encodeURIComponent(oldDate)}&location_id=${encodeURIComponent(locationId || "")}`, {
+          headers: { 'Accept': 'text/vnd.turbo-stream.html' }
+        }).then(r => r.text()).then(html => Turbo.renderStreamMessage(html));
+      }
+    };
+
+    // If this is an aggregate pill with multiple shift ids, move them all
+    if (groupIds.length > 1) {
+      const requests = groupIds.map(id => {
+        const u = this.urlValue.replace(":id", id);
+        return fetch(u, { method: 'PATCH', headers: csrfHeaders, body: JSON.stringify(body) });
+      });
+
+      Promise.all(requests).then(responses => {
+        const anyError = responses.some(r => !r.ok && r.status === 422);
+        if (anyError) {
+          const originalSortable = Sortable.get(event.from);
+          originalSortable.sort(originalSortable.toArray(), true);
+          return Promise.all(responses.map(r => r.text())).then(htmls => htmls.forEach(html => Turbo.renderStreamMessage(html)));
+        } else {
+          // After all succeed, refresh both source and destination compact cells once
+          refreshCells();
+        }
+      });
+      return;
+    }
+
+    // Single shift move (default behavior)
+    fetch(url, { method: 'PATCH', headers: csrfHeaders, body: JSON.stringify(body) })
+      .then(response => {
+        if (!response.ok && response.status === 422) {
+          const originalSortable = Sortable.get(event.from);
+          originalSortable.sort(originalSortable.toArray(), true);
+        }
+        return response.text();
+      })
+      .then(html => { Turbo.renderStreamMessage(html); });
   }
 }
