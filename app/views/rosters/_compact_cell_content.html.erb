@@ -35,9 +35,16 @@
       <% shifts.drop(1).each do |shift| %>
         <%= render 'rosters/shift_pill', shift: shift, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true %>
       <% end %>
-      <%= render 'rosters/shift_pill', shift: first_shift, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true, time_label: aggregate_label, group_ids: shifts.map(&:id).join(',') %>
+      <%= render 'rosters/shift_pill', shift: first_shift, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true, time_label: aggregate_label, group_ids: shifts.map(&:id).join(','), tooltip_shifts: shifts %>
     <% else %>
-      <%= render 'rosters/shift_pill', shift: shifts.first, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true %>
+      <%= render 'rosters/shift_pill', shift: shifts.first, user: user, date: date, count_for_day: count_for_day, selected_location_id: selected_location_id, stacked: true, hover_controls: true %>
+    <% end %>
+
+    <%# Overlay count badge positioned like the hover drag icon (left ~2.5px). Hidden when only one shift %>
+    <% if count_for_day > 1 %>
+      <span class="ml-2 mt-4 pointer-events-none absolute left-[8px] top-1/2 -translate-y-1/2 translate-y-[2px] inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white text-xs z-10">
+        <%= count_for_day %>
+      </span>
     <% end %>
   <% else %>
     <% if roster.draft? %>
@@ -45,8 +52,8 @@
                   data: { turbo_frame: 'assign_shift_modal' },
                   class: 'block w-full h-full text-center group',
                   aria_label: "Add shift for #{user.name} on #{date.strftime('%A, %B %d')}" do %>
-        <div class="flex items-center justify-center w-full h-full">
-          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white text-xs">
+        <div class="flex items-center justify-center w-full h-full relative">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-white text-xs translate-y-[1.5px]">
             +
           </span>
         </div>
