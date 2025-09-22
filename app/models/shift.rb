@@ -1,8 +1,9 @@
 # app/models/shift.rb
 class Shift < ApplicationRecord
   default_scope { order(:start_time, :end_time, :id) }
-  # Add an attribute to control the validation
+  # Add attributes to control validations
   attr_accessor :bypass_unavailability_validation
+  attr_accessor :bypass_past_published_validation
   attr_reader :unavailability_conflict
 
   belongs_to :roster,   inverse_of: :shifts
@@ -125,7 +126,7 @@ class Shift < ApplicationRecord
   end
 
   def not_in_past_for_published_roster
-    return if roster.blank? || start_time.blank?
+    return if roster.blank? || start_time.blank? || bypass_past_published_validation
 
     if roster.published? && start_time < Time.current
       errors.add(:base, "Cannot schedule a shift in the past for a published roster.")

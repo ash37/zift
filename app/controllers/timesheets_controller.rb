@@ -75,7 +75,8 @@ class TimesheetsController < ApplicationController
       roster: roster,
       user: current_user,
       start_time: Time.current,
-      end_time: Time.current + 8.hours
+      end_time: Time.current + 8.hours,
+      bypass_past_published_validation: true
     ))
 
     @timesheet = @shift.timesheets.build(
@@ -205,7 +206,8 @@ class TimesheetsController < ApplicationController
       roster: roster,
       start_time: start_time,
       end_time: end_time,
-      bypass_unavailability_validation: true
+      bypass_unavailability_validation: true,
+      bypass_past_published_validation: true
     )
 
     if shift.save
