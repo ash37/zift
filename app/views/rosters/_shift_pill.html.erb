@@ -39,7 +39,7 @@
         <% end %>
 
         <%# Hover controls for single-shift cells: drag handle, edit, add %>
-        <% if local_assigns[:hover_controls] %>
+        <% if local_assigns[:hover_controls] && roster.draft? %>
           <div class="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition flex items-center justify-between px-2 pointer-events-none group-hover:pointer-events-auto bg-violet-200 rounded-full">
             <!-- Left: drag handle (six dots) -->
             <span class="drag-handle flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white cursor-grab active:cursor-grabbing" title="Drag">
