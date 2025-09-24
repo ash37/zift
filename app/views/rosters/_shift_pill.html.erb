@@ -1,6 +1,6 @@
 <%# Renders a draggable shift as a compact pill. Must be wrapped in a turbo-frame with data-id for Sortable. %>
 <% roster = shift.roster %>
-<% wrapper_classes = local_assigns[:stacked] ? "absolute inset-0" : "inline-block" %>
+<% wrapper_classes = local_assigns[:stacked] ? "absolute inset-0" : "block w-full h-full" %>
 <%
   data_attrs = { id: shift.id }
   data_attrs[:group_ids] = local_assigns[:group_ids] if local_assigns[:group_ids].present?

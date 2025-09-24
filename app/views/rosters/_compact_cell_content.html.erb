@@ -14,6 +14,7 @@
 
 <div id="<%= dom_id(roster, "cell_content_#{user.id}_#{date}") %>"
      class="shifts-container relative w-45 h-9 rounded-2xl p-0"
+     style="width: 11.25rem; height: 2.25rem;"
      data-controller="drag"
      data-drag-enabled-value="<%= roster.draft? %>"
      data-drag-url-value="/shifts/:id"
@@ -42,7 +43,7 @@
 
     <%# Overlay count badge positioned like the hover drag icon (left ~2.5px). Hidden when only one shift %>
     <% if count_for_day > 1 %>
-      <span class="ml-2 mt-4 pointer-events-none absolute left-[8px] top-1/2 -translate-y-1/2 translate-y-[2px] inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white text-xs z-10">
+      <span class="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 translate-y-0.5 inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white z-10" style="font-size: 8px;">
         <%= count_for_day %>
       </span>
     <% end %>
