@@ -9,7 +9,7 @@
       </div>
 
       <% if @shifts_for_day.present? %>
-        <div class="space-y-2"
+        <div class="space-y-1"
              data-controller="drag"
              data-drag-enabled-value="<%= @roster.draft? %>"
              data-drag-url-value="/shifts/:id"
