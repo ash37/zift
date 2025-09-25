@@ -18,7 +18,17 @@
         <div class="text-lg font-semibold text-gray-800">Agreements</div>
         <div class="text-sm text-gray-500">Manage employment and service agreements</div>
       <% end %>
+
+      <div class="block p-4 rounded-xl border border-gray-200" data-controller="push" data-push-subscribed-value="false">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-lg font-semibold text-gray-800">Push Notifications</div>
+            <div class="text-sm text-gray-500">Enable browser push reminders</div>
+          </div>
+          <button data-push-target="button" data-action="push#enable" class="px-3 py-1.5 rounded-lg bg-violet-600 text-white text-sm shadow-sm hover:bg-violet-700">Enable</button>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">Status: <span data-push-target="status">Disabled</span></div>
+      </div>
     </div>
   </div>
 </section>
-

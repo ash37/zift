@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :shift_answers, dependent: :nullify
   has_many :unavailability_requests, dependent: :destroy
   has_many :timesheet_export_lines
+  has_many :push_subscriptions, dependent: :destroy
 
   # Employee compliance documents
   has_one_attached :ndis_screening_card

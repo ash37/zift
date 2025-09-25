@@ -102,6 +102,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :push_subscriptions, only: [:create, :destroy]
+
   # Agreements
   get  "agreements/:document_type", to: "agreements#show",   as: :agreement
   post "agreements/:document_type/accept", to: "agreements#accept", as: :accept_agreement
