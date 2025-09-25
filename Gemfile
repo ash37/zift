@@ -92,7 +92,7 @@ end
 
 gem "devise", "~> 4.9"
 
-gem "xero-ruby", "~> 12.0.0"
+gem "xero-ruby", "~> 12.1.0"
 
 gem "httparty"
 gem "prawn"
