@@ -6,6 +6,8 @@ export default class extends Controller {
   static targets = ["source", "target"]
 
   connect() {
+    // Preserve any preselected area from the server-rendered form on first connect
+    this._initialAreaId = this.targetTarget?.value || null;
     this.updateTarget();
   }
 
@@ -27,6 +29,13 @@ export default class extends Controller {
         option.textContent = area.name;
         targetSelect.appendChild(option);
       });
+
+      // If we had a preselected area (e.g., editing an existing shift), restore it once
+      if (this._initialAreaId) {
+        const exists = Array.from(targetSelect.options).some(o => o.value == this._initialAreaId);
+        if (exists) targetSelect.value = this._initialAreaId;
+        this._initialAreaId = null;
+      }
     }
   }
 }
