@@ -1,6 +1,6 @@
 <%= turbo_frame_tag "assign_shift_modal" do %>
   <div class="fixed inset-0 w-full h-full bg-black/50 z-50" data-controller="modal" data-action="click->modal#close">
-    <div class="relative absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4 w-full max-w-lg" style="width: calc(100% - 10px); max-width: calc(32rem - 10px);" data-action="click->modal#stopClose">
+    <div class="relative absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4 w-full max-w-lg" style="width: calc(100% - 20px); max-width: calc(32rem - 20px);" data-action="click->modal#stopClose">
       <div class="flex items-center justify-between mb-3">
         <h2 class="text-sm font-semibold text-gray-800">Shifts for <%= @user.first_name %> on <%= @day.strftime('%a %d %b') %></h2>
         <button type="button" data-action="click->modal#close" class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
