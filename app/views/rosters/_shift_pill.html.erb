@@ -10,32 +10,32 @@
   <div class="relative w-full h-full">
     <% if has_modal %>
       <%= link_to day_details_roster_path(shift.roster, user_id: user.id, date: date, location_id: selected_location_id), data: { turbo_frame: 'assign_shift_modal' }, class: 'block w-full h-full' do %>
-        <button type="button" class="group relative flex items-center justify-center pl-10 pr-8 py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden">
+        <button type="button" class="group relative flex items-center justify-center pl-9 pr-7 py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden">
           <!-- Centered time text -->
           <% provided_label = local_assigns[:time_label] %>
           <% if provided_label.present? %>
-            <span class="mx-2 grow text-center font-semibold text-violet-700 text-sm truncate"><%= provided_label %></span>
+            <span class="mx-1 grow text-center text-violet-700 text-xs truncate"><%= provided_label %></span>
           <% else %>
             <% st = shift.start_time.in_time_zone %>
             <% et = shift.end_time.in_time_zone %>
             <% start_label = st.min.zero? ? st.strftime('%-l') : st.strftime('%-l:%M') %>
             <% end_label = et.min.zero? ? et.strftime('%-l%P') : et.strftime('%-l:%M%P') %>
-            <span class="mx-2 grow text-center font-semibold text-violet-700 text-sm truncate"><%= "#{start_label} - #{end_label}" %></span>
+            <span class="mx-1 grow text-center text-violet-700 text-xs truncate"><%= "#{start_label} - #{end_label}" %></span>
           <% end %>
         </button>
       <% end %>
     <% else %>
-      <button class="group relative flex items-center justify-center pl-10 pr-8 py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden">
+      <button class="group relative flex items-center justify-center pl-9 pr-7 py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden">
         <!-- Centered time text -->
         <% provided_label = local_assigns[:time_label] %>
         <% if provided_label.present? %>
-          <span class="mx-2 grow text-center font-semibold text-violet-700 text-sm truncate"><%= provided_label %></span>
+          <span class="mx-1 grow text-center text-violet-700 text-xs truncate"><%= provided_label %></span>
         <% else %>
           <% st = shift.start_time.in_time_zone %>
           <% et = shift.end_time.in_time_zone %>
           <% start_label = st.min.zero? ? st.strftime('%-l') : st.strftime('%-l:%M') %>
           <% end_label = et.min.zero? ? et.strftime('%-l%P') : et.strftime('%-l:%M%P') %>
-          <span class="mx-2 grow text-center font-semibold text-violet-700 text-sm truncate"><%= "#{start_label} - #{end_label}" %></span>
+          <span class="mx-1 grow text-center text-violet-700 text-xs truncate"><%= "#{start_label} - #{end_label}" %></span>
         <% end %>
 
         <%# Hover controls for single-shift cells: drag handle, edit, add %>
