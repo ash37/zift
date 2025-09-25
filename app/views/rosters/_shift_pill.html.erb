@@ -14,13 +14,13 @@
           <!-- Centered time text -->
           <% provided_label = local_assigns[:time_label] %>
           <% if provided_label.present? %>
-            <span class="mx-1 grow text-center text-violet-700 text-xs truncate"><%= provided_label %></span>
+            <span class="mx-1 grow text-center font-semibold text-violet-700 text-xs truncate"><%= provided_label %></span>
           <% else %>
             <% st = shift.start_time.in_time_zone %>
             <% et = shift.end_time.in_time_zone %>
             <% start_label = st.min.zero? ? st.strftime('%-l') : st.strftime('%-l:%M') %>
             <% end_label = et.min.zero? ? et.strftime('%-l%P') : et.strftime('%-l:%M%P') %>
-            <span class="mx-1 grow text-center text-violet-700 text-xs truncate"><%= "#{start_label} - #{end_label}" %></span>
+            <span class="mx-1 grow text-center font-semibold text-violet-700 text-xs truncate"><%= "#{start_label} - #{end_label}" %></span>
           <% end %>
         </button>
       <% end %>
@@ -29,13 +29,13 @@
         <!-- Centered time text -->
         <% provided_label = local_assigns[:time_label] %>
         <% if provided_label.present? %>
-          <span class="mx-1 grow text-center text-violet-700 text-xs truncate"><%= provided_label %></span>
+          <span class="mx-1 grow text-center font-semibold text-violet-700 text-xs truncate"><%= provided_label %></span>
         <% else %>
           <% st = shift.start_time.in_time_zone %>
           <% et = shift.end_time.in_time_zone %>
           <% start_label = st.min.zero? ? st.strftime('%-l') : st.strftime('%-l:%M') %>
           <% end_label = et.min.zero? ? et.strftime('%-l%P') : et.strftime('%-l:%M%P') %>
-          <span class="mx-1 grow text-center text-violet-700 text-xs truncate"><%= "#{start_label} - #{end_label}" %></span>
+          <span class="mx-1 grow text-center font-semibold text-violet-700 text-xs truncate"><%= "#{start_label} - #{end_label}" %></span>
         <% end %>
 
         <%# Hover controls for single-shift cells: drag handle, edit, add %>
