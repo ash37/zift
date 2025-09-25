@@ -5,12 +5,13 @@
   data_attrs = { id: shift.id }
   data_attrs[:group_ids] = local_assigns[:group_ids] if local_assigns[:group_ids].present?
 %>
+<% border_class = roster.draft? ? 'border-2 border-dashed border-violet-500' : '' %>
 <%= turbo_frame_tag dom_id(shift), data: data_attrs, target: "assign_shift_modal", class: wrapper_classes do %>
   <% has_modal = local_assigns[:tooltip_shifts].present? %>
   <div class="relative w-full h-full">
     <% if has_modal %>
       <%= link_to day_details_roster_path(shift.roster, user_id: user.id, date: date, location_id: selected_location_id), data: { turbo_frame: 'assign_shift_modal' }, class: 'block w-full h-full' do %>
-        <button type="button" class="group relative flex items-center justify-center pl-9 pr-7 py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden">
+        <button type="button" class="group relative flex items-center justify-center pl-9 pr-7 py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden <%= border_class %>">
           <!-- Centered time text -->
           <% provided_label = local_assigns[:time_label] %>
           <% if provided_label.present? %>
@@ -25,7 +26,7 @@
         </button>
       <% end %>
     <% else %>
-      <button class="group relative flex items-center justify-center pl-9 pr-7 py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden">
+      <button class="group relative flex items-center justify-center pl-9 pr-7 py-1.5 bg-violet-200 rounded-full hover:bg-violet-300 transition w-full h-9 box-border overflow-hidden <%= border_class %>">
         <!-- Centered time text -->
         <% provided_label = local_assigns[:time_label] %>
         <% if provided_label.present? %>
