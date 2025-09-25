@@ -43,7 +43,7 @@
 
     <%# Overlay count badge positioned like the hover drag icon (left ~2.5px). Hidden when only one shift %>
     <% if count_for_day > 1 %>
-      <span class="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 translate-y-0.5 inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white z-10" style="font-size: 8px;">
+      <span class="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500 text-white z-10" style="font-size: 8px; top: calc(50% - 5px);">
         <%= count_for_day %>
       </span>
     <% end %>
