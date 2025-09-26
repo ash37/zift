@@ -48,6 +48,12 @@ Rails.application.routes.draw do
       post :resend_service_agreement
     end
   end
+  concern :commentable do
+    resources :comments, only: [:index, :create]
+  end
+  resources :users, concerns: :commentable
+  resources :locations, concerns: :commentable
+  resources :comments, only: [:edit, :update]
   resources :shifts
   resources :shift_questions
   resources :recurrences

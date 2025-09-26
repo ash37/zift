@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_12_000001) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_26_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -92,6 +92,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_12_000001) do
     t.index ["area_id", "shift_question_id"], name: "idx_areas_shift_questions_uniqueness", unique: true
     t.index ["area_id"], name: "index_areas_shift_questions_on_area_id"
     t.index ["shift_question_id"], name: "index_areas_shift_questions_on_shift_question_id"
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text "body", null: false
+    t.string "commentable_type", null: false
+    t.bigint "commentable_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "edited_at"
+    t.bigint "edited_by_id"
+    t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
+    t.index ["edited_by_id"], name: "index_comments_on_edited_by_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
   create_table "invoice_export_lines", force: :cascade do |t|

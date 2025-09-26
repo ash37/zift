@@ -307,6 +307,29 @@
       </div>
       <% end %>
 
+      <% if current_user&.admin? %>
+        <div class="mt-8 bg-white rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-800">Comments</h2>
+            <%# See more link container aligned right %>
+            <% initial = @user.comments.order(created_at: :desc, id: :desc).limit(5).to_a.reverse %>
+            <div id="<%= dom_id(@user, :comments_see_more) %>">
+              <% if oldest_comment = initial.first %>
+                <% has_older = @user.comments.where("(created_at < ?) OR (created_at = ? AND id < ?)", oldest_comment.created_at, oldest_comment.created_at, oldest_comment.id).exists? %>
+                <% if has_older %>
+                  <%= link_to 'See more', polymorphic_path([@user, :comments], before_id: oldest_comment.id), data: { turbo_stream: true }, class: 'text-violet-700 hover:underline text-sm' %>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+          <%# Initial 5 comments (newest 5, display oldest->newest) %>
+          <%= render 'comments/list', commentable: @user, comments_for_display: initial %>
+
+          <div id="<%= dom_id(@user, :comments_form) %>">
+            <%= render 'comments/form', commentable: @user %>
+          </div>
+        </div>
+      <% end %>
       <!-- File Preview Modal (kept inside controller scope) -->
       <div id="file-preview-modal" class="fixed inset-0 z-50 hidden" data-file-preview-target="modal">
         <div class="absolute inset-0 bg-black/50" data-action="click->file-preview#close"></div>

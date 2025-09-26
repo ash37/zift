@@ -1,0 +1,13 @@
+<%# Append the new comment at the bottom and clear the form %>
+<%= turbo_stream.append dom_id(@commentable, :comments_list) do %>
+  <%= render 'comments/comment', comment: @comment %>
+<% end %>
+
+<%= turbo_stream.replace dom_id(@commentable, :comments_errors), '' %>
+
+<%= turbo_stream.replace dom_id(@commentable, :comments_form) do %>
+  <div id="<%= dom_id(@commentable, :comments_form) %>">
+    <%= render 'comments/form', commentable: @commentable %>
+  </div>
+<% end %>
+

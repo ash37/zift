@@ -1,0 +1,18 @@
+<%# Prepend older comments and update the see more link %>
+<%= turbo_stream.prepend dom_id(@commentable, :comments_list) do %>
+  <% @comments_for_display.each do |comment| %>
+    <%= render 'comments/comment', comment: comment %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace dom_id(@commentable, :comments_see_more) do %>
+  <div id="<%= dom_id(@commentable, :comments_see_more) %>">
+    <% if oldest = (@comments_for_display.first || @commentable.comments.order(created_at: :asc, id: :asc).first) %>
+      <% has_older = @commentable.comments.where("(created_at < ?) OR (created_at = ? AND id < ?)", oldest.created_at, oldest.created_at, oldest.id).exists? %>
+      <% if has_older %>
+        <%= link_to 'See more', polymorphic_path([@commentable, :comments], before_id: oldest.id), data: { turbo_stream: true }, class: 'text-violet-700 hover:underline text-sm' %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+

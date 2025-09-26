@@ -1,0 +1,15 @@
+<%# Only render for admins; controller already guards %>
+<%= form_with model: Comment.new, url: polymorphic_path([commentable, :comments]), data: { turbo_stream: true }, html: { multipart: true, class: 'mt-3' } do |f| %>
+  <div id="<%= dom_id(commentable, :comments_errors) %>" class="text-sm text-red-600 mb-2"></div>
+  <div>
+    <%= f.text_area :body, rows: 3, class: "block w-full rounded-2xl border border-gray-300 p-3 text-sm", placeholder: "Write a comment..." %>
+  </div>
+  <div class="mt-2 flex items-center justify-between">
+    <label class="px-3 py-1 rounded-3xl bg-gray-100 text-gray-800 hover:bg-gray-200 text-sm cursor-pointer">
+      Attach files
+      <%= f.file_field :files, multiple: true, direct_upload: true, class: 'sr-only' %>
+    </label>
+    <%= f.submit 'Post', class: 'px-3 py-1 rounded-3xl bg-violet-600 text-white text-sm hover:bg-violet-700' %>
+  </div>
+<% end %>
+

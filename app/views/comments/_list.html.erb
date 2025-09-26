@@ -1,0 +1,5 @@
+<div id="<%= dom_id(commentable, :comments_list) %>" class="space-y-2">
+  <% comments_for_display.each do |comment| %>
+    <%= render 'comments/comment', comment: comment %>
+  <% end %>
+</div>

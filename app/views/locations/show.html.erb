@@ -265,3 +265,28 @@
     </div>
   </section>
 </div>
+<%# Admin comments for Location %>
+<% if current_user&.admin? %>
+  <div class="bg-zinc-100">
+    <section class="container mx-auto px-4 pb-10">
+      <div class="w-full max-w-4xl mx-auto mt-4 bg-white rounded-3xl p-6 sm:p-8">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xl font-bold text-gray-800">Comments</h2>
+          <% initial_loc_comments = @location.comments.order(created_at: :desc, id: :desc).limit(5).to_a.reverse %>
+          <div id="<%= dom_id(@location, :comments_see_more) %>">
+            <% if oldest_comment = initial_loc_comments.first %>
+              <% has_older = @location.comments.where("(created_at < ?) OR (created_at = ? AND id < ?)", oldest_comment.created_at, oldest_comment.created_at, oldest_comment.id).exists? %>
+              <% if has_older %>
+                <%= link_to 'See more', polymorphic_path([@location, :comments], before_id: oldest_comment.id), data: { turbo_stream: true }, class: 'text-violet-700 hover:underline text-sm' %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+        <%= render 'comments/list', commentable: @location, comments_for_display: initial_loc_comments %>
+        <div id="<%= dom_id(@location, :comments_form) %>">
+          <%= render 'comments/form', commentable: @location %>
+        </div>
+      </div>
+    </section>
+  </div>
+<% end %>
