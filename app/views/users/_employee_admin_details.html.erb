@@ -168,7 +168,7 @@
     <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
       <div class="min-w-0">
         <div class="text-xs uppercase tracking-wide text-gray-500">Yellow card expiry</div>
-        <div class="text-gray-800 break-all sm:break-normal"><%= user.yellow_expiry.presence || '—' %></div>
+        <div class="text-gray-800 break-all sm:break-normal"><%= user.yellow_expiry.present? ? user.yellow_expiry.in_time_zone.strftime('%-d %b %Y') : '—' %></div>
       </div>
     </div>
 
@@ -176,7 +176,7 @@
     <div class="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50">
       <div class="min-w-0">
         <div class="text-xs uppercase tracking-wide text-gray-500">Blue card expiry</div>
-        <div class="text-gray-800 break-all sm:break-normal"><%= user.blue_expiry.presence || '—' %></div>
+        <div class="text-gray-800 break-all sm:break-normal"><%= user.blue_expiry.present? ? user.blue_expiry.in_time_zone.strftime('%-d %b %Y') : '—' %></div>
       </div>
     </div>
 

@@ -183,12 +183,39 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_12_000001) do
     t.index ["user_id"], name: "index_locations_users_on_user_id"
   end
 
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "endpoint", null: false
+    t.text "p256dh", null: false
+    t.text "auth", null: false
+    t.boolean "active", default: true, null: false
+    t.string "user_agent"
+    t.string "platform"
+    t.datetime "last_used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
   create_table "recurrences", force: :cascade do |t|
     t.string "frequency"
     t.integer "interval"
     t.date "ends_on"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "reminder_sends", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "shift_id", null: false
+    t.string "kind", null: false
+    t.datetime "sent_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shift_id"], name: "index_reminder_sends_on_shift_id"
+    t.index ["user_id", "shift_id", "kind"], name: "index_reminder_sends_unique", unique: true
+    t.index ["user_id"], name: "index_reminder_sends_on_user_id"
   end
 
   create_table "rosters", force: :cascade do |t|
@@ -355,8 +382,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_12_000001) do
     t.string "tfn"
     t.string "training"
     t.string "departure"
-    t.string "yellow_expiry"
-    t.string "blue_expiry"
+    t.datetime "yellow_expiry", precision: nil
+    t.datetime "blue_expiry", precision: nil
     t.string "tfn_threshold"
     t.string "debt"
     t.string "super_name"
@@ -404,6 +431,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_12_000001) do
   add_foreign_key "items", "locations"
   add_foreign_key "location_agreement_acceptances", "agreements"
   add_foreign_key "location_agreement_acceptances", "locations"
+  add_foreign_key "push_subscriptions", "users"
+  add_foreign_key "reminder_sends", "shifts"
+  add_foreign_key "reminder_sends", "users"
   add_foreign_key "shift_answers", "shift_questions"
   add_foreign_key "shift_answers", "shifts"
   add_foreign_key "shift_answers", "timesheets"
