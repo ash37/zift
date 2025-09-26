@@ -16,8 +16,14 @@ production:
   auto_clock_out:
     class: AutoClockOutJob
     schedule: every 15 minutes
+  compliance_expiry_reminders:
+    class: QueueExpiryRemindersJob
+    schedule: at 6am every day
 
 development:
   auto_clock_out:
     class: AutoClockOutJob
     schedule: every 15 minutes
+  compliance_expiry_reminders:
+    class: QueueExpiryRemindersJob
+    schedule: at 6am every day
