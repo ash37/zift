@@ -4,12 +4,15 @@
   <div>
     <%= f.text_area :body, rows: 3, class: "block w-full rounded-2xl border border-gray-300 p-3 text-sm", placeholder: "Write a comment..." %>
   </div>
-  <div class="mt-2 flex items-center justify-between">
-    <label class="px-3 py-1 rounded-3xl bg-gray-100 text-gray-800 hover:bg-gray-200 text-sm cursor-pointer">
-      Attach files
-      <%= f.file_field :files, multiple: true, direct_upload: true, class: 'sr-only' %>
-    </label>
+  <div class="mt-2 flex items-center justify-between" data-controller="file-input">
+    <div class="flex items-center gap-3">
+      
+      <label class="px-3 py-1 rounded-3xl bg-gray-100 text-gray-800 hover:bg-gray-200 text-sm cursor-pointer">
+        Attach files
+        <%= f.file_field :files, multiple: true, direct_upload: true, class: 'sr-only', data: { action: 'change->file-input#update', file_input_target: 'input' } %>
+      </label>
+      <span class="text-xs text-gray-400" data-file-input-target="label">No file selected</span>
+    </div>
     <%= f.submit 'Post', class: 'px-3 py-1 rounded-3xl bg-violet-600 text-white text-sm hover:bg-violet-700' %>
   </div>
 <% end %>
-

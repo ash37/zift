@@ -5,5 +5,12 @@ class Comment < ApplicationRecord
 
   has_many_attached :files
 
-  validates :body, presence: true
+  validate :body_or_files_present
+
+  private
+  def body_or_files_present
+    if body.to_s.strip.blank? && !files.attached?
+      errors.add(:base, "Please add a comment or attach a file.")
+    end
+  end
 end

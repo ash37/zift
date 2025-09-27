@@ -53,7 +53,11 @@ Rails.application.routes.draw do
   end
   resources :users, concerns: :commentable
   resources :locations, concerns: :commentable
-  resources :comments, only: [:edit, :update]
+  resources :comments, only: [:edit, :update, :destroy] do
+    member do
+      delete :remove_file
+    end
+  end
   resources :shifts
   resources :shift_questions
   resources :recurrences

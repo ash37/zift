@@ -8,3 +8,4 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 pin "@rails/ujs", to: "@rails--ujs.js" # @7.1.3
 pin "alpinejs", to: "https://ga.jspm.io/npm:alpinejs@3.13.5/dist/module.esm.js"
 pin "sortablejs" # @1.15.6
+pin "@rails/activestorage", to: "activestorage.esm.js"
