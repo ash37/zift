@@ -1,6 +1,6 @@
 class LocationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_location, only: %i[ show edit update destroy archive restore send_service_agreement resend_service_agreement ]
+  before_action :set_location, only: %i[ show edit update destroy archive restore send_service_agreement resend_service_agreement remove_attachment ]
 
   # GET /locations or /locations.json
   def index
@@ -48,6 +48,7 @@ class LocationsController < ApplicationController
   def update
     respond_to do |format|
       if @location.update(location_params)
+        enqueue_attachment_optimization!
         format.html { redirect_to location_url(@location), notice: "Client was successfully updated." }
         format.json { render :show, status: :ok, location: @location }
       else
@@ -75,6 +76,26 @@ class LocationsController < ApplicationController
   def restore
     @location.update(archived_at: nil)
     redirect_to locations_url, notice: "Client was successfully restored."
+  end
+
+  def remove_attachment
+    unless current_user&.admin? || current_user&.manager?
+      redirect_to @location, alert: "Unauthorized" and return
+    end
+
+    name = params[:name].to_s
+    allowed = %w[support_plan risk_assessment]
+    unless allowed.include?(name)
+      redirect_to @location, alert: "Unknown attachment" and return
+    end
+
+    attachment = @location.public_send(name)
+    if attachment.attached?
+      attachment.purge
+      redirect_to @location, notice: "Attachment removed."
+    else
+      redirect_to @location, alert: "No attachment to remove."
+    end
   end
 
   def send_service_agreement
@@ -167,6 +188,8 @@ class LocationsController < ApplicationController
         :pets,
         :activities_of_interest,
         :tasks,
+        :support_plan,
+        :risk_assessment,
         areas_attributes: [
           :id,
           :name,
@@ -179,5 +202,14 @@ class LocationsController < ApplicationController
           { shift_question_ids: [] }
         ]
       )
+    end
+
+    def enqueue_attachment_optimization!
+      [
+        @location.support_plan,
+        @location.risk_assessment
+      ].each do |att|
+        AttachmentOptimizeJob.perform_later(att.attachment.id) if att.respond_to?(:attachment) && att.attached?
+      end
     end
 end

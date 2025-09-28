@@ -46,6 +46,7 @@ Rails.application.routes.draw do
       patch :restore
       post :send_service_agreement
       post :resend_service_agreement
+      delete :remove_attachment
     end
   end
   concern :commentable do

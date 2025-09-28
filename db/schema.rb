@@ -339,7 +339,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_103000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "notes"
-    t.decimal "travel", precision: 10, scale: 2, default: "0.0"
+    t.decimal "travel", precision: 10, scale: 2, default: "0"
     t.boolean "auto_clock_off", default: false
     t.index ["shift_id"], name: "index_timesheets_on_shift_id"
     t.index ["user_id"], name: "index_timesheets_on_user_id"
