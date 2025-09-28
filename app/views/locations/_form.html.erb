@@ -4,13 +4,8 @@
   <!-- CARD WRAPPER -->
   <div class="mt-2 w-full rounded-3xl bg-white p-8 sm:mt-2 sm:w-1/2 sm:mx-auto sm:rounded-3xl">
 <% if location.persisted? %>
-  <div class="flex justify-end space-x-2 mb-4">
+  <div class="flex justify-end mb-4">
     <%= link_to "Areas", location_areas_path(location), class: "px-3 py-1.5 text-xs text-violet-500 bg-white border border-violet-500 rounded-3xl hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
-    <% if location.archived? %>
-      <%= button_to "Restore", restore_location_path(location), method: :patch, class: "px-3 py-1.5 text-xs text-white bg-green-600 rounded-3xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
-    <% else %>
-      <%= button_to "Archive", archive_location_path(location), method: :patch, class: "px-3 py-1.5 text-xs bg-white text-red-600 border border-red-600 rounded-3xl hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500", data: { confirm: "Are you sure you want to archive this location?" } %>
-    <% end %>
   </div>
 <% end %>
     <div class="text-center mb-8">
