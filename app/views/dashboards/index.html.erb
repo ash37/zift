@@ -128,7 +128,19 @@
             </div>
           <% end %>
         <% else %>
-          <p class="text-gray-500">No shifts scheduled for today.</p>
+          <div class="relative overflow-hidden rounded-3xl p-6 sm:p-7 bg-white/40 backdrop-blur-xl ring-1 ring-inset ring-white/60 shadow-xl shadow-slate-300/40">
+            <div class="pointer-events-none absolute -inset-8 rounded-[2rem] blur-2xl opacity-60" style="background: radial-gradient(60% 60% at 20% 10%, rgba(59,130,246,0.18) 0%, rgba(99,102,241,0.14) 40%, rgba(139,92,246,0.10) 70%, rgba(255,255,255,0) 100%);"></div>
+            <div class="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full blur-3xl bg-gradient-to-br from-indigo-300/40 via-violet-300/30 to-transparent"></div>
+            <div class="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full blur-3xl bg-gradient-to-tr from-blue-300/35 via-indigo-300/25 to-transparent"></div>
+            <div class="pointer-events-none absolute top-5 right-6 h-2 w-2 rounded-full bg-orange-300/70 shadow shadow-orange-400/30"></div>
+            <div class="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/40 via-transparent to-transparent"></div>
+            <div class="relative flex items-center gap-3 text-slate-700">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-6 w-6 shrink-0 text-indigo-600/80">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+              <p class="font-medium text-slate-800">No shifts scheduled for today.</p>
+            </div>
+          </div>
         <% end %>
       </div>
     </div>
