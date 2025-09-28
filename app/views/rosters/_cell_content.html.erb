@@ -4,7 +4,7 @@
     shifts = (@shifts_by_user_and_date[[user.id, date]] || [])
   else
     # Fallback to original query if controller didn’t precompute
-    shifts = roster.shifts.where(user: user, start_time: date.all_day)
+    shifts = roster.shifts.where(user: user, start_time: date.all_day).where(unscheduled: false)
   end
 
   # Respect selected location if present

@@ -27,8 +27,58 @@
     <div>
       <div class="flex justify-between items-center">
         <h3 class="text-4xl font-bold text-gray-700">Today</h3>
-        <%= link_to "Start Unscheduled Shift", new_timesheet_path, class: "bg-white text-gray-400 py-1 px-4 rounded-3xl" %>
+        <% has_in_progress = current_user.timesheets.where(clock_out_at: nil).exists? %>
+        <% if has_in_progress %>
+          <button type="button"
+                  onclick="alert('You need to clock off from your current shift before starting a new unscheduled shift.')"
+                  class="bg-white text-gray-400 py-1 px-4 rounded-3xl cursor-not-allowed">
+            Start Unscheduled Shift
+          </button>
+        <% else %>
+          <%= link_to "Start Unscheduled Shift", new_timesheet_path, class: "bg-white text-gray-400 py-1 px-4 rounded-3xl" %>
+        <% end %>
       </div>
+
+      <%# Show in-progress unscheduled shifts with a Clock Off button %>
+      <% in_progress_timesheets = current_user.timesheets.includes(shift: [:roster, :location, :area]).where(clock_out_at: nil) %>
+      <% unscheduled_in_progress = in_progress_timesheets.select { |ts| ts.shift&.roster&.draft? } %>
+      <% if unscheduled_in_progress.any? %>
+        <div class="mt-4 space-y-4">
+          <% unscheduled_in_progress.each do |timesheet| %>
+            <% shift = timesheet.shift %>
+            <div class="p-4 bg-white rounded-3xl flex justify-between items-center">
+              <div class="flex items-center gap-x-3">
+                <div>
+                  <p class="text-2xl font-bold"><%= format_shift_time(timesheet.clock_in_at) %> - Now</p>
+                  <% if shift&.location %>
+                    <p class="text-sm text-violet-700"><%= shift.location.name %></p>
+                  <% end %>
+                  <% if shift&.area %>
+                    <p class="text-sm text-gray-500"><%= shift.area.name %></p>
+                  <% end %>
+                  <p class="text-sm text-gray-500">Unscheduled</p>
+                </div>
+              </div>
+
+              <div x-data="{
+                    clockedInAt: '<%= timesheet.clock_in_at&.iso8601 %>',
+                    canClockOff: false,
+                    init() {
+                      const five = 5 * 60 * 1000;
+                      const t = new Date(this.clockedInAt).getTime();
+                      const now = Date.now();
+                      if (!t || (now - t) >= five) { this.canClockOff = true; return }
+                      setTimeout(() => { this.canClockOff = true }, five - (now - t));
+                    }
+                  }" class="flex items-center gap-x-4">
+                <a :href="canClockOff ? '<%= clock_off_form_timesheet_path(timesheet) %>' : '#'"
+                   :class="{ 'opacity-50 cursor-not-allowed': !canClockOff }"
+                   class="px-4 py-3 text-md font-bold text-white bg-red-500 rounded-full hover:bg-red-600">Clock Off</a>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
       <div class="mt-4 space-y-4">
         <% if today_shifts.any? %>
           <% today_shifts.each do |shift| %>

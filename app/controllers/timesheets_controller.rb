@@ -58,6 +58,9 @@ class TimesheetsController < ApplicationController
   end
 
   def new
+    if current_user.timesheets.where(clock_out_at: nil).exists?
+      redirect_to dashboards_path, alert: "You need to clock off from your current shift before starting a new unscheduled shift." and return
+    end
     @timesheet = Timesheet.new(user: current_user, clock_in_at: Time.current)
     @timesheet.build_shift(user: current_user)
   end
@@ -76,7 +79,10 @@ class TimesheetsController < ApplicationController
       user: current_user,
       start_time: Time.current,
       end_time: Time.current + 8.hours,
-      bypass_past_published_validation: true
+      bypass_past_published_validation: true,
+      bypass_unavailability_validation: true,
+      bypass_overlap_validation: true,
+      unscheduled: true
     ))
 
     @timesheet = @shift.timesheets.build(
@@ -175,6 +181,9 @@ class TimesheetsController < ApplicationController
   end
 
   def new_unscheduled
+    if current_user.timesheets.where(clock_out_at: nil).exists?
+      redirect_to dashboards_path, alert: "You need to clock off from your current shift before starting a new unscheduled shift." and return
+    end
     @users = User.where.not(role: nil).order(:name)
     @locations = Location.order(:name)
     @areas = Area.all.to_json(only: [ :id, :name, :location_id ])
@@ -207,7 +216,9 @@ class TimesheetsController < ApplicationController
       start_time: start_time,
       end_time: end_time,
       bypass_unavailability_validation: true,
-      bypass_past_published_validation: true
+      bypass_past_published_validation: true,
+      bypass_overlap_validation: true,
+      unscheduled: true
     )
 
     if shift.save
@@ -289,6 +300,6 @@ class TimesheetsController < ApplicationController
     end
 
     def shift_params
-      params.require(:timesheet).require(:shift_attributes).permit(:location_id)
+      params.require(:timesheet).require(:shift_attributes).permit(:location_id, :area_id)
     end
 end

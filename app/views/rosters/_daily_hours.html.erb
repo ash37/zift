@@ -4,7 +4,7 @@
     total_hours = @hours_by_date[date] || 0
   else
     # Fallback: compute from DB (respect selected_location_id if provided)
-    shifts_for_day = roster.shifts.where(start_time: date.all_day)
+    shifts_for_day = roster.shifts.where(start_time: date.all_day).where(unscheduled: false)
     if defined?(selected_location_id) && selected_location_id.present?
       shifts_for_day = shifts_for_day.where(location_id: selected_location_id)
     end

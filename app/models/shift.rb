@@ -4,6 +4,7 @@ class Shift < ApplicationRecord
   # Add attributes to control validations
   attr_accessor :bypass_unavailability_validation
   attr_accessor :bypass_past_published_validation
+  attr_accessor :bypass_overlap_validation
   attr_reader :unavailability_conflict
 
   belongs_to :roster,   inverse_of: :shifts
@@ -88,6 +89,7 @@ class Shift < ApplicationRecord
 
   def no_overlapping_shifts
     return if user.blank? || start_time.blank? || end_time.blank?
+    return if bypass_overlap_validation
 
     overlapping = user.shifts.where.not(id: id)
                       .where("start_time < ? AND end_time > ?", end_time, start_time)

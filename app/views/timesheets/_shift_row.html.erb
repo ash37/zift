@@ -67,7 +67,7 @@
           <% times_already_match = timesheet.clock_in_at.present? && timesheet.clock_out_at.present? &&
                                    (timesheet.clock_in_at.to_i == shift.start_time.to_i) &&
                                    (timesheet.clock_out_at.to_i == shift.end_time.to_i) %>
-          <% unless times_already_match %>
+          <% unless times_already_match || shift.unscheduled? %>
             <%= link_to "Match Roster", match_roster_times_timesheet_path(timesheet), method: :patch, class: "text-violet-800 hover:bg-violet-100 hover:rounded-3xl px-2 py-1" %>
           <% end %>
           <%= button_to approve_timesheet_path(timesheet), method: :patch, class: "bg-green-500 hover:bg-green-700 text-white font-semibold p-2 rounded-full" do %>

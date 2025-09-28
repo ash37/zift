@@ -6,7 +6,7 @@
 
   # This is the corrected query. It now scopes the shifts to the specific
   # 7-day period of the roster being displayed.
-  user_shifts_for_week = roster.shifts.where(user: user, start_time: week_start..week_end)
+  user_shifts_for_week = roster.shifts.where(user: user, start_time: week_start..week_end).where(unscheduled: false)
   
   # Calculate the total duration in seconds.
   total_seconds = user_shifts_for_week.sum { |shift| shift.end_time - shift.start_time }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_26_100000) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_26_103000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -290,9 +290,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_100000) do
     t.datetime "updated_at", null: false
     t.integer "area_id"
     t.text "note"
+    t.boolean "unscheduled", default: false, null: false
     t.index ["area_id"], name: "index_shifts_on_area_id"
     t.index ["location_id"], name: "index_shifts_on_location_id"
     t.index ["roster_id"], name: "index_shifts_on_roster_id"
+    t.index ["unscheduled"], name: "index_shifts_on_unscheduled"
     t.index ["user_id"], name: "index_shifts_on_user_id"
   end
 

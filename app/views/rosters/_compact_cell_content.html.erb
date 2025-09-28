@@ -3,7 +3,7 @@
   if defined?(@shifts_by_user_and_date) && @shifts_by_user_and_date
     shifts = (@shifts_by_user_and_date[[user.id, date]] || [])
   else
-    shifts = roster.shifts.where(user: user, start_time: date.all_day)
+    shifts = roster.shifts.where(user: user, start_time: date.all_day).where(unscheduled: false)
   end
   if selected_location_id.present?
     shifts = shifts.select { |s| s.location_id.to_s == selected_location_id.to_s }

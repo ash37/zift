@@ -146,7 +146,7 @@
 
 
     <div class="flex justify-end items-center mt-6">
-      <%= link_to "Match Roster", match_roster_times_timesheet_path(@timesheet), method: :patch, class: "text-violet-800 px-4 py-2.5 hover:bg-violet-100 hover:rounded-3xl" if @timesheet.persisted? %>
+      <%= link_to "Match Roster", match_roster_times_timesheet_path(@timesheet), method: :patch, class: "text-violet-800 px-4 py-2.5 hover:bg-violet-100 hover:rounded-3xl" if @timesheet.persisted? && !@timesheet.shift&.unscheduled? %>
       <%= form.submit "Update Timesheet", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-green-600 rounded-3xl hover:bg-green-500 focus:outline-none focus:bg-green-700" %>
     </div>
   <% end %>
