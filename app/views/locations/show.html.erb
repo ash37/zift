@@ -27,7 +27,7 @@
                   <% if @location.archived? %>
                     <%= button_to "Restore", restore_location_path(@location), method: :patch, class: "w-full text-left block px-4 py-2 text-sm text-green-700 hover:bg-green-50" %>
                   <% else %>
-                    <%= button_to "Archive", archive_location_path(@location), method: :patch, data: { turbo_confirm: "Archive this location?" }, class: "w-full text-left block px-4 py-2 text-sm text-red-700 hover:bg-red-50" %>
+                    <%= button_to "Archive", archive_location_path(@location), method: :patch, data: { turbo_confirm: "Archive this client?" }, class: "w-full text-left block px-4 py-2 text-sm text-red-700 hover:bg-red-50" %>
                   <% end %>
                 </div>
               </div>

@@ -17,7 +17,7 @@
     <div class="mb-4">
       <%= shift_form.label :location_id, class: "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" %>
       <%= shift_form.collection_select :location_id, Location.all, :id, :name,
-            { prompt: "Select a location" },
+            { prompt: "Select a client" },
             { class: "block w-full rounded-md border-gray-300 shadow-sm dark:text-gray-200", required: true, id: "shift_location_id", data: { behavior: "location-select" } } %>
     </div>
     <div class="mb-4">

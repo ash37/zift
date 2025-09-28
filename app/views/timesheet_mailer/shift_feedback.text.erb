@@ -1,6 +1,6 @@
 Timesheet feedback received
 
-Location: <%= @location&.name || 'Unknown' %>
+Client: <%= @location&.name || 'Unknown' %>
 User: <%= @user&.name || 'Unknown' %>
 
 <% if @timesheet.notes.present? %>
@@ -12,4 +12,3 @@ Shift answers:
 <% @answers.each do |ans| %>
 - <%= ans.shift_question&.question_text %>: <%= ans.answer_text %>
 <% end %>
-

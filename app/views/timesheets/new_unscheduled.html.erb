@@ -10,8 +10,8 @@
         </div>
 
         <div>
-          <%= form.label :location_id, "Location", class: "text-gray-700 dark:text-gray-200" %>
-          <%= form.collection_select :location_id, @locations, :id, :name, { prompt: "Select a location" }, { class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md", data: { action: "change->dynamic-select#updateTarget", 'dynamic-select-target': 'source' } } %>
+          <%= form.label :location_id, "Client", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.collection_select :location_id, @locations, :id, :name, { prompt: "Select a client" }, { class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md", data: { action: "change->dynamic-select#updateTarget", 'dynamic-select-target': 'source' } } %>
         </div>
 
         <div>

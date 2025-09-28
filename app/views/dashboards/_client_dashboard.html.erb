@@ -36,7 +36,7 @@
 
     <% if shifts.empty? %>
       <div class="rounded-md border border-gray-200 bg-white p-6 text-gray-600">
-        No shifts scheduled for <%= (loc&.name || "your location") %> on <%= selected_date.strftime("%-d %b %Y") %>.
+        No shifts scheduled for <%= (loc&.name || "your client") %> on <%= selected_date.strftime("%-d %b %Y") %>.
       </div>
     <% else %>
       <div class="p-4 grid sm:grid-cols-2 lg:grid-cols-3">

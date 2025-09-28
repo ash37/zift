@@ -16,7 +16,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-500" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
           </svg>
-          <span><%= @current_location&.name || "All Locations" %></span>
+          <span><%= @current_location&.name || "All Clients" %></span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
           </svg>
@@ -33,7 +33,7 @@
           style="display: none;"
         >
           <div class="py-1">
-            <%= link_to "All Locations", roster_path(@roster, location_id: nil), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+            <%= link_to "All Clients", roster_path(@roster, location_id: nil), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
             <% Location.all.each do |location| %>
               <%= link_to location.name, roster_path(@roster, location_id: location.id), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
             <% end %>

@@ -15,7 +15,7 @@
 
       <div x-show="open" @click.away="open = false" x-transition class="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white focus:outline-none" style="display: none;">
         <div class="py-1">
-           <%= link_to "All Locations", week_timesheets_path(date: @start_date, location_id: nil), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+           <%= link_to "All Clients", week_timesheets_path(date: @start_date, location_id: nil), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
           <% @locations.each do |location| %>
             <%= link_to location.name, week_timesheets_path(date: @start_date, location_id: location.id), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
           <% end %>

@@ -35,7 +35,7 @@ class LocationsController < ApplicationController
     respond_to do |format|
       if @location.save
         # This is the updated line. It now redirects to the locations index page.
-        format.html { redirect_to locations_url, notice: "Location was successfully created." }
+        format.html { redirect_to locations_url, notice: "Client was successfully created." }
         format.json { render :show, status: :created, location: @location }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -48,7 +48,7 @@ class LocationsController < ApplicationController
   def update
     respond_to do |format|
       if @location.update(location_params)
-        format.html { redirect_to location_url(@location), notice: "Location was successfully updated." }
+        format.html { redirect_to location_url(@location), notice: "Client was successfully updated." }
         format.json { render :show, status: :ok, location: @location }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -62,19 +62,19 @@ class LocationsController < ApplicationController
     @location.destroy!
 
     respond_to do |format|
-      format.html { redirect_to locations_url, notice: "Location was successfully destroyed." }
+      format.html { redirect_to locations_url, notice: "Client was successfully destroyed." }
       format.json { head :no_content }
     end
   end
 
   def archive
     @location.update(archived_at: Time.current)
-    redirect_to locations_url, notice: "Location was successfully archived."
+    redirect_to locations_url, notice: "Client was successfully archived."
   end
 
   def restore
     @location.update(archived_at: nil)
-    redirect_to locations_url, notice: "Location was successfully restored."
+    redirect_to locations_url, notice: "Client was successfully restored."
   end
 
   def send_service_agreement
