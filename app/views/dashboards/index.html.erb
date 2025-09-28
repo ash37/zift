@@ -35,7 +35,12 @@
             Start Unscheduled Shift
           </button>
         <% else %>
-          <%= link_to "Start Unscheduled Shift", new_timesheet_path, class: "bg-white text-gray-400 py-1 px-4 rounded-3xl" %>
+          <% btn_classes = if today_shifts.any?
+            "bg-white text-gray-400 py-1 px-4 rounded-3xl"
+          else
+            "bg-white text-violet-500 hover:text-violet-600 py-1 px-4 rounded-3xl"
+          end %>
+          <%= link_to "Start Unscheduled Shift", new_timesheet_path, class: btn_classes %>
         <% end %>
       </div>
 
@@ -128,7 +133,7 @@
             </div>
           <% end %>
         <% else %>
-          <div class="relative overflow-hidden rounded-3xl p-6 sm:p-7 bg-white/40 backdrop-blur-xl ring-1 ring-inset ring-white/60 shadow-xl shadow-slate-300/40">
+          <div class="relative overflow-hidden rounded-3xl p-6 sm:p-7 bg-white/40 backdrop-blur-xl ring-1 ring-inset ring-white/60">
             <div class="pointer-events-none absolute -inset-8 rounded-[2rem] blur-2xl opacity-60" style="background: radial-gradient(60% 60% at 20% 10%, rgba(59,130,246,0.18) 0%, rgba(99,102,241,0.14) 40%, rgba(139,92,246,0.10) 70%, rgba(255,255,255,0) 100%);"></div>
             <div class="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full blur-3xl bg-gradient-to-br from-indigo-300/40 via-violet-300/30 to-transparent"></div>
             <div class="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full blur-3xl bg-gradient-to-tr from-blue-300/35 via-indigo-300/25 to-transparent"></div>
