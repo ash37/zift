@@ -1,4 +1,4 @@
-<section id="<%= dom_id(@timesheet, :form) %>" class="relative max-w-4xl p-4 sm:p-6 mx-auto bg-white sm:rounded-md sm:shadow-md dark:bg-gray-800 overflow-hidden">
+<section id="<%= dom_id(@timesheet, :form) %>" class="relative max-w-4xl p-4 sm:p-6 mx-auto bg-white sm:rounded-md sm:shadow-md overflow-hidden">
   <%
     status_color_class = case @timesheet.status_name
                          when 'approved'
@@ -13,7 +13,7 @@
     <%= @timesheet.status_name.titleize %> Timesheet
   </div>
 
-  <%= link_to timesheets_path, class: "absolute top-0 right-0 mt-12 mr-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 z-10" do %>
+  <%= link_to timesheets_path, class: "absolute top-0 right-0 mt-12 mr-4 text-gray-400 hover:text-gray-600 z-10" do %>
     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
@@ -43,7 +43,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
       <div x-data="{ open: false, selectedStatus: '<%= @timesheet.status_name.titleize %>' }">
-        <%= form.label :status, "Status", class: "text-gray-700 dark:text-gray-200" %>
+        <%= form.label :status, "Status", class: "text-gray-700" %>
         <div class="relative mt-2">
           <button @click="open = !open" type="button" class="flex items-center justify-between w-full gap-x-2 px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
             <span x-text="selectedStatus"></span>
@@ -67,7 +67,7 @@
       </div>
       <% if current_user&.admin? %>
         <div x-data="{ open: false, selectedWorker: '<%= @timesheet.user&.name || "Select a Worker" %>' }">
-          <%= form.label :user_id, "Worker", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.label :user_id, "Worker", class: "text-gray-700" %>
           <div class="relative mt-2">
             <button @click="open = !open" type="button" class="flex items-center justify-between w-full gap-x-2 px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
               <span x-text="selectedWorker"></span>
@@ -93,7 +93,7 @@
 
       <%= form.fields_for :shift, @timesheet.shift do |shift_form| %>
         <div x-data="{ open: false, selectedArea: '<%= @timesheet.shift&.area&.name || "Select an Area" %>' }">
-          <label class="text-gray-700 dark:text-gray-200">Area</label>
+          <label class="text-gray-700">Area</label>
           <div class="relative mt-2">
             <button @click="open = !open" type="button" class="flex items-center justify-between w-full gap-x-2 px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
               <span x-text="selectedArea"></span>
@@ -115,21 +115,21 @@
         </div>
       <% end %>
     </div>
-<h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white pt-6"><%= @timesheet.shift&.start_time&.strftime("%A %-d %B") %></h2>
+<h2 class="text-lg font-semibold text-gray-700 capitalize pt-6"><%= @timesheet.shift&.start_time&.strftime("%A %-d %B") %></h2>
     <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-6">
       <div>
-        <%= form.label :clock_in_at, "Start", class: "text-gray-700 dark:text-gray-200" %>
+        <%= form.label :clock_in_at, "Start", class: "text-gray-700" %>
         <%= form.time_field :clock_in_at, value: @timesheet.clock_in_at&.strftime('%H:%M'), class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
       </div>
       <div>
-        <%= form.label :clock_out_at, "Finish", class: "text-gray-700 dark:text-gray-200" %>
+        <%= form.label :clock_out_at, "Finish", class: "text-gray-700" %>
         <%= form.time_field :clock_out_at, value: @timesheet.clock_out_at&.strftime('%H:%M'), class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
       </div>
       <div class="col-span-2 sm:col-span-1">
         <div class="sm:hidden mb-2">
           <p class="text-sm font-semibold text-orange-600">Scheduled: <%= format_shift_time(@timesheet.shift&.start_time) %> - <%= format_shift_time(@timesheet.shift&.end_time) %></p>
         </div>
-        <%= form.label :travel, "Travel (km)", class: "text-gray-700 dark:text-gray-200" %>
+        <%= form.label :travel, "Travel (km)", class: "text-gray-700" %>
         <%= form.number_field :travel, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
       </div>
     </div>
@@ -139,7 +139,7 @@
     </div>
 
     <div class="mt-6">
-      <%= form.label :notes, class: "text-gray-700 dark:text-gray-200" %>
+      <%= form.label :notes, class: "text-gray-700" %>
       <%= form.text_area :notes, rows: 4, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
     </div>
 

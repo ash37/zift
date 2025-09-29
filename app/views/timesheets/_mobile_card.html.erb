@@ -4,10 +4,10 @@
   data-controller="clickable-row"
   data-action="click->clickable-row#visit"
   data-clickable-row-url-value="<%= click_url %>"
-  class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl dark:bg-gray-800"
+  class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl"
 >
   <div class="flex items-center justify-between">
-    <h1 class="text-lg font-semibold text-gray-800 dark:text-white"><%= shift.user.name %></h1>
+    <h1 class="text-lg font-semibold text-gray-800"><%= shift.user.name %></h1>
     <% if timesheet %>
       <%
         status_classes = case timesheet.status_name.downcase
@@ -28,7 +28,7 @@
   </div>
 
   <div>
-    <p class="text-sm text-gray-600 dark:text-gray-300"><%= shift.location.name %> - <%= shift.area&.name %></p>
+    <p class="text-sm text-gray-600"><%= shift.location.name %> - <%= shift.area&.name %></p>
     <% if timesheet %>
       <% if timesheet.notes&.include?("Auto-generated: Missed clock on.") %>
         <p class="text-sm text-gray-600">Unattended</p>

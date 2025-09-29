@@ -5,12 +5,12 @@
     data-controller="clickable-row"
     data-action="click->clickable-row#visit"
     data-clickable-row-url-value="<%= click_url %>"
-    class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
-  <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap dark:text-white"><%= (timesheet&.user&.name.presence || shift.user.name) %>
-  <p class="text-xs text-gray-500 dark:text-gray-400"><%= [shift.area&.name, shift.location.name].compact.join(' - ') %></p>
+    class="cursor-pointer hover:bg-gray-50">
+  <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap"><%= (timesheet&.user&.name.presence || shift.user.name) %>
+  <p class="text-xs text-gray-500"><%= [shift.area&.name, shift.location.name].compact.join(' - ') %></p>
   </td>
-  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"><%= shift.start_time.strftime("%a, %d %b") %></td>
-  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+  <td class="px-4 py-4 text-sm text-gray-500 whitespace-nowrap"><%= shift.start_time.strftime("%a, %d %b") %></td>
+  <td class="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
     <% if timesheet %>
       <% if timesheet.notes&.include?("Auto-generated: Missed clock on.") %>
         <div class="text-gray-600">Unattended</div>
@@ -26,7 +26,7 @@
       <% end %>
     </div>
   </td>
-  <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+  <td class="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
     <% if timesheet %>
       <div><%= number_with_precision(timesheet.duration_in_hours, precision: 2) %>h</div>
     <% end %>

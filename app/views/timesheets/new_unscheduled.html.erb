@@ -5,32 +5,32 @@
     <%= form_with(model: @timesheet, url: create_unscheduled_timesheets_path, method: :post, local: true, class: "mt-2") do |form| %>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <%= form.label :user_id, "Employee", class: "text-gray-700 dark:text-gray-200" %>
+        <%= form.label :user_id, "Employee", class: "text-gray-700" %>
           <%= form.collection_select :user_id, @users, :id, :name, {}, { class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" } %>
         </div>
 
         <div>
-          <%= form.label :location_id, "Client", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.label :location_id, "Client", class: "text-gray-700" %>
           <%= form.collection_select :location_id, @locations, :id, :name, { prompt: "Select a client" }, { class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md", data: { action: "change->dynamic-select#updateTarget", 'dynamic-select-target': 'source' } } %>
         </div>
 
         <div>
-          <%= form.label :area_id, "Area", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.label :area_id, "Area", class: "text-gray-700" %>
           <%= form.select :area_id, [], { prompt: "Select an Area" }, { class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md", data: { 'dynamic-select-target': 'target' } } %>
         </div>
 
         <div>
-          <%= form.label :date, "Date", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.label :date, "Date", class: "text-gray-700" %>
           <%= form.date_field :date, value: @start_date, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
         </div>
 
         <div>
-          <%= form.label :clock_in_at, "Start Time", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.label :clock_in_at, "Start Time", class: "text-gray-700" %>
           <%= form.time_field :clock_in_at, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
         </div>
 
         <div>
-          <%= form.label :clock_out_at, "End Time", class: "text-gray-700 dark:text-gray-200" %>
+          <%= form.label :clock_out_at, "End Time", class: "text-gray-700" %>
           <%= form.time_field :clock_out_at, class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md" %>
         </div>
       </div>

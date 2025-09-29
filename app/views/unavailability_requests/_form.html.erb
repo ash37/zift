@@ -19,7 +19,7 @@
     <input type="hidden" name="unavailability_request[all_day]" x-bind:value="allDay">
 
     <div class="max-w-2xl mx-auto bg-white p-6 rounded-3xl mt-8">
-      <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white"><%= unavailability_request.new_record? ? 'New Unavailability Request' : 'Edit Unavailability Request' %></h2>
+      <h2 class="text-lg font-semibold text-gray-700 capitalize"><%= unavailability_request.new_record? ? 'New Unavailability Request' : 'Edit Unavailability Request' %></h2>
 
       <% if unavailability_request.errors.any? %>
         <div id="error_explanation" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">

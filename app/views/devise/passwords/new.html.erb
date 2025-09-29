@@ -1,4 +1,4 @@
-<div class="bg-white dark:bg-gray-900">
+<div class="bg-white">
   <div class="flex justify-center h-screen">
     <%# This div now uses the hero.gif as a full-bleed background image %>
     <div class="hidden bg-cover lg:block lg:w-2/3" style="background-image: url(<%= image_path 'hero.gif' %>)">
@@ -19,7 +19,7 @@
             <%= image_tag "qcare_logo.png", class: "w-auto h-8", alt: "Zift Logo" %>
           </div>
 
-          <p class="mt-3 text-gray-500 dark:text-gray-300">Forgot your password?</p>
+          <p class="mt-3 text-gray-500">Forgot your password?</p>
         </div>
 
         <div class="mt-8">
@@ -27,8 +27,8 @@
             <%= render "devise/shared/error_messages", resource: resource %>
 
             <div>
-              <%= f.label :email, class: "block mb-2 text-sm text-gray-600 dark:text-gray-200" %>
-              <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-violet-400 focus:ring-violet-400 focus:outline-none focus:ring focus:ring-opacity-40" %>
+              <%= f.label :email, class: "block mb-2 text-sm text-gray-600" %>
+              <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:border-violet-400 focus:ring-violet-400 focus:outline-none focus:ring focus:ring-opacity-40" %>
             </div>
 
             <div class="mt-6">

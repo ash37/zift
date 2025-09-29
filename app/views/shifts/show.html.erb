@@ -1,10 +1,10 @@
 <% content_for :title, "Showing shift" %>
 
 <section class="container relative px-4 py-4 mx-auto">
-  <div class="w-full max-w-sm px-4 py-3 mx-auto bg-white rounded-2xl dark:bg-gray-800">
+  <div class="w-full max-w-sm px-4 py-3 mx-auto bg-white rounded-2xl">
     <div class="flex items-center justify-between">
-      <h1 class="text-lg font-bold text-gray-800 dark:text-white"><%= @shift.location.name %></h1>
-      <%= link_to dashboards_path, class: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" do %>
+      <h1 class="text-lg font-bold text-gray-800"><%= @shift.location.name %></h1>
+      <%= link_to dashboards_path, class: "text-gray-400 hover:text-gray-600" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -19,17 +19,17 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
-        <p class="ml-2 text-violet-800 dark:text-violet-900"><%= @shift.location.address %></p>
+        <p class="ml-2 text-violet-800"><%= @shift.location.address %></p>
       </div>
-      <p class="ml-4 mt-2 text-lg font-bold text-gray-800 dark:text-white">Shift: <%= format_shift_time(@shift.start_time) %> - <%= format_shift_time(@shift.end_time) %></p>
+      <p class="ml-4 mt-2 text-lg font-bold text-gray-800">Shift: <%= format_shift_time(@shift.start_time) %> - <%= format_shift_time(@shift.end_time) %></p>
     </div>
-    <p class="ml-4 mt-2 text-md text-gray-600 dark:text-gray-300"><%= @shift.area&.name %></p>
+    <p class="ml-4 mt-2 text-md text-gray-600"><%= @shift.area&.name %></p>
     <% if @shift.note.present? %>
-      <p class="ml-4 text-md text-gray-600 dark:text-gray-300"><em><%= @shift.note %></em></p>
+      <p class="ml-4 text-md text-gray-600"><em><%= @shift.note %></em></p>
     <% end %>
 
     <div class="flex justify-end mt-4">
-      <span class="px-3 py-1 text-xs text-violet-800 uppercase bg-violet-200 rounded-full dark:bg-violet-300 dark:text-violet-900"><%= @shift.start_time.strftime("%a, %d %b") %></span>
+      <span class="px-3 py-1 text-xs text-violet-800 uppercase bg-violet-200 rounded-full"><%= @shift.start_time.strftime("%a, %d %b") %></span>
     </div>
   </div>
 </section>

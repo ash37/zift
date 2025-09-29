@@ -9,10 +9,10 @@
     <div class="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <% @timesheets.each do |timesheet| %>
         <% if timesheet.notes.present? || timesheet.shift_answers.any? %>
-          <div class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl dark:bg-gray-800">
+          <div class="w-full max-w-sm px-4 py-3 bg-white rounded-2xl">
             <div class="flex items-center justify-between">
-              <h1 class="text-lg font-semibold text-gray-800 dark:text-white"><%= timesheet.shift.location.name %></h1>
-              <span class="px-3 py-1 text-xs text-violet-800 uppercase bg-violet-200 rounded-full dark:bg-violet-300 dark:text-violet-900"><%= timesheet.shift.start_time.strftime("%a, %d %b") %></span>
+              <h1 class="text-lg font-semibold text-gray-800"><%= timesheet.shift.location.name %></h1>
+              <span class="px-3 py-1 text-xs text-violet-800 uppercase bg-violet-200 rounded-full"><%= timesheet.shift.start_time.strftime("%a, %d %b") %></span>
             </div>
 
             <div>
@@ -25,7 +25,7 @@
                 <h2 class="ml-2 text-gray-600 text-sm"><%= timesheet.user.name %></h2>
               </div>
 
-              <p class="ml-4 mt-2 text-sm text-gray-600 dark:text-gray-300">
+              <p class="ml-4 mt-2 text-sm text-gray-600">
                 <%= timesheet.shift.area&.name %>
                 <% if timesheet.shift.note.present? %>
                   : <em><%= timesheet.shift.note %></em>
@@ -41,7 +41,7 @@
                 >
                   <!-- Display mode -->
                   <div data-ts-note-target="display" class="flex items-start justify-between gap-3">
-                    <p class="text-sm text-gray-600 dark:text-gray-300 break-words cursor-pointer hover:underline focus:underline focus:outline-none"
+                    <p class="text-sm text-gray-600 break-words cursor-pointer hover:underline focus:underline focus:outline-none"
                        role="button"
                        tabindex="0"
                        data-action="click->ts-note#start keydown.enter->ts-note#start keydown.space->ts-note#start">
@@ -73,7 +73,7 @@
                 </div>
               <% else %>
                 <% if timesheet.notes.present? %>
-                  <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><%= timesheet.notes %></p>
+                  <p class="mt-2 text-sm text-gray-600"><%= timesheet.notes %></p>
                 <% end %>
               <% end %>
 
@@ -93,7 +93,7 @@
               <% end %>
 
               <% if timesheet.travel.present? && timesheet.travel > 0 %>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"><strong>Travel on this shift:</strong> <%= timesheet.travel %>km</p>
+                <p class="mt-2 text-sm text-gray-600"><strong>Travel on this shift:</strong> <%= timesheet.travel %>km</p>
               <% end %>
             </div>
           </div>
