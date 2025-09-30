@@ -58,9 +58,11 @@ class TimesheetsController < ApplicationController
   end
 
   def new
-    if current_user.timesheets.where(clock_out_at: nil).exists?
+    if current_user.timesheets.includes(:shift).where(clock_out_at: nil).any?(&:blocks_new_unscheduled_shift?)
       redirect_to dashboards_path, alert: "You need to clock off from your current shift before starting a new unscheduled shift." and return
     end
+    @available_locations = available_locations_for(current_user)
+    @areas_by_location = areas_map(@available_locations)
     @timesheet = Timesheet.new(user: current_user, clock_in_at: Time.current)
     @timesheet.build_shift(user: current_user)
   end
@@ -181,12 +183,12 @@ class TimesheetsController < ApplicationController
   end
 
   def new_unscheduled
-    if current_user.timesheets.where(clock_out_at: nil).exists?
+    if current_user.timesheets.includes(:shift).where(clock_out_at: nil).any?(&:blocks_new_unscheduled_shift?)
       redirect_to dashboards_path, alert: "You need to clock off from your current shift before starting a new unscheduled shift." and return
     end
     @users = User.where.not(role: nil).order(:name)
-    @locations = Location.order(:name)
-    @areas = Area.all.to_json(only: [ :id, :name, :location_id ])
+    @locations = available_locations_for(current_user)
+    @areas = areas_map(@locations).to_json
     @start_date = params[:date] ? Date.parse(params[:date]) : Date.current
     @timesheet = Timesheet.new(
       clock_in_at: @start_date.to_time.change(hour: 9),
@@ -232,8 +234,8 @@ class TimesheetsController < ApplicationController
       redirect_to week_timesheets_path(date: start_time.to_date), notice: "Unscheduled timesheet created successfully."
     else
       @users = User.where.not(role: nil).order(:name)
-      @locations = Location.order(:name)
-      @areas = Area.all.to_json(only: [ :id, :name, :location_id ])
+      @locations = available_locations_for(current_user)
+      @areas = areas_map(@locations).to_json
       @start_date = start_time.to_date
       @timesheet = Timesheet.new(clock_in_at: start_time, clock_out_at: end_time)
       flash.now[:alert] = shift.errors.full_messages.to_sentence
@@ -301,5 +303,22 @@ class TimesheetsController < ApplicationController
 
     def shift_params
       params.require(:timesheet).require(:shift_attributes).permit(:location_id, :area_id)
+    end
+
+    def available_locations_for(user)
+      if user.admin?
+        Location.order(:name)
+      else
+        user.locations.order(:name)
+      end
+    end
+
+    def areas_map(locations)
+      locations.includes(:areas).each_with_object({}) do |location, map|
+        filtered_areas = location.areas.select do |area|
+          area.name.present? && !area.travel?
+        end
+        map[location.id] = filtered_areas.sort_by(&:name).map { |area| { id: area.id, name: area.name } }
+      end
     end
 end

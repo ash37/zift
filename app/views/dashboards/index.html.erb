@@ -25,7 +25,9 @@
   
   <div class="mt-6 space-y-8">
     <div>
-      <% has_in_progress = current_user.timesheets.where(clock_out_at: nil).exists? %>
+      <% in_progress_timesheets = current_user.timesheets.includes(shift: [:roster, :location, :area]).where(clock_out_at: nil).to_a %>
+      <% blocking_in_progress_timesheets = in_progress_timesheets.select(&:blocks_new_unscheduled_shift?) %>
+      <% has_in_progress = blocking_in_progress_timesheets.any? %>
       <% if today_shifts.any? %>
         <div class="flex justify-end items-center">
           <% if has_in_progress %>
@@ -41,7 +43,6 @@
       <% end %>
 
       <%# Show in-progress unscheduled shifts with a Clock Off button %>
-      <% in_progress_timesheets = current_user.timesheets.includes(shift: [:roster, :location, :area]).where(clock_out_at: nil) %>
       <% unscheduled_in_progress = in_progress_timesheets.select { |ts| ts.shift&.roster&.draft? } %>
       <% if unscheduled_in_progress.any? %>
         <div class="mt-4 space-y-4">

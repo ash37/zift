@@ -56,6 +56,18 @@ class Timesheet < ApplicationRecord
     end
   end
 
+  # Returns true if this in-progress timesheet should block the user from
+  # starting a new unscheduled shift. We allow creating a new one when the
+  # associated shift ended more than 4 hours ago (the auto-clock-off job will
+  # take care of closing it soon), but we still block if the shift is ongoing
+  # or its end time is unknown.
+  def blocks_new_unscheduled_shift?
+    return false if clock_out_at.present?
+
+    shift_end = shift&.end_time
+    shift_end.nil? || shift_end > 4.hours.ago
+  end
+
   def duration_in_hours
     return 0 unless clock_in_at && clock_out_at
     ((clock_out_at - clock_in_at) / 3600.0)

@@ -1,6 +1,6 @@
 <%= turbo_frame_tag "assign_shift_modal" do %>
   <div class="fixed inset-0 w-full h-full bg-black/50 z-10" data-controller="modal" data-action="click->modal#close">
-    <div class="relative absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-full max-w-md" data-action="click->modal#stopClose" data-controller="dynamic-select" data-areas="<%= Area.all.to_json(only: [:id, :name, :location_id]) %>">
+    <div class="relative absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-full max-w-md" data-action="click->modal#stopClose" data-controller="dynamic-select" data-areas="<%= Area.excluding_travel.order(:name).to_json(only: [:id, :name, :location_id]) %>">
 
       <h2 class="text-xl font-bold mb-4"><%= @shift.persisted? ? "Edit Shift" : "New Shift" %></h2>
 
@@ -28,7 +28,7 @@
           <%= f.label :area_id, class: "block text-sm font-medium text-gray-700 mb-1" %>
           <% if @shift.location_id.present? %>
             <% loc = Location.find(@shift.location_id) rescue nil %>
-            <%= f.collection_select :area_id, (loc ? loc.areas.order(:name) : []), :id, :name,
+            <%= f.collection_select :area_id, (loc ? loc.areas.excluding_travel.order(:name) : []), :id, :name,
                   { prompt: "Select an Area", selected: @shift.area_id },
                   { class: "block w-full rounded-md border-gray-300 shadow-sm", data: { 'dynamic-select-target': 'target' } } %>
           <% else %>
