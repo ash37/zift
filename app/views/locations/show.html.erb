@@ -110,9 +110,9 @@
                       file_preview_file_name: @location.support_plan.filename,
                       file_preview_file_type: @location.support_plan.blob.content_type,
                       file_preview_remove_url: support_plan_remove_url
-                    } %>
+                    }.compact %>
                     <div class="mt-2 text-xs">
-                      <%= link_to '#', data: support_plan_data.compact, class: 'text-gray-700 hover:underline' do %>
+                      <%= link_to '#', class: 'text-gray-700 hover:underline', data: support_plan_data do %>
                         <%= @location.support_plan.filename %>
                       <% end %>
                     </div>
@@ -156,9 +156,9 @@
                       file_preview_file_name: @location.risk_assessment.filename,
                       file_preview_file_type: @location.risk_assessment.blob.content_type,
                       file_preview_remove_url: risk_remove_url
-                    } %>
+                    }.compact %>
                     <div class="mt-2 text-xs">
-                      <%= link_to '#', data: risk_data.compact, class: 'text-gray-700 hover:underline' do %>
+                      <%= link_to '#', class: 'text-gray-700 hover:underline', data: risk_data do %>
                         <%= @location.risk_assessment.filename %>
                       <% end %>
                     </div>

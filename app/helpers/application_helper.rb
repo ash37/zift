@@ -13,9 +13,10 @@ module ApplicationHelper
     # exactly at local midnight for start
     starts_at_midnight = (s == s.beginning_of_day)
 
-    # at end-of-day for finish; allow 23:59:59, 23:59:59.999999, or exactly end_of_day
+    # at end-of-day for finish; allow 23:59 through end_of_day with fractional seconds tolerance
+    day_end_threshold = e.beginning_of_day + 23.hours + 59.minutes
     eod = e.end_of_day
-    ends_at_eod = (e >= (eod - 1.second) && e <= eod)
+    ends_at_eod = (e >= day_end_threshold && e <= eod)
 
     starts_at_midnight && ends_at_eod
   end
