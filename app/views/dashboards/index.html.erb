@@ -130,10 +130,23 @@
             </div>
           <% end %>
         <% else %>
-          <div class="relative overflow-hidden rounded-3xl px-6 sm:px-7 py-16 sm:py-20 bg-white/40 backdrop-blur-xl ring-1 ring-inset ring-white/60 space-y-6">
-            <div class="pointer-events-none absolute -inset-8 rounded-[2rem] blur-2xl opacity-60" style="background: radial-gradient(60% 60% at 80% 10%, rgba(59,130,246,0.18) 0%, rgba(99,102,241,0.14) 40%, rgba(139,92,246,0.10) 70%, rgba(255,255,255,0) 100%);"></div>
-            <div class="pointer-events-none absolute -top-10 -left-10 h-40 w-40 rounded-full blur-3xl bg-gradient-to-bl from-indigo-300/40 via-violet-300/30 to-transparent"></div>
-            <div class="pointer-events-none absolute -bottom-10 -right-10 h-40 w-40 rounded-full blur-3xl bg-gradient-to-tl from-blue-300/35 via-indigo-300/25 to-transparent"></div>
+          <div class="relative overflow-hidden rounded-3xl px-6 sm:px-7 py-16 sm:py-20 bg-white/40 backdrop-blur-xl ring-1 ring-inset ring-white/60">
+            <div class="pointer-events-none absolute -inset-10 rounded-[2rem] blur-2xl opacity-80"
+                 style="background:
+                   radial-gradient(68% 68% at 20% 15%,
+                     rgba(96,165,250,0.30) 0%,
+                     rgba(59,130,246,0.24) 36%,
+                     rgba(99,102,241,0.16) 60%,
+                     rgba(139,92,246,0.12) 78%,
+                     rgba(253,186,116,0.18) 88%,
+                     rgba(255,255,255,0) 100%),
+                   radial-gradient(40% 40% at 85% 75%,
+                     rgba(253,186,116,0.22) 0%,
+                     rgba(251,146,60,0.12) 40%,
+                     rgba(255,255,255,0) 100%)">
+            </div>
+            <div class="pointer-events-none absolute -top-12 -right-10 h-48 w-48 rounded-full blur-3xl bg-gradient-to-br from-blue-300/50 via-indigo-300/30 to-transparent"></div>
+            <div class="pointer-events-none absolute -bottom-12 -left-12 h-48 w-48 rounded-full blur-3xl bg-gradient-to-tr from-blue-200/60 via-blue-300/35 to-transparent"></div>
             <div class="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/40 via-transparent to-transparent"></div>
             <div class="relative flex items-center gap-3 text-slate-700 justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 shrink-0 text-orange-400">
@@ -141,7 +154,7 @@
               </svg>
               <p class="font-semibold text-slate-800">No shifts scheduled for today.</p>
             </div>
-            <div class="relative flex justify-center">
+            <div class="relative flex justify-center mt-6">
               <% if has_in_progress %>
                 <button type="button"
                         onclick="alert('You need to clock off from your current shift before starting a new unscheduled shift.')"
