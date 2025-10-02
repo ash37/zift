@@ -7,15 +7,17 @@ class UsersController < ApplicationController
   def index
     case params[:filter]
     when "applicants"
-      @users = User.applicants
+      @users = User.applicants.ordered_by_name
     when "contacted"
-      @users = User.contacted
+      @users = User.contacted.ordered_by_name
     when "ended"
       # Show users whose status is ended OR who are archived
-      @users = User.with_archived.where("status = :ended OR archived_at IS NOT NULL", ended: User::STATUSES[:ended])
+      @users = User.with_archived
+                   .where("status = :ended OR archived_at IS NOT NULL", ended: User::STATUSES[:ended])
+                   .ordered_by_name
     else
       # Now correctly fetches all users with a role.
-      @users = User.where.not(role: nil)
+      @users = User.where.not(role: nil).ordered_by_name
     end
   end
 

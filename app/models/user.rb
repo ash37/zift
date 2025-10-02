@@ -77,6 +77,7 @@ class User < ApplicationRecord
   scope :employees, -> { where(status: STATUSES[:employee]) }
   scope :contacted, -> { where(status: STATUSES[:contacted]) }
   scope :ended, -> { where(status: STATUSES[:ended]) }
+  scope :ordered_by_name, -> { order(Arel.sql('LOWER(name) ASC')) }
 
   # Archiving
   default_scope { where(archived_at: nil) }

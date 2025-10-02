@@ -22,9 +22,12 @@
 
     <% # Exclude clients from display %>
     <% users = if users.respond_to?(:where)
-                 users.where.not(role: User::ROLES[:client])
+                 users = users.where.not(role: User::ROLES[:client])
+                 users = users.order(Arel.sql('LOWER(name) ASC')) if users.respond_to?(:order)
+                 users
                else
                  users.reject { |u| u.respond_to?(:client?) ? u.client? : u.role == User::ROLES[:client] }
+                      .sort_by { |u| u.name.to_s.downcase }
                end %>
     <% users.each do |user| %>
       <tr class="align-top">

@@ -45,6 +45,12 @@
                else
                  User.where.not(role: User::ROLES[:client])
                end %>
+
+    <% users = if users.respond_to?(:order)
+                 users.order(Arel.sql('LOWER(name) ASC'))
+               else
+                 users.sort_by { |u| u.name.to_s.downcase }
+               end %>
     <% users.each do |user| %>
       <tr class="align-top">
         <td class="p-2 border-t border-zinc-200 bg-white">

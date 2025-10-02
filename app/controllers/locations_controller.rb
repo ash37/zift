@@ -5,9 +5,9 @@ class LocationsController < ApplicationController
   # GET /locations or /locations.json
   def index
     if params[:archived] == "true"
-      @locations = Location.archived
+      @locations = Location.archived.ordered_by_name
     else
-      @locations = Location.all
+      @locations = Location.ordered_by_name
     end
   end
 

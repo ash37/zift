@@ -15,6 +15,7 @@ class Location < ApplicationRecord
 
   scope :archived, -> { unscope(where: :archived_at).where.not(archived_at: nil) }
   scope :with_archived, -> { unscope(where: :archived_at) }
+  scope :ordered_by_name, -> { order(Arel.sql('LOWER(name) ASC')) }
 
   def archived?
     archived_at.present?
