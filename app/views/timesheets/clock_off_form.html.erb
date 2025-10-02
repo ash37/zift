@@ -12,7 +12,33 @@
                   oninput: "this.setCustomValidity(this.value.trim().length ? '' : 'Please add a brief note about your shift.')",
                   oninvalid: "this.setCustomValidity('Please add a brief note about your shift.')",
                   class: "block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-violet-400 focus:ring-violet-300 focus:ring-opacity-40 focus:outline-none focus:ring" %>
-            <p class="mt-1 text-xs text-gray-500">A short summary is required to clock off.</p>
+            <div class="mt-1 text-xs text-gray-500" data-controller="tips">
+              <div class="flex items-center gap-2">
+                <span>A short summary is required to clock off.</span>
+                <button type="button"
+                        class="text-purple-500 hover:text-purple-600 focus:outline-none"
+                        data-action="tips#toggle">
+                  Tips
+                </button>
+              </div>
+              <div class="mt-2 hidden" data-tips-target="panel">
+                <div class="relative bg-white border border-purple-500 rounded-lg shadow-lg p-4 text-xs text-gray-700 max-w-md">
+                  <button type="button"
+                          class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                          data-action="tips#toggle"
+                          aria-label="Close tips">
+                    &times;
+                  </button>
+                  <p class="font-bold mb-2">Notes should describe tasks that support the participant’s goals.</p>
+                  <ul class="space-y-2 list-disc list-inside">
+                    <li><strong>Be objective:</strong> Only document the facts - what you have seen, heard, witnessed or initiated.</li>
+                    <li><strong>Be concise:</strong> Capture the important details and no more.</li>
+                    <li><strong>Be professional:</strong> Notes may be used for incident reviews and can be accessed by the people you support. Use professional language.</li>
+                    <li><strong>Use appropriate language:</strong> Avoid uncommon terms or abbreviations that make notes hard to understand.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         <% end %>
         <% if @timesheet&.shift&.area&.show_timesheet_travel? %>
