@@ -31,6 +31,10 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
+  # Allow submissions from domains served over HTTP by proxies/CDNs that terminate TLS
+  # before reaching the app (prevents Origin/Host mismatch CSRF exceptions).
+  config.action_controller.forgery_protection_origin_check = false
+
   Rails.application.routes.default_url_options[:host] =
     ENV.fetch("APP_HOST", "fathomless-lowlands-58156.herokuapp.com")
 
