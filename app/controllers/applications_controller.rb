@@ -16,6 +16,8 @@ class ApplicationsController < ApplicationController
       @application.status = User::STATUSES[:applicant]
     end
 
+    @application.application_submission = true
+
     if @application.save
       ApplicantMailer.notify_new_applicant(@application).deliver_later
       ApplicantMailer.acknowledge_applicant(@application).deliver_later if @application.email.present?

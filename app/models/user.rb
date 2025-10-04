@@ -25,6 +25,8 @@ class User < ApplicationRecord
   has_one_attached :ndis_orientation_certificate
   has_one_attached :qcare_induction_certificate
 
+  attr_accessor :application_submission
+
   MAX_ATTACHMENT_SIZE = 12.megabytes
   ALLOWED_CONTENT_TYPES = %w[
     image/jpeg image/png image/webp image/heic image/heif application/pdf
@@ -78,6 +80,12 @@ class User < ApplicationRecord
   scope :contacted, -> { where(status: STATUSES[:contacted]) }
   scope :ended, -> { where(status: STATUSES[:ended]) }
   scope :ordered_by_name, -> { order(Arel.sql('LOWER(name) ASC')) }
+
+  with_options if: :application_submission? do
+    validates :name, :email, :phone, :date_of_birth, :suburb, :postcode,
+              :obtained_screening, :disability_experience,
+              :other_employment, :licence, :availability, presence: true
+  end
 
   # Archiving
   default_scope { where(archived_at: nil) }
@@ -136,6 +144,10 @@ class User < ApplicationRecord
   end
 
   protected
+
+  def application_submission?
+    ActiveModel::Type::Boolean.new.cast(application_submission)
+  end
 
   # This method is called by Devise to check if a password is required.
   def password_required?
