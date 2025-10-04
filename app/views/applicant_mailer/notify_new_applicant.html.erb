@@ -1,0 +1,51 @@
+<div style="font-family: Arial, sans-serif; color: #1f2937;">
+  <h2 style="margin-bottom: 16px; color: #4338ca;">New applicant received</h2>
+  <p style="margin-bottom: 12px;">A new application has been submitted via the public form. Details below:</p>
+
+  <table style="border-collapse: collapse; width: 100%; max-width: 520px; font-size: 14px;">
+    <tbody>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe; width: 160px;">Name</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;"><%= @applicant.name %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe;">Email</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;"><%= @applicant.email %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe;">Phone</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;"><%= @applicant.phone.presence || "—" %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe;">Suburb</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;"><%= @applicant.suburb.presence || "—" %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe;">Postcode</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;"><%= @applicant.postcode.presence || "—" %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe;">Availability</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;"><%= @applicant.availability.presence || "—" %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe;">Disability experience</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; white-space: pre-wrap;"><%= @applicant.disability_experience.presence || "—" %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe;">Other employment</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; white-space: pre-wrap;"><%= @applicant.other_employment.presence || "—" %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff; border-bottom: 1px solid #c7d2fe;">Licence</th>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;"><%= @applicant.licence.presence || "—" %></td>
+      </tr>
+      <tr>
+        <th align="left" style="padding: 6px 8px; background-color: #eef2ff;">Screening obtained</th>
+        <td style="padding: 6px 8px;"><%= @applicant.obtained_screening.presence || "—" %></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="margin-top: 16px; font-size: 13px; color: #6b7280;">You can review the full application in the admin panel.</p>
+</div>

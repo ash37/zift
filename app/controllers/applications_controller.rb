@@ -17,6 +17,8 @@ class ApplicationsController < ApplicationController
     end
 
     if @application.save
+      ApplicantMailer.notify_new_applicant(@application).deliver_later
+      ApplicantMailer.acknowledge_applicant(@application).deliver_later if @application.email.present?
       redirect_to success_applications_path
     else
       render :new, status: :unprocessable_entity
