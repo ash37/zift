@@ -176,6 +176,11 @@ end
 
   # POST /users/:id/employ
   def employ
+    @user ||= User.with_archived.find_by(id: params[:id])
+    unless @user
+      redirect_to users_path, alert: "User not found" and return
+    end
+
     if @user.status == User::STATUSES[:applicant]
       @user.invitation_token = SecureRandom.urlsafe_base64
       @user.invitation_sent_at = Time.current
