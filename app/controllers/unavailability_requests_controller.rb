@@ -26,6 +26,7 @@ class UnavailabilityRequestsController < ApplicationController
     @unavailability_request.status = UnavailabilityRequest::STATUSES[:pending]
 
     if @unavailability_request.save
+      UnavailabilityMailer.new_request_notification(@unavailability_request).deliver_later
       redirect_to unavailability_requests_path, notice: "Unavailability request was successfully submitted."
     else
       render :new, status: :unprocessable_entity

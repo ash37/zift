@@ -1,0 +1,165 @@
+<div class="bg-zinc-100 pt-4 px-0 sm:py-12 sm:px-6 lg:px-8">
+  <div class="mt-6 w-full rounded-none bg-white p-8 sm:mt-10 sm:w-1/2 sm:mx-auto sm:rounded-3xl">
+    <div class="text-center mb-8">
+
+
+      <span class="text-4xl font-bold text-gray-800">Incident</span>
+      <span class="text-4xl font-bold text-violet-700">Reporting</span>
+      <p class="mt-6 text-gray-600">
+        Please complete the form below to document any incident, near miss, or hazard. All required fields are marked.
+      </p>
+    </div>
+
+    <%= form_with(model: @incident, scope: :incident, url: incidents_path, method: :post, html: { class: "space-y-6" }) do |form| %>
+      <% if @incident.errors.any? %>
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
+          <p class="font-semibold"><%= pluralize(@incident.errors.count, "error") %> prevented this incident from being submitted:</p>
+          <ul class="mt-2 list-disc pl-5">
+            <% @incident.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <%= form.label :reporter_first_name, "First name", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :reporter_first_name, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Your first name" %>
+        </div>
+        <div>
+          <%= form.label :reporter_last_name, "Last name", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :reporter_last_name, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Your last name" %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :reporter_email, "Email", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.email_field :reporter_email, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "you@example.com" %>
+      </div>
+
+      <div>
+        <%= form.label :category, "Category of incident", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :category,
+                        [
+                          "Serious incident resulting in harm or potential harm for a disability participant",
+                          "Behaviour tracking (all clients / participants)",
+                          "Incident resulting in staff injury",
+                          "Incident involving vehicle damage",
+                          "Incident involving property damage",
+                          "Incident involving privacy breach",
+                          "Reporting an OHS hazard or near miss"
+                        ],
+                        { prompt: "Select a category" },
+                        { required: true,
+                          class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" }
+        %>
+      </div>
+
+      <div>
+        <%= form.label :details, "Details", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_area :details, required: true, rows: 5, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Describe what happened and who was involved" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <%= form.label :incident_date, "Date of incident", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.date_field :incident_date, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+        <div>
+          <%= form.label :incident_time, "Time of incident", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.time_field :incident_time, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :incident_address_line1, "Address", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :incident_address_line1, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <%= form.label :incident_suburb, "Suburb", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :incident_suburb, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+        <div>
+          <%= form.label :incident_state, "State", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :incident_state, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "e.g., QLD" %>
+        </div>
+        <div>
+          <%= form.label :incident_postcode, "Postcode", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :incident_postcode, required: true, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", inputmode: "numeric", pattern: "\\d*" %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :witnesses, "Name of other staff / people / witnesses involved", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_area :witnesses, rows: 3, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <div>
+        <%= form.label :immediate_action, "Immediate action taken", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_area :immediate_action, rows: 3, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+      </div>
+
+      <div x-data="{ val: '<%= @incident.police_notified.to_s %>' }" class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Were the police notified?</label>
+        <input type="hidden" name="incident[police_notified]" :value="val">
+        <div class="inline-flex w-full sm:w-auto bg-gray-100 rounded-3xl p-1">
+          <button type="button" @click="val='yes'" class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition" :class="val==='yes' ? 'bg-violet-700 text-white' : 'text-gray-700'">Yes</button>
+          <button type="button" @click="val='no'" class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition" :class="val==='no' ? 'bg-violet-700 text-white' : 'text-gray-700'">No</button>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-200 pt-8 space-y-6">
+        <h2 class="text-xl font-semibold text-gray-800 mt-4">Participant details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <%= form.label :client_first_name, "Participant first name", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.text_field :client_first_name, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+          </div>
+          <div>
+            <%= form.label :client_last_name, "Participant last name", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.text_field :client_last_name, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div x-data="{ val: '<%= @incident.client_behaviour.to_s %>' }" class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Did the incident involve participant behaviour?</label>
+            <input type="hidden" name="incident[client_behaviour]" :value="val">
+            <div class="inline-flex w-full bg-gray-100 rounded-3xl p-1">
+              <button type="button" @click="val='yes'" class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition" :class="val==='yes' ? 'bg-violet-700 text-white' : 'text-gray-700'">Yes</button>
+              <button type="button" @click="val='no'" class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition" :class="val==='no' ? 'bg-violet-700 text-white' : 'text-gray-700'">No</button>
+            </div>
+          </div>
+          <div x-data="{ val: '<%= @incident.injuries_sustained.to_s %>' }" class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Were injuries sustained?</label>
+            <input type="hidden" name="incident[injuries_sustained]" :value="val">
+            <div class="inline-flex w-full bg-gray-100 rounded-3xl p-1">
+              <button type="button" @click="val='yes'" class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition" :class="val==='yes' ? 'bg-violet-700 text-white' : 'text-gray-700'">Yes</button>
+              <button type="button" @click="val='no'" class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition" :class="val==='no' ? 'bg-violet-700 text-white' : 'text-gray-700'">No</button>
+            </div>
+          </div>
+          <div x-data="{ val: '<%= @incident.treatment_required.to_s %>' }" class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Was treatment required?</label>
+            <input type="hidden" name="incident[treatment_required]" :value="val">
+            <div class="inline-flex w-full bg-gray-100 rounded-3xl p-1">
+              <button type="button" @click="val='yes'" class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition" :class="val==='yes' ? 'bg-violet-700 text-white' : 'text-gray-700'">Yes</button>
+              <button type="button" @click="val='no'" class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition" :class="val==='no' ? 'bg-violet-700 text-white' : 'text-gray-700'">No</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :property_damage, "Detail if there was any equipment or property damage", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_area :property_damage, rows: 3, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500" %>
+        </div>
+      </div>
+
+      <div class="pt-6">
+        <%= form.submit "Send", class: "w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-4 rounded-3xl shadow-lg transition-transform transform hover:scale-105" %>
+      </div>
+    <% end %>
+  </div>
+</div>

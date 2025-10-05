@@ -1,0 +1,85 @@
+<div class="bg-zinc-100 min-h-screen py-12 px-4">
+  <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm p-8">
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <div>
+        <p class="text-sm text-gray-500"><%= @incident.incident_date&.strftime('%A, %d %B %Y') || 'Date not provided' %></p>
+        <h1 class="text-2xl font-bold text-gray-900"><%= @incident.category %></h1>
+      </div>
+      <%= link_to "Back to incidents", incidents_path, class: "text-sm text-violet-700 hover:text-violet-900" %>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-500">Reporter</p>
+        <p class="text-gray-800 font-medium"><%= [@incident.reporter_first_name, @incident.reporter_last_name].compact.join(' ') %></p>
+        <p class="text-gray-600 text-sm"><%= @incident.reporter_email %></p>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-500">Time</p>
+        <p class="text-gray-800 font-medium"><%= @incident.incident_time&.strftime('%I:%M %p') || '—' %></p>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-500">Address</p>
+        <p class="text-gray-800 font-medium">
+          <%= @incident.incident_address_line1 %><br>
+          <%= [@incident.incident_suburb, @incident.incident_state, @incident.incident_postcode].reject(&:blank?).join(', ') %>
+        </p>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-500">Police notified</p>
+        <p class="text-gray-800 font-medium"><%= @incident.police_notified.presence || 'Not specified' %></p>
+      </div>
+    </div>
+
+    <div class="mt-8 space-y-6">
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-500">Details</p>
+        <p class="mt-2 text-gray-700 leading-relaxed whitespace-pre-wrap"><%= @incident.details %></p>
+      </div>
+
+      <% if @incident.witnesses.present? %>
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500">Witnesses</p>
+          <p class="mt-2 text-gray-700 leading-relaxed whitespace-pre-wrap"><%= @incident.witnesses %></p>
+        </div>
+      <% end %>
+
+      <% if @incident.immediate_action.present? %>
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500">Immediate action taken</p>
+          <p class="mt-2 text-gray-700 leading-relaxed whitespace-pre-wrap"><%= @incident.immediate_action %></p>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500">Participant</p>
+          <p class="mt-2 text-gray-800 font-medium"><%= [@incident.client_first_name, @incident.client_last_name].compact.join(' ').presence || 'Not specified' %></p>
+        </div>
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500">Participant behaviour</p>
+          <p class="mt-2 text-gray-800 font-medium"><%= @incident.client_behaviour.presence || 'Not specified' %></p>
+        </div>
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500">Injuries sustained</p>
+          <p class="mt-2 text-gray-800 font-medium"><%= @incident.injuries_sustained.presence || 'Not specified' %></p>
+        </div>
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500">Treatment required</p>
+          <p class="mt-2 text-gray-800 font-medium"><%= @incident.treatment_required.presence || 'Not specified' %></p>
+        </div>
+      </div>
+
+      <% if @incident.property_damage.present? %>
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500">Equipment / property damage</p>
+          <p class="mt-2 text-gray-700 leading-relaxed whitespace-pre-wrap"><%= @incident.property_damage %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-10">
+      <%= link_to "Submit another incident", new_incident_path, class: "inline-flex items-center px-5 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-3xl" %>
+    </div>
+  </div>
+</div>

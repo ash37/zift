@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Incident Reported</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f9fafb; margin: 0; padding: 24px; color: #1f2937; }
+    .card { max-width: 680px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 24px 32px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); }
+    h1 { font-size: 22px; margin: 0 0 16px; color: #4c1d95; }
+    h2 { font-size: 16px; margin-top: 28px; margin-bottom: 12px; color: #4c1d95; }
+    .row { display: flex; gap: 16px; margin-bottom: 12px; }
+    .col { flex: 1; }
+    .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 4px; }
+    .value { font-size: 15px; font-weight: 600; color: #111827; }
+    .box { background: #f3f4f6; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+    .muted { color: #6b7280; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>New incident reported</h1>
+    <p class="muted">An incident form has been submitted on Qcare. Details are below.</p>
+
+    <h2>Reporter</h2>
+    <div class="row">
+      <div class="col">
+        <div class="label">Name</div>
+        <div class="value"><%= [@incident.reporter_first_name, @incident.reporter_last_name].compact.join(' ') %></div>
+      </div>
+      <div class="col">
+        <div class="label">Email</div>
+        <div class="value"><%= @incident.reporter_email %></div>
+      </div>
+    </div>
+
+    <h2>Incident summary</h2>
+    <div class="row">
+      <div class="col">
+        <div class="label">Category</div>
+        <div class="value"><%= @incident.category %></div>
+      </div>
+      <div class="col">
+        <div class="label">Date</div>
+        <div class="value"><%= @incident.incident_date.strftime('%A, %d %B %Y') if @incident.incident_date %></div>
+      </div>
+      <div class="col">
+        <div class="label">Time</div>
+        <div class="value"><%= @incident.incident_time&.strftime('%I:%M %p') || '—' %></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="label">Address</div>
+      <div class="value">
+        <%= @incident.incident_address_line1 %><br>
+        <%= [@incident.incident_suburb, @incident.incident_state, @incident.incident_postcode].reject(&:blank?).join(' ') %>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="label">Details</div>
+      <p class="muted" style="margin:4px 0; white-space:pre-wrap;"><%= @incident.details %></p>
+    </div>
+
+    <% if @incident.witnesses.present? %>
+      <div class="box">
+        <div class="label">Witnesses</div>
+        <p class="muted" style="margin:4px 0; white-space:pre-wrap;"><%= @incident.witnesses %></p>
+      </div>
+    <% end %>
+
+    <% if @incident.immediate_action.present? %>
+      <div class="box">
+        <div class="label">Immediate action taken</div>
+        <p class="muted" style="margin:4px 0; white-space:pre-wrap;"><%= @incident.immediate_action %></p>
+      </div>
+    <% end %>
+
+    <h2>Further information</h2>
+    <div class="row">
+      <div class="col">
+        <div class="label">Police notified</div>
+        <div class="value"><%= @incident.police_notified.presence || 'Not specified' %></div>
+      </div>
+      <div class="col">
+        <div class="label">Participant</div>
+        <div class="value"><%= [@incident.client_first_name, @incident.client_last_name].compact.join(' ').presence || 'Not specified' %></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="label">Participant behaviour</div>
+        <div class="value"><%= @incident.client_behaviour.presence || 'Not specified' %></div>
+      </div>
+      <div class="col">
+        <div class="label">Injuries sustained</div>
+        <div class="value"><%= @incident.injuries_sustained.presence || 'Not specified' %></div>
+      </div>
+      <div class="col">
+        <div class="label">Treatment required</div>
+        <div class="value"><%= @incident.treatment_required.presence || 'Not specified' %></div>
+      </div>
+    </div>
+
+    <% if @incident.property_damage.present? %>
+      <div class="box">
+        <div class="label">Equipment / property damage</div>
+        <p class="muted" style="margin:4px 0; white-space:pre-wrap;"><%= @incident.property_damage %></p>
+      </div>
+    <% end %>
+  </div>
+</body>
+</html>

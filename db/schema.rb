@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_26_103000) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_04_123000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -106,6 +106,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_103000) do
     t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
     t.index ["edited_by_id"], name: "index_comments_on_edited_by_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "incidents", force: :cascade do |t|
+    t.string "reporter_first_name", null: false
+    t.string "reporter_last_name", null: false
+    t.string "reporter_email", null: false
+    t.string "category", null: false
+    t.text "details", null: false
+    t.date "incident_date", null: false
+    t.time "incident_time"
+    t.string "incident_address_line1", null: false
+    t.string "incident_suburb", null: false
+    t.string "incident_state", null: false
+    t.string "incident_postcode", null: false
+    t.text "witnesses"
+    t.text "immediate_action"
+    t.string "police_notified"
+    t.string "client_first_name"
+    t.string "client_last_name"
+    t.string "client_behaviour"
+    t.string "injuries_sustained"
+    t.string "treatment_required"
+    t.text "property_damage"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "invoice_export_lines", force: :cascade do |t|
@@ -339,7 +364,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_103000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "notes"
-    t.decimal "travel", precision: 10, scale: 2, default: "0"
+    t.decimal "travel", precision: 10, scale: 2, default: "0.0"
     t.boolean "auto_clock_off", default: false
     t.index ["shift_id"], name: "index_timesheets_on_shift_id"
     t.index ["user_id"], name: "index_timesheets_on_user_id"

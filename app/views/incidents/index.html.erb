@@ -1,0 +1,40 @@
+<div class="bg-zinc-100 min-h-screen py-12 px-4">
+  <div class="max-w-5xl mx-auto">
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl font-bold text-gray-900">Incident Reports</h1>
+      <p class="mt-2 text-gray-600 mb-4">Submitted incidents appear newest first. Select any entry to review its details.</p>
+    </div>
+
+    <% if @incidents.any? %>
+      <div class="space-y-4">
+        <% @incidents.each do |incident| %>
+          <%= link_to incident_path(incident), class: "block bg-white rounded-3xl p-6 shadow-sm hover:shadow-md transition" do %>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <p class="text-sm text-gray-500"><%= incident.incident_date&.strftime('%A, %d %B %Y') || 'Date not provided' %></p>
+                <h2 class="text-lg font-semibold text-gray-900"><%= incident.category %></h2>
+                <p class="text-sm text-gray-600 mt-1">Reported by <%= [incident.reporter_first_name, incident.reporter_last_name].compact.join(' ') %></p>
+              </div>
+              <div class="flex items-center gap-3">
+                <% if incident.incident_time.present? %>
+                  <span class="rounded-full bg-violet-100 text-violet-700 text-xs font-semibold px-3 py-1">
+                    <%= incident.incident_time.strftime('%I:%M %p') %>
+                  </span>
+                <% end %>
+                <span class="text-violet-700 font-medium text-sm">View details →</span>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white border border-dashed border-violet-200 rounded-3xl p-8 text-center text-gray-500">
+        No incidents have been recorded yet.
+      </div>
+    <% end %>
+
+    <div class="mt-10 text-center">
+      <%= link_to "Submit an incident", new_incident_path, class: "inline-flex items-center px-5 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-3xl" %>
+    </div>
+  </div>
+</div>
