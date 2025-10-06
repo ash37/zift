@@ -1,0 +1,50 @@
+<div class="bg-zinc-100 min-h-screen pt-8 pb-16 px-4 sm:px-6 lg:px-8">
+  <div class="mt-6 w-full max-w-2xl mx-auto bg-white rounded-3xl shadow-sm p-8 sm:p-10">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-violet-700 mb-4">Welcome 👋</h1>
+      <p class="text-md text-gray-500 max-w-xl mx-auto">
+        We need some basic information from you in order to create a tailored support plan and ensure you get the most out of our service. 
+      </p><br>
+      <p class="text-md text-gray-500 max-w-xl mx-auto">
+        Feel free to include as much or as little detail as you like to get started.
+      </p>
+
+      
+    </div>
+
+    <%= form_with(model: @location, url: locations_path, html: { class: "space-y-6" }) do |form| %>
+      <% if @location.errors.any? %>
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
+          <p class="font-semibold"><%= pluralize(@location.errors.count, "error") %> prevented this form from being submitted:</p>
+          <ul class="mt-2 list-disc pl-5">
+            <% @location.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :name, "Participant’s Name", class: "block text-sm font-semibold text-gray-700" %>
+        <p class="text-xs text-gray-500 mb-2">The participant is the person that requires support.</p>
+        <%= form.text_field :name, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Participant name" %>
+      </div>
+
+      <div>
+        <%= form.label :phone, "Participant’s Phone", class: "block text-sm font-semibold text-gray-700" %>
+        <p class="text-xs text-gray-500 mb-2">What is the best contact phone number?</p>
+        <%= form.text_field :phone, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "Preferred phone number" %>
+      </div>
+
+      <div>
+        <%= form.label :email, "Email address", class: "block text-sm font-semibold text-gray-700" %>
+        <p class="text-xs text-gray-500 mb-2">Include an email address if available.</p>
+        <%= form.email_field :email, class: "block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:ring-violet-500 focus:border-violet-500", placeholder: "example@email.com" %>
+      </div>
+
+      <div class="pt-2">
+        <%= form.submit "Next", class: "w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-4 rounded-3xl shadow-lg transition-transform transform hover:scale-105" %>
+      </div>
+    <% end %>
+  </div>
+</div>

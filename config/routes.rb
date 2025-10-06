@@ -44,6 +44,11 @@ resources :incidents, only: [ :index, :new, :create, :show ] do
     end
   end
   resources :locations do
+    collection do
+      get  'intake/details', to: 'locations#intake_details', as: :intake_details
+      patch 'intake/details', to: 'locations#intake_details_update', as: :intake_details_update
+      get  'intake/success', to: 'locations#intake_success', as: :intake_success
+    end
     resources :areas, only: [ :index, :create, :edit, :update, :destroy ]
     member do
       patch :archive

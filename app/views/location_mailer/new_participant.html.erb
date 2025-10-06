@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Participant</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#f9fafb; margin:0; padding:24px; color:#1f2937; }
+    .card { max-width: 640px; margin:0 auto; background:#ffffff; border-radius:16px; padding:28px 32px; box-shadow:0 10px 30px rgba(15, 23, 42, 0.08); }
+    h1 { font-size: 22px; margin:0 0 16px; color:#4c1d95; }
+    .grid { display:flex; flex-wrap:wrap; gap:16px; margin:16px 0; }
+    .col { flex:1 1 180px; }
+    .label { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#6b7280; margin-bottom:4px; }
+    .value { font-size:15px; font-weight:600; color:#111827; word-break:break-word; }
+    .box { background:#f3f4f6; border-radius:12px; padding:14px; margin-top:14px; }
+    .muted { color:#4b5563; font-size:14px; line-height:1.5; white-space:pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>New participant enquiry</h1>
+    <p class="muted">A new participant has submitted their initial details. You can follow up to gather additional information.</p>
+
+    <div class="grid">
+      <div class="col">
+        <div class="label">Participant name</div>
+        <div class="value"><%= @location.name.presence || 'Not provided' %></div>
+      </div>
+      <div class="col">
+        <div class="label">Email</div>
+        <div class="value"><%= @location.email.presence || 'Not provided' %></div>
+      </div>
+      <div class="col">
+        <div class="label">Phone</div>
+        <div class="value"><%= @location.phone.presence || 'Not provided' %></div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="label">Status</div>
+      <p class="muted"><%= @location.status&.humanize || 'Prospect' %></p>
+    </div>
+  </div>
+</body>
+</html>

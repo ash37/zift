@@ -215,7 +215,7 @@
           <a href="#ndis">NDIS</a>
           <a href="#feedback">Feedback</a>
           <%= link_to "Careers", new_application_path %>
-          <%= link_to "Get started", new_application_path, class: "btn" %>
+          <%= link_to "Get started", new_location_path, class: "btn" %>
         <% end %> 
         </div>
       </nav>
@@ -252,7 +252,7 @@
 
   <!-- Mobile CTA -->
   <div class="hero-cta">
-    <a href="/get_started.html" class="btn" style="width:75%; text-align:center;">Get started</a>
+    <%= link_to "Get started", new_location_path, class: "btn", style: "width:75%; text-align:center;" %>
   </div>
 
   <!-- Cards strip -->

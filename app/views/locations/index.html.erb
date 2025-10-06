@@ -4,21 +4,38 @@
   <div class="flex justify-between items-center">
     <%# Left Side: Title and location count %>
     <div class="flex items-center gap-x-3">
-    <% if params[:archived] == "true" %>
-        <h2 class="text-lg font-medium text-gray-800">Archived Clients</h2>
-      <% else %>
-        <h2 class="text-lg font-medium text-gray-800">Clients</h2>
-      <% end %>
+      <h2 class="text-lg font-medium text-gray-800">Clients</h2>
     </div>
 
-    <%# Right Side: Add location and filter buttons %>
+    <%# Right Side: filters and actions %>
     <div class="flex items-center gap-x-3">
-      <% if params[:archived] == "true" %>
-        <%= link_to "View Active", locations_path, class: "px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full" %>
-      <% else %>
-        <%= link_to "View Archived", locations_path(archived: true), class: "px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full" %>
-      <% end %>
-      <% unless params[:archived] == "true" %>
+      <div class="relative inline-block text-left" x-data="{ open: false }">
+        <% current_label = case @status_filter
+            when 'prospect' then 'Prospects'
+            when 'archived' then 'Archived'
+            else 'Active'
+          end
+        %>
+        <button type="button"
+                @click="open = !open"
+                @keydown.escape.window="open = false"
+                class="inline-flex items-center gap-x-2 rounded-3xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                :aria-expanded="open">
+          <span><%= current_label %></span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.207l3.71-2.977a.75.75 0 111.06 1.06l-4.24 3.4a.75.75 0 01-.94 0l-4.24-3.4a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div x-cloak x-show="open" x-transition @click.outside="open = false" class="absolute right-0 z-50 mt-2 w-48 rounded-lg shadow-md bg-white focus:outline-none" style="display:none;">
+          <div class="py-1" role="none">
+            <%= link_to "Active", locations_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+            <%= link_to "Prospects", locations_path(status: 'prospect'), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+            <%= link_to "Archived", locations_path(status: 'archived'), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+          </div>
+        </div>
+      </div>
+
+      <% if user_signed_in? %>
         <%= link_to "Add", new_location_path, class: "tracking-wide rounded-3xl px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-900 text-white" %>
       <% end %>
     </div>

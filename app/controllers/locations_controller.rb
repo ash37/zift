@@ -1,14 +1,20 @@
 class LocationsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: %i[new create intake_details intake_details_update intake_success]
   before_action :set_location, only: %i[ show edit update destroy archive restore send_service_agreement resend_service_agreement remove_attachment ]
+  before_action :set_location_from_token, only: %i[intake_details intake_details_update]
 
   # GET /locations or /locations.json
   def index
-    if params[:archived] == "true"
-      @locations = Location.archived.ordered_by_name
-    else
-      @locations = Location.ordered_by_name
-    end
+    @status_filter = params[:status].presence
+
+    @locations = case @status_filter
+                 when 'prospect'
+                   Location.ordered_by_name.prospects
+                 when 'archived'
+                   Location.archived.ordered_by_name
+                 else
+                   Location.ordered_by_name.active_status
+                 end
   end
 
   # GET /locations/1 or /locations/1.json
@@ -19,8 +25,15 @@ class LocationsController < ApplicationController
 
   # GET /locations/new
   def new
-    @location = Location.new
-    @location.areas.build
+    if user_signed_in?
+      @location = Location.new
+      @location.areas.build
+    else
+      @location = Location.new
+      @location.public_intake = true
+      @current_step = :basic
+      render :public_new
+    end
   end
 
   # GET /locations/1/edit
@@ -30,16 +43,29 @@ class LocationsController < ApplicationController
 
   # POST /locations or /locations.json
   def create
-    @location = Location.new(location_params)
+    if user_signed_in?
+      @location = Location.new(location_params)
 
-    respond_to do |format|
+      respond_to do |format|
+        if @location.save
+          format.html { redirect_to locations_url, notice: "Client was successfully created." }
+          format.json { render :show, status: :created, location: @location }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: @location.errors, status: :unprocessable_entity }
+        end
+      end
+    else
+      @location = Location.new(public_step_one_params)
+      @location.public_intake = true
+      @location.status = Location::STATUSES[:prospect]
+
       if @location.save
-        # This is the updated line. It now redirects to the locations index page.
-        format.html { redirect_to locations_url, notice: "Client was successfully created." }
-        format.json { render :show, status: :created, location: @location }
+        LocationMailer.new_participant(@location).deliver_later
+        redirect_to intake_details_locations_path(token: @location.signed_id(purpose: :location_intake))
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @location.errors, status: :unprocessable_entity }
+        @current_step = :basic
+        render :public_new, status: :unprocessable_entity
       end
     end
   end
@@ -57,6 +83,23 @@ class LocationsController < ApplicationController
       end
     end
   end
+
+  def intake_details
+    @location.public_intake = true
+    @current_step = :details
+  end
+
+  def intake_details_update
+    @location.public_intake = true
+    if @location.update(public_step_two_params)
+      redirect_to intake_success_locations_path
+    else
+      @current_step = :details
+      render :intake_details, status: :unprocessable_entity
+    end
+  end
+
+  def intake_success; end
 
   # DELETE /locations/1 or /locations/1.json
   def destroy
@@ -202,6 +245,36 @@ class LocationsController < ApplicationController
           { shift_question_ids: [] }
         ]
       )
+    end
+
+    def public_step_one_params
+      params.require(:location).permit(:name, :email, :phone)
+    end
+
+    def public_step_two_params
+      params.require(:location).permit(
+        :address,
+        :date_of_birth,
+        :gender,
+        :ndis_number,
+        :representative_name,
+        :representative_email,
+        :phone,
+        :email,
+        :funding,
+        :plan_manager_email,
+        :activities_of_interest,
+        :tasks,
+        :lives_with,
+        :pets
+      )
+    end
+
+    def set_location_from_token
+      token = params[:token].to_s
+      @location = Location.find_signed(token, purpose: :location_intake)
+    rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound
+      redirect_to new_location_path, alert: "The link you used has expired. Please start again." and return
     end
 
     def enqueue_attachment_optimization!
