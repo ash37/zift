@@ -17,7 +17,9 @@ Rails.application.routes.draw do
     get "success", on: :collection
   end
 
-resources :incidents, only: [ :index, :new, :create, :show ] do
+  get "audit", to: "audit#index"
+
+  resources :incidents, only: [ :index, :new, :create, :show ] do
     get "success", on: :collection
   end
 

@@ -63,7 +63,8 @@ class User < ApplicationRecord
     employee: 0,
     manager: 1,
     admin: 2,
-    client: 3
+    client: 3,
+    auditor: 4
   }.freeze
 
   STATUSES = {
@@ -114,6 +115,10 @@ class User < ApplicationRecord
 
   def client?
     role == ROLES[:client]
+  end
+
+  def auditor?
+    role == ROLES[:auditor]
   end
 
   # Used in views to allow role assignment only for admins
