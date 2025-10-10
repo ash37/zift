@@ -1,11 +1,27 @@
 <div class="bg-zinc-100 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
   <div class="max-w-6xl mx-auto space-y-8">
-    <div class="bg-white rounded-3xl shadow-sm p-8">
-      <h1 class="text-3xl font-bold text-gray-900">Audit Dashboard</h1>
-      <p class="mt-2 text-gray-600">Snapshot of recent activity across participants, team members, and incidents.</p>
-    </div>
-
-    <div class="bg-white rounded-3xl shadow-sm p-6">
+    <div x-data="{ tab: 'staff' }" class="space-y-6">
+      <div class="inline-flex bg-white rounded-3xl p-1">
+        <button type="button"
+                @click="tab = 'staff'"
+                class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                :class="tab === 'staff' ? 'bg-violet-700 text-white' : 'text-gray-700'">
+          Employees
+        </button>
+        <button type="button"
+                @click="tab = 'clients'"
+                class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                :class="tab === 'clients' ? 'bg-violet-700 text-white' : 'text-gray-700'">
+          Participants
+        </button>
+        <button type="button"
+                @click="tab = 'company'"
+                class="flex-1 rounded-3xl px-4 py-2 text-sm font-medium transition"
+                :class="tab === 'company' ? 'bg-violet-700 text-white' : 'text-gray-700'">
+          Company
+        </button>
+      </div>
+      <div class="bg-white rounded-3xl shadow-sm p-6" x-show="tab === 'staff'">
       <h2 class="text-xl font-semibold text-gray-900">Employees</h2>
       <p class="text-sm text-gray-500">All current Qcare employees</p>
       <ul class="mt-4 space-y-2 divide-y divide-gray-100">
@@ -13,15 +29,81 @@
           <li class="py-3 space-y-1">
             <div class="flex items-center justify-between text-sm text-gray-800">
               <span class="font-medium"><%= employee.name %></span>
-              <%= employee.email %>
+              <%= gender_badge(employee) %>
             </div>
-            <div class="text-xs text-gray-500"><%= gender_badge(employee) %></div>
+            <div class="text-xs text-gray-500"><%= employee.email %></div>
           </li>
         <% end %>
         <% if @active_employees.empty? %>
           <li class="py-4 text-sm text-gray-500">No active employees found.</li>
         <% end %>
       </ul>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-sm p-6" x-show="tab === 'clients'">
+      <h2 class="text-xl font-semibold text-gray-900">Participants</h2>
+      <p class="text-sm text-gray-500">All current active participants</p>
+      <ul class="mt-4 space-y-2 divide-y divide-gray-100">
+        <% @recent_locations.each do |location| %>
+          <li class="py-3 space-y-1">
+            <div class="flex items-center justify-between text-sm text-gray-800">
+              <span class="font-medium"><%= location.name %></span>
+              <span class="text-xs text-gray-500"><%= location.created_at.strftime('%d %b %Y') %></span>
+            </div>
+            <div class="text-xs text-gray-500"><%= location.email.presence || 'No email on file' %></div>
+          </li>
+        <% end %>
+        <% if @recent_locations.empty? %>
+          <li class="py-4 text-sm text-gray-500">No participants found.</li>
+        <% end %>
+      </ul>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-sm p-6" x-show="tab === 'company'">
+      <h2 class="text-xl font-semibold text-gray-900">Company Details</h2>
+      <dl class="mt-4 space-y-3 text-sm text-gray-700">
+        <div class="flex justify-between">
+          <dt class="font-medium">Provider Legal Entity Name</dt>
+          <dd>QCARE QLD PTY LTD</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="font-medium">ABN</dt>
+          <dd>87 638 703 803</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="font-medium">Provider Business Trading Name</dt>
+          <dd>QCARE QLD PTY LTD</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="font-medium">Application Reference Number (ARN)</dt>
+          <dd>6DHGKH3S | Recert: 4-JND9F5F</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="font-medium">Registration ID</dt>
+          <dd>4-G24F75I</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="font-medium">Contact Person</dt>
+          <dd>Ashley Knight</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="font-medium">Position Title</dt>
+          <dd>Director</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="font-medium">Phone</dt>
+          <dd>0448 129 224</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="font-medium">Email</dt>
+          <dd>ak@qcare.life</dd>
+        </div>
+        <div>
+          <dt class="font-medium">Head Office Address &amp; Outlets</dt>
+          <dd class="mt-1 text-gray-600">2 Lancewood Close, Norman Gardens, QLD, 4701, Australia</dd>
+        </div>
+      </dl>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

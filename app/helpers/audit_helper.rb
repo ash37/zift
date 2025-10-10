@@ -51,7 +51,7 @@ module AuditHelper
     today = Date.current
     years = today.year - dob.year
     years -= 1 if dob.to_date.change(year: today.year) > today
-    years.positive? ? "#{years} yrs" : '—'
+    years.positive? ? years.to_s : '—'
   rescue
     '—'
   end
