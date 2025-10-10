@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_04_123000) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_04_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -106,6 +106,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_04_123000) do
     t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
     t.index ["edited_by_id"], name: "index_comments_on_edited_by_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "course_completions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "course_slug", null: false
+    t.integer "score"
+    t.boolean "passed", default: false, null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "course_slug"], name: "index_course_completions_on_user_id_and_course_slug", unique: true
+    t.index ["user_id"], name: "index_course_completions_on_user_id"
   end
 
   create_table "incidents", force: :cascade do |t|
@@ -465,6 +477,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_04_123000) do
   add_foreign_key "areas", "locations"
   add_foreign_key "areas_shift_questions", "areas"
   add_foreign_key "areas_shift_questions", "shift_questions"
+  add_foreign_key "course_completions", "users"
   add_foreign_key "invoice_export_lines", "areas"
   add_foreign_key "invoice_export_lines", "invoice_exports"
   add_foreign_key "invoice_export_lines", "locations"

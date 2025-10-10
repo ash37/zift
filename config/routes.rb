@@ -19,6 +19,11 @@ Rails.application.routes.draw do
 
   get "audit", to: "audit#index"
 
+  namespace :courses do
+    get "infection-control(/:step)", to: "infection_control#show", as: :infection_control
+    post "infection-control/submit", to: "infection_control#submit_quiz", as: :infection_control_submit_quiz
+  end
+
   resources :incidents, only: [ :index, :new, :create, :show ] do
     get "success", on: :collection
   end

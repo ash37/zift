@@ -44,7 +44,7 @@
       <h2 class="text-xl font-semibold text-gray-900">Participants</h2>
       <p class="text-sm text-gray-500">All current active participants</p>
       <ul class="mt-4 space-y-2 divide-y divide-gray-100">
-        <% @recent_locations.each do |location| %>
+        <% @active_locations.each do |location| %>
           <li class="py-3 space-y-1">
             <div class="flex items-center justify-between text-sm text-gray-800">
               <span class="font-medium"><%= location.name %></span>
@@ -53,7 +53,7 @@
             <div class="text-xs text-gray-500"><%= location.email.presence || 'No email on file' %></div>
           </li>
         <% end %>
-        <% if @recent_locations.empty? %>
+        <% if @active_locations.empty? %>
           <li class="py-4 text-sm text-gray-500">No participants found.</li>
         <% end %>
       </ul>

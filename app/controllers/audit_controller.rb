@@ -5,7 +5,8 @@ class AuditController < ApplicationController
   def index
     @recent_users = User.order(created_at: :desc).limit(10)
     @active_employees = User.where(role: User::ROLES[:employee]).order(:name)
-    @recent_locations = Location.with_archived.order(created_at: :desc).limit(10)
+    @active_locations = Location.ordered_by_name.active_status
+    @recent_locations = Location.order(created_at: :desc).limit(10)
     @recent_incidents = Incident.order(created_at: :desc).limit(10)
   end
 

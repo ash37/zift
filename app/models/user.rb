@@ -18,6 +18,7 @@ class User < ApplicationRecord
   has_many :unavailability_requests, dependent: :destroy
   has_many :timesheet_export_lines
   has_many :comments, as: :commentable, dependent: :destroy
+  has_many :course_completions, dependent: :destroy
 
   # Employee compliance documents
   has_one_attached :ndis_screening_card
@@ -119,6 +120,15 @@ class User < ApplicationRecord
 
   def auditor?
     role == ROLES[:auditor]
+  end
+
+  def course_completion_for(slug)
+    course_completions.find_by(course_slug: slug)
+  end
+
+  def course_completed?(slug)
+    completion = course_completion_for(slug)
+    completion&.passed?
   end
 
   # Used in views to allow role assignment only for admins
