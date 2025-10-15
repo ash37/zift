@@ -47,13 +47,10 @@ class Timesheet < ApplicationRecord
   end
 
   def status_name
-    if auto_clock_off?
-      "Auto"
-    elsif started?
-      "Started"
-    else
-      STATUSES.key(status).to_s
-    end
+    return "Auto" if auto_clock_off? && (status.nil? || status == STATUSES[:pending])
+    return STATUSES.key(status).to_s if status.present? && STATUSES.value?(status)
+    return "Started" if started?
+    "pending"
   end
 
   # Returns true if this in-progress timesheet should block the user from
