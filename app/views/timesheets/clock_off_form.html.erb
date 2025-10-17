@@ -1,6 +1,9 @@
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
   <section class="relative max-w-4xl p-6 mx-auto bg-white rounded-3xl">
-    <%= form_with(model: @timesheet, url: clock_off_timesheet_path(@timesheet), method: :patch, class: "mt-6") do |form| %>
+    <%= form_with(model: @timesheet,
+                 url: clock_off_timesheet_path(@timesheet),
+                 method: :patch,
+                 html: { class: "mt-6", id: dom_id(@timesheet, :clock_off_form) }) do |form| %>
       <%= hidden_field_tag "timesheet[_present]", "1" %>
       <div class="grid grid-cols-1 gap-6">
         <% if @timesheet&.shift&.area&.show_timesheet_notes? %>
@@ -126,9 +129,7 @@ post_questions = [
           <% end %>
         </div>
       <% end %>
-      <div class="flex justify-end mt-6">
-        <%= form.submit "Clock Off", class: "px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-violet-700 rounded-3xl hover:bg-violet-500 focus:outline-none focus:bg-violet-600" %>
-      </div>
+      <%= form.submit "Clock Off", class: "sr-only" %>
     <% end %>
   </section>
 </div>

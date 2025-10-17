@@ -35,7 +35,19 @@
   </head>
 
   <body class="bg-zinc-100 font-sans">
-    <% unless controller_name == 'welcome' && action_name == 'index' %>
+    <% if controller_name == 'timesheets' && action_name == 'clock_off_form' %>
+    <nav class="bg-white shadow">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex items-center justify-center">
+          <%= button_tag type: :submit,
+              form: @timesheet ? dom_id(@timesheet, :clock_off_form) : nil,
+              class: "inline-flex items-center justify-center rounded-full bg-violet-700 px-8 py-3 text-sm font-semibold text-white shadow hover:bg-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2" do %>
+            Clock Off
+          <% end %>
+        </div>
+      </div>
+    </nav>
+    <% elsif !(controller_name == 'welcome' && action_name == 'index') %>
     <nav x-data="{ isOpen: false }" class="relative bg-white shadow">
       <div class="container px-6 py-4 mx-auto">
         <div class="lg:flex lg:items-center lg:justify-between">
